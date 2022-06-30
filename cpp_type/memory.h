@@ -1,7 +1,9 @@
 #ifndef _NUTS_MEMO_
 #define _NUTS_MEMO_
 
+#include <cassert>
 #include "type.h"
+
 namespace nuts
 {
 	template <class T>
@@ -33,18 +35,40 @@ namespace nuts
 			_ptr = nullptr;
 		}
 
-		T &operator*() { return *_ptr; }
-		T *operator->() { return _ptr; }
+		T &operator*()
+		{
+			assert(_ptr != nullptr);
+			return *_ptr;
+		}
+
+		T *operator->()
+		{
+			assert(_ptr != nullptr);
+			return _ptr;
+		}
+
+		const T &operator*() const
+		{
+			assert(_ptr != nullptr);
+			return *_ptr;
+		}
+
+		const T *operator->() const
+		{
+			assert(_ptr != nullptr);
+			return _ptr;
+		}
+
 		T *get() const { return _ptr; }
 
-		unique_ptr<T> &operator=(unique_ptr<T> &src)
+		unique_ptr &operator=(unique_ptr<T> &src)
 		{
 			_ptr = src._ptr;
 			src._ptr = nullptr;
 			return *this;
 		}
 
-		unique_ptr<T> &operator=(T *src)
+		unique_ptr &operator=(T *src)
 		{
 			_ptr = src;
 			return *this;
@@ -142,8 +166,30 @@ namespace nuts
 				(*_cnt)++;
 		}
 
-		T &operator*() { return *_ptr; }
-		T *operator->() { return _ptr; }
+		T &operator*()
+		{
+			assert(_ptr != nullptr);
+			return *_ptr;
+		}
+
+		T *operator->()
+		{
+			assert(_ptr != nullptr);
+			return _ptr;
+		}
+
+		const T &operator*() const
+		{
+			assert(_ptr != nullptr);
+			return *_ptr;
+		}
+
+		const T *operator->() const
+		{
+			assert(_ptr != nullptr);
+			return _ptr;
+		}
+
 		T *get() const { return _ptr; }
 
 		bool operator==(shared_ptr<T> &obj) const
@@ -203,17 +249,10 @@ namespace nuts
 	};
 
 	template <class T>
-	T *get_raw(const unique_ptr<T> &src)
-	{
-		return src.get();
-	}
+	T *get_raw(const unique_ptr<T> &src) { return src.get(); }
 
 	template <class T>
-	T *get_raw(const shared_ptr<T> &src)
-	{
-		return src.get();
-	}
-
+	T *get_raw(const shared_ptr<T> &src) { return src.get(); }
 }
 
 #endif

@@ -3,9 +3,16 @@
 
 #include <cassert>
 #include "type.h"
+#include "algorithm.h"
 
 namespace nuts
 {
+	// template <typename T>
+	// bool less(const T &a, const T &b) { return a < b; }
+
+	// template <typename T>
+	// bool greater(const T &a, const T &b) { return a > b; }
+
 	template <typename Itr, class Visitor>
 	void for_each(Itr st, Itr ed, const Visitor &fn)
 	{

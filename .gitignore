@@ -33,6 +33,8 @@
 *.vscode
 
 main
+core
+tags
 CMakeLists.txt
 /cmake-build-debug/
 /.idea/

@@ -1,5 +1,6 @@
 #ifndef _NUTS_UTILI_
 #define _NUTS_UTILI_
+#include <iostream>
 
 namespace nuts
 {
@@ -11,10 +12,15 @@ namespace nuts
 
 		pair() = default;
 		pair(const T1 &_first, const T2 &_last)
-			: first(_first), second(_last) {}
+				: first(_first), second(_last) {}
 
 		pair(const pair &obj)
-			: first(obj.first), second(obj.second) {}
+				: first(obj.first), second(obj.second) {}
+
+		T1 &get_first() { return first; }
+		T2 &get_second() { return second; }
+		const T1 &get_first() const { return first; }
+		const T2 &get_second() const { return second; }
 
 		bool operator<(const pair<T1, T2> &after) const
 		{
@@ -35,7 +41,7 @@ namespace nuts
 		bool operator==(const pair<T1, T2> &after) const
 		{
 			return (this->first == after.first) &&
-                   (this->second == after.second);
+			       (this->second == after.second);
 		}
 
 		bool operator!=(const pair<T1, T2> &after) const
@@ -48,6 +54,12 @@ namespace nuts
 		{
 			first = obj.first, second = obj.second;
 			return *this;
+		}
+
+		friend std::ostream &operator<<(std::ostream &output, const pair<T1, T2> &obj)
+		{
+			std::cout << '(' << obj.first << ", " << obj.second << ')';
+			return output;
 		}
 	};
 

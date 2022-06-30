@@ -54,7 +54,6 @@ namespace nuts
 	template <class T, class base>
 	queue<T, base> &queue<T, base>::pop()
 	{
-		assert(!container.empty());
 		container.pop_front();
 		return *this;
 	}
@@ -62,7 +61,6 @@ namespace nuts
 	template <class T, class base>
 	queue<T, base> &queue<T, base>::clear()
 	{
-		assert(!container.empty());
 		container.clear();
 		return *this;
 	}

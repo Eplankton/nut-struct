@@ -7,64 +7,84 @@
 
 #include "utility.h"
 #include "vector.h"
-#include "array.h"
 #include "list.h"
 #include "functional.h"
 
 namespace nuts
 {
+	// Capacity of the bucket
 	const u64 LONG_PRIME_LIST[28] = {
-		53u, 97u, 193u, 389u, 769u,
-		1543u, 3079u, 6151u, 12289u, 24593u};
+		53ul, 97ul, 193ul, 389ul, 769ul,
+		1543ul, 3079ul, 6151ul, 12289ul, 24593ul,
+		49157ul, 98317ul, 196613ul, 393241ul, 786433ul,
+		1572869ul, 3145739ul, 6291469ul, 12582917ul, 25165843ul,
+		50331653ul, 100663319ul, 201326611ul, 402653189ul, 805306457ul,
+		1610612741ul, 3221225473ul, 429496729ul};
 
-	// Abstract hash function
-	template <class key>
-	u64 hash(const key &val) { return 0; }
-
-	// Full specialization of hash function
-	template <>
-	u64 hash(const int &i) { return i % LONG_PRIME_LIST[1]; }
-
-	function<u64(const int &)> HASH_INT = hash;
-
-	template <class key, class value, class hash_func = function<u64(const key &)>>
+	// Hash_Table
+	template <typename Key,
+			  typename Val,
+			  class Hasher = nuts::hash<Key>>
 	class hash_table
 	{
+		using Self_Type = hash_table<Key, Val, Hasher>;
+		using Container_Type = list<pair<Key, Val>>;
+
 	protected:
-		u64 table_size = LONG_PRIME_LIST[1]; // Give a prime number
-		vector<list<pair<key, value>>> bucket;
-		hash_func hash_fn;
+		u64 bucket_size = LONG_PRIME_LIST[9];
+		u64 _size = 0;
+		vector<Container_Type> bucket;
+		Hasher hash_fn;
 
 	public:
 		hash_table();
-		hash_table(const hash_func &src);
-		value &operator[](const key &_k);
-		void insert(const key &_k, const value &_val);
-		void insert(const pair<key, value> &_p);
-		bool remove(const key &_k);
+		hash_table(const Self_Type &src);
+
+		u64 size() const { return _size; }
+		bool empty() const { return _size == 0; }
+		bool contains(const Key &_k) const;
+		Val &operator[](const Key &_k);
+		const Val &operator[](const Key &_k) const;
+		void insert(const Key &_k, const Val &_val);
+		void insert(const pair<Key, Val> &_p);
+		bool erase(const Key &_k);
 		void clear();
 	};
 
-	template <class key, class value, class hash_func>
-	hash_table<key, value, hash_func>::hash_table()
+	template <class Key, class Val, class Hasher = nuts::hash<Key>>
+	using unordered_map = hash_table<Key, Val, Hasher>; // Unordered_Map
+
+	template <class Key, class Val, class Hasher>
+	hash_table<Key, Val, Hasher>::hash_table()
 	{
-		vector<list<pair<key, value>>> tmp(table_size);
+		vector<list<pair<Key, Val>>> tmp(bucket_size);
 		this->bucket.move(tmp);
-		hash_fn = HASH_INT;
 	}
 
-	template <class key, class value, class hash_func>
-	hash_table<key, value, hash_func>::hash_table(const hash_func &src)
+	template <class Key, class Val, class Hasher>
+	hash_table<Key, Val, Hasher>::hash_table(const Self_Type &src)
 	{
-		vector<list<pair<key, value>>> tmp(table_size);
-		this->bucket.move(tmp);
-		hash_fn = src;
+		this->bucket_size = src.bucket_size;
+		this->bucket = src.bucket;
+		this->_size = src._size;
 	}
 
-	template <class key, class value, class hash_func>
-	value &hash_table<key, value, hash_func>::operator[](const key &_k)
+	template <class Key, class Val, class Hasher>
+	bool hash_table<Key, Val, Hasher>::contains(const Key &_k) const
 	{
-		u64 index = hash_fn(_k);
+		u64 index = hash_fn(_k) % bucket_size;
+		for (auto res = bucket[index].begin(); res != bucket[index].end() + 1; res++)
+		{
+			if (res->first == _k)
+				return true;
+		}
+		return false;
+	}
+
+	template <class Key, class Val, class Hasher>
+	Val &hash_table<Key, Val, Hasher>::operator[](const Key &_k)
+	{
+		u64 index = hash_fn(_k) % bucket_size;
 		for (auto res = bucket[index].begin(); res != bucket[index].end() + 1; res++)
 		{
 			if (res->first == _k)
@@ -72,45 +92,147 @@ namespace nuts
 		}
 		bucket[index].push_back();
 		bucket[index].back().first = _k;
+		_size++;
 		return bucket[index].back().second;
 	}
 
-	template <class key, class value, class hash_func>
-	void hash_table<key, value, hash_func>::insert(const key &_k, const value &_val)
+	template <class Key, class Val, class Hasher>
+	const Val &hash_table<Key, Val, Hasher>::operator[](const Key &_k) const
+	{
+		u64 index = hash_fn(_k) % bucket_size;
+		assert(this->contains(_k));
+		return (*this)[_k];
+	}
+
+	template <class Key, class Val, class Hasher>
+	void hash_table<Key, Val, Hasher>::insert(const Key &_k, const Val &_val)
 	{
 		(*this)[_k] = _val;
 	}
 
-	template <class key, class value, class hash_func>
-	void hash_table<key, value, hash_func>::insert(const pair<key, value> &_p)
+	template <class Key, class Val, class Hasher>
+	void hash_table<Key, Val, Hasher>::insert(const pair<Key, Val> &_p)
 	{
 		(*this)[_p.first] = _p.second;
 	}
 
-	template <class key, class value, class hash_func>
-	bool hash_table<key, value, hash_func>::remove(const key &_k)
+	template <class Key, class Val, class Hasher>
+	bool hash_table<Key, Val, Hasher>::erase(const Key &_k)
 	{
-		u64 index = hash_fn(_k);
+		u64 index = hash_fn(_k) % bucket_size;
 		for (auto res = bucket[index].begin(); res != bucket[index].end() + 1; res++)
 		{
 			if (res->first == _k)
 			{
-				bucket[index].erase(res, 0);
+				bucket[index].erase(res);
+				_size--;
 				return true;
 			}
 		}
 		return false;
 	}
 
-	template <class key, class value, class hash_func>
-	void hash_table<key, value, hash_func>::clear()
+	template <class Key, class Val, class Hasher>
+	void hash_table<Key, Val, Hasher>::clear()
 	{
-		for (u64 i = 0; i < table_size; i++)
+		for (u64 i = 0; i < bucket_size; i++)
 		{
 			bucket[i].clear();
 		}
+		_size = 0;
 	}
 
+	// Unordered_Set
+	template <typename Key,
+			  typename Hasher = nuts::hash<Key>>
+	class unordered_set
+	{
+		using Self_Type = unordered_set<Key, Hasher>;
+		using Bucket_Type = list<Key>;
+
+	protected:
+		u64 bucket_size = LONG_PRIME_LIST[9];
+		u64 _size = 0;
+		vector<Bucket_Type> bucket;
+		Hasher hash_fn;
+
+	public:
+		unordered_set();
+		unordered_set(const Self_Type &src);
+
+		u64 size() const { return _size; }
+		bool empty() const { return _size == 0; }
+		bool contains(const Key &_k) const;
+		void insert(const Key &_k);
+		bool erase(const Key &_k);
+		void clear();
+	};
+
+	template <class Key, class Hasher>
+	unordered_set<Key, Hasher>::unordered_set()
+	{
+		vector<Bucket_Type> tmp(bucket_size);
+		this->bucket.move(tmp);
+	}
+
+	template <class Key, class Hasher>
+	unordered_set<Key, Hasher>::unordered_set(const Self_Type &src)
+	{
+		this->bucket_size = src.bucket_size;
+		this->bucket = src.bucket;
+		this->_size = src._size;
+	}
+
+	template <class Key, class Hasher>
+	bool unordered_set<Key, Hasher>::contains(const Key &_k) const
+	{
+		u64 index = hash_fn(_k) % bucket_size;
+		for (auto res = bucket[index].begin(); res != bucket[index].end() + 1; res++)
+		{
+			if (res != nullptr && *res == _k)
+				return true;
+		}
+		return false;
+	}
+
+	template <class Key, class Hasher>
+	void unordered_set<Key, Hasher>::insert(const Key &_k)
+	{
+		u64 index = hash_fn(_k) % bucket_size;
+		for (auto res = bucket[index].begin(); res != bucket[index].end() + 1; res++)
+		{
+			if (res != nullptr && *res == _k)
+				return;
+		}
+		bucket[index].push_back(_k);
+		_size++;
+	}
+
+	template <class Key, class Hasher>
+	bool unordered_set<Key, Hasher>::erase(const Key &_k)
+	{
+		u64 index = hash_fn(_k) % bucket_size;
+		for (auto res = bucket[index].begin(); res != bucket[index].end() + 1; res++)
+		{
+			if (res != nullptr && *res == _k)
+			{
+				bucket[index].erase(res);
+				_size--;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	template <class Key, class Hasher>
+	void unordered_set<Key, Hasher>::clear()
+	{
+		for (u64 i = 0; i < bucket_size; i++)
+		{
+			bucket[i].clear();
+		}
+		_size = 0;
+	}
 }
 
 #endif

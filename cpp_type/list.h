@@ -15,30 +15,20 @@
 #define _WARNING 1
 #endif
 
-#define node ListNode
-
 namespace nuts
 {
 	template <class T>
 	struct ListNode // Element class
 	{
-#if _DEBUG
-	protected:
-		size_t index = 0; // For test only
-#endif
-	protected:
+	public:
 		T data;
 		ListNode<T> *prev = nullptr;
 		ListNode<T> *next = nullptr;
 
-	public:
 		ListNode() = default;
-		explicit ListNode(const T &userInputData) : data(userInputData), prev(nullptr), next(nullptr) {}
+		explicit ListNode(const T& userInputData) : data(userInputData), prev(nullptr), next(nullptr) {}
 		~ListNode()
 		{
-#if _DEBUG
-			this->index = 0; // For test only
-#endif
 			prev = nullptr;
 			next = nullptr;
 
@@ -47,8 +37,8 @@ namespace nuts
 			/* And if 'data' is not a pointer, you can't delete it manually anyway */
 		}
 
-		template <class>
-		friend class list;
+		// template <class>
+		// friend class list;
 		/* Don't need an explicit class/typename T */
 		/* Very import, this authorizes the manager class */
 	};
@@ -62,45 +52,50 @@ namespace nuts
 		size_t length = 0;
 
 	public:
-		list() = default;												   // Void constructor
-		explicit list(size_t userInputlength);							   // Init by several empty nodes
-		explicit list(const T &userInputData, size_t userInputlength = 1); // Init by several valued nodes
-		list(ListNode<T> *start_node, ListNode<T> *end_node);			   // Init by a sub-list of another list(deep copy)
-		list(const list<T> &obj);										   // Init by another list(deep copy)
-		list(std::initializer_list<T> ilist);							   // Init by a {ilist}
-		~list() { this->clear(); }										   // Clear and gain back memory
+		list() = default;                                                   // Void constructor
+		explicit list(size_t userInputlength);                               // Init by several empty nodes
+		explicit list(const T& userInputData, size_t userInputlength = 1); // Init by several valued nodes
+		list(ListNode<T> *start_node, ListNode<T> *end_node);               // Init by a sub-list of another list(deep copy)
+		list(const list<T>& obj);                                           // Init by another list(deep copy)
+		list(std::initializer_list<T> ilist);                               // Init by a {ilist}
+		~list() { this->clear(); }                                           // Clear and gain back memory
 
-		bool empty() const { return this->size() == 0 && head == nullptr && tail == nullptr; } // Whether the list is empty
-		bool exist() const { return this->empty(); }										   // Whether the list exists
+		bool empty() const // Whether the list is empty
+		{
+			return this->size() == 0 &&
+			       head == nullptr &&
+			       tail == nullptr;
+		}
+
+		bool exist() const { return this->empty(); } // Whether the list exists
+
 #if _DEBUG
 		void print(); // Print a list in console
 #endif
 
-		size_t size() const
-		{
-			return this->length;
-		} // Get the length of the whole list
+		size_t size() const { return this->length; }// Get the length of the whole list
 
-		size_t get_length(ListNode<T> *start_node) const;				  // Get the length of a sub-list(start from start_node)
-		T &operator[](size_t N);										  // Access to the address(return pointer) of node {WARNING: NOT A GOOD DESIGN}
-		list<T> &operator=(const list<T> &obj);							  // Assign deeply
-		list<T> &erase(ListNode<T> *start_node, size_t N_far = 0);		  // Remove a node that N blocks from the start_node(reference argument)
-		size_t erase_all(bool (*condition)(T &stock_val));				  // Remove all node match the condition,The number of elements removed
-		list<T> &clear();												  // Clear the whole list, release all nodes
-		list<T> &destroy(ListNode<T> *start_node, ListNode<T> *end_node); // Clear a part of the list(release nodes partly)
-		list<T> &push_back(size_t num = 1);								  // Add back an empty node
-		list<T> &push_back(const T &obj, size_t num = 1);				  // Add back several nodes(add by init calue)
-		list<T> &push_front(size_t num = 1);							  // Add front an empty node
-		list<T> &push_front(const T &obj, size_t num = 1);				  // Add frontseveral nodes(add by init value)
-		list<T> &pop_back();											  // Remove last element
-		list<T> &pop_front();											  // Remove first element
-		list<T> &merge(list<T> &after);									  // Merge lists together, the latter lost ownership
-		list<T> &move(list<T> &after);									  // A void manager can deprive other's ownership
+		size_t get_length(ListNode<T> *start_node) const;                  // Get the length of a sub-list(start from start_node)
+		T& operator[](size_t N);                                          // Access to the address(return pointer) of node {WARNING: NOT A GOOD DESIGN}
+		list<T>& operator=(const list<T>& obj);                              // Assign deeply
+		list<T>& erase(ListNode<T> *start_node, size_t N_far = 0);          // Remove a node that N blocks from the start_node(reference argument)
+		size_t erase_all(bool (*condition)(T& stock_val));                  // Remove all node match the condition,The number of elements removed
+		list<T>& clear();                                                  // Clear the whole list, release all nodes
+		list<T>& destroy(ListNode<T> *start_node, ListNode<T> *end_node); // Clear a part of the list(release nodes partly)
+		list<T>& push_back();                                              // Add back an empty node
+		list<T>& push_back(const T& obj, size_t num = 1);                  // Add back several nodes(add by init calue)
+		list<T>& push_front();                                              // Add front an empty node
+		list<T>& push_front(const T& obj, size_t num = 1);                  // Add frontseveral nodes(add by init value)
+		list<T>& pop_back();                                              // Remove last element
+		list<T>& pop_front();                                              // Remove first element
+		list<T>& merge(list<T>& after);                                      // Merge lists together, the latter lost ownership
+		list<T>& move(list<T>& after);                                      // A void manager can deprive other's ownership
 		// list<T> &operator<<=(list<T> &obj);                                               // Overload as b.destroy(a)
 
-		ListNode<T> *find(bool (*condition)(T &stock_val)); // Find the first element match the condition
+		ListNode<T> *find(bool (*condition)(T& stock_val)); // Find the first element match the condition
+
 #ifdef _DEBUG
-		friend std::ostream &operator<<(std::ostream &output, list<T> &obj)
+		friend std::ostream& operator<<(std::ostream& output, list<T>& obj)
 		{
 			for (int i = 0; i < obj.size(); i++)
 			{
@@ -118,17 +113,17 @@ namespace nuts
 		public:
 			iterator() = default;
 			iterator(ListNode<T> *obj) : ptr_onNode(obj) {}
-			iterator(const iterator &obj) : ptr_onNode(obj.ptr_onNode) {}
+			iterator(const iterator& obj) : ptr_onNode(obj.ptr_onNode) {}
 
-			T &operator*() { return (*ptr_onNode).data; }
+			T& operator*() { return (*ptr_onNode).data; }
 
-			iterator &operator=(T *obj)
+			iterator& operator=(T *obj)
 			{
 				ptr_onNode = obj;
 				return *this;
 			}
 
-			iterator &operator=(const iterator &obj)
+			iterator& operator=(const iterator& obj)
 			{
 				this->ptr_onNode = obj.ptr_onNode;
 				return *this;
@@ -137,10 +132,10 @@ namespace nuts
 			bool operator==(ListNode<T> *obj) const { return ptr_onNode == obj; }
 			bool operator!=(ListNode<T> *obj) const { return ptr_onNode != obj; }
 
-			bool operator==(const iterator &obj) const { return ptr_onNode == obj.ptr_onNode; }
-			bool operator!=(const iterator &obj) const { return ptr_onNode != obj.ptr_onNode; }
+			bool operator==(const iterator& obj) const { return ptr_onNode == obj.ptr_onNode; }
+			bool operator!=(const iterator& obj) const { return ptr_onNode != obj.ptr_onNode; }
 
-			iterator &operator++()
+			iterator& operator++()
 			{
 				if (this->ptr_onNode != nullptr)
 					this->ptr_onNode = this->ptr_onNode->next;
@@ -154,7 +149,7 @@ namespace nuts
 				return res;
 			}
 
-			iterator &operator--()
+			iterator& operator--()
 			{
 				if (this->ptr_onNode != nullptr)
 					this->ptr_onNode = this->ptr_onNode->prev;
@@ -168,24 +163,24 @@ namespace nuts
 				return res;
 			}
 
-			iterator operator+(const int &bias)
+			iterator operator+(const int& bias)
 			{
 				iterator res = *this;
 				return advance(res, bias);
 			}
 
-			void operator+=(const int &bias)
+			void operator+=(const int& bias)
 			{
 				return advance(*this, bias);
 			}
 
-			iterator operator-(const int &bias)
+			iterator operator-(const int& bias)
 			{
 				iterator res = *this;
 				return advance(res, -bias);
 			}
 
-			void operator-=(const int &bias)
+			void operator-=(const int& bias)
 			{
 				return advance(*this, -bias);
 			}
@@ -193,29 +188,30 @@ namespace nuts
 			T *operator->() { return &ptr_onNode->data; }
 
 			template <class>
-			friend class list;
+			friend
+			class list;
 		};
 
-		iterator begin() // Return iterator to the first element
+		iterator begin() const// Return iterator to the first element
 		{
 			return iterator(this->head);
 		}
 
-		iterator end() // Return iterator to the last element
+		iterator end() const // Return iterator to the last element
 		{
 			return iterator(this->tail);
 		}
 
-		T &front() { return this->head->data; }
-		T &back() { return this->tail->data; }
+		T& front() { return this->head->data; }
+		T& back() { return this->tail->data; }
 
-		const T &front() const { return this->head->data; }
-		const T &back() const { return this->tail->data; }
+		const T& front() const { return this->head->data; }
+		const T& back() const { return this->tail->data; }
 
-		list(const iterator st, const iterator ed);
-		list<T> &erase(iterator &it, size_t num = 0);
-		list<T> &insert(node<T> *position, const T &obj, size_t num = 1);
-		typename list<T>::iterator insert(const iterator &position, const T &obj, size_t num = 1); // Insert several node at position
+		list(iterator st, iterator ed);
+		list<T>& erase(iterator& it, size_t num = 0);
+		list<T>& insert(ListNode<T> *position, const T& obj, size_t num = 1);
+		typename list<T>::iterator insert(const iterator& position, const T& obj, size_t num = 1); // Insert several node at position
 	};
 
 	template <class T>
@@ -225,29 +221,20 @@ namespace nuts
 		{
 			this->length = userInputlength;
 			this->head = new ListNode<T>; // Save the head node address.
-			ListNode<T> *p = head;
+			auto p = head;
 			for (int i = 1; i < userInputlength; i++)
 			{
 				p->next = new ListNode<T>;
 				p->next->prev = p;
 				p = p->next;
-#if _DEBUG
-				p->index = i;
-#endif
 				p->next = nullptr;
 			}
 			this->tail = p; // Save the last node address.
 		}
-		else
-		{
-#if _WARNING
-			std::cout << "[Error] Length short than '1'\n";
-#endif
-		}
 	}
 
 	template <class T>
-	list<T>::list(const T &userInputData, size_t userInputlength)
+	list<T>::list(const T& userInputData, size_t userInputlength)
 	{
 		this->push_back(userInputData, userInputlength); // better way
 	}
@@ -257,29 +244,9 @@ namespace nuts
 	{
 		if (start_node != nullptr && end_node != nullptr)
 		{
-			for (node<T> *p = start_node; p != end_node; p = p->next)
+			for (auto p = start_node; p != end_node; p = p->next)
 				this->push_back(p->data);
 			this->push_back(end_node->data);
-
-			// this->head = new node<T>(start_node->data);
-			// this->length++;
-			// node<T> *q = this->head;
-			// for (node<T> *p = start_node->next; p != end_node; p = p->next)
-			// {
-			//     q->next = new node<T>(p->data);
-			//     q->next->prev = q;
-			//     q = q->next;
-			//     this->length++;
-			// }
-			// this->tail = new node<T>(end_node->data);
-			// q->next = this->tail;
-			// this->length++;
-		}
-		else
-		{
-#if _WARNING
-			std::cout << "[Error] Empty origin list\n";
-#endif
 		}
 	}
 
@@ -291,7 +258,7 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T>::list(const list<T> &obj)
+	list<T>::list(const list<T>& obj)
 	{
 		if (!this->empty())
 			this->operator=(obj);
@@ -311,11 +278,11 @@ namespace nuts
 		if (!this->empty())
 		{
 			std::cout << "+++++++\n";
-			for (ListNode<T> *p = this->head; p != nullptr; p = p->next)
+			for (auto p = this->head; p != nullptr; p = p->next)
 			{
 				std::cout << "node[" << p->index << "]: " << p << " -> "
-						  << p->data
-						  << '\n';
+				          << p->data
+				          << '\n';
 			}
 			std::cout << "+++++++\n\n";
 		}
@@ -334,7 +301,7 @@ namespace nuts
 		size_t count_list_size = 0;
 		if (start_node != nullptr)
 		{
-			for (ListNode<T> *p = start_node; p != nullptr; p = p->next)
+			for (auto p = start_node; p != nullptr; p = p->next)
 				count_list_size++;
 			return count_list_size;
 		}
@@ -346,27 +313,27 @@ namespace nuts
 
 #ifdef _DEBUG
 	template <class T>
-	T &list<T>::operator[](size_t N)
+	T& list<T>::operator[](size_t N)
 	{
 		assert(N < this->size());
-		ListNode<T> *p = this->head;
+		auto p = this->head;
 		for (int i = 0; i < N; i++)
 			p = p->next;
-		T &tmp = p->data;
+		T& tmp = p->data;
 		return tmp;
 	}
 #endif
 
 	template <class T>
-	list<T> &list<T>::operator=(const list<T> &obj)
+	list<T>& list<T>::operator=(const list<T>& obj)
 	{
 		if (!this->empty())
 			this->clear();
-		node<T> *start_node = obj.head;
-		node<T> *end_node = obj.tail;
+		auto start_node = obj.head;
+		auto end_node = obj.tail;
 		if (start_node != nullptr && end_node != nullptr)
 		{
-			for (node<T> *p = start_node; p != end_node; p = p->next)
+			for (auto p = start_node; p != end_node; p = p->next)
 				this->push_back(p->data);
 			this->push_back(end_node->data);
 			return *this;
@@ -375,87 +342,78 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T> &list<T>::erase(ListNode<T> *start_node, size_t N_far)
+	list<T>& list<T>::erase(ListNode<T> *start_node, size_t N_far)
 	{
-		if (N_far < this->size() && !this->empty())
+		assert(N_far < this->size() && !this->empty());
+		int i = 0;
+		for (auto p = start_node; p != nullptr; p = p->next)
 		{
-			int i = 0;
-			for (node<T> *p = start_node; p != nullptr; p = p->next)
+			if (i == N_far)
 			{
-				if (i == N_far)
+				if (p == this->head)
 				{
-					if (p == this->head)
+					if (p->next != nullptr)
 					{
-						if (p->next != nullptr)
-						{
-							p->next->prev = nullptr;
-							this->head = p->next;
-							delete p;
-							this->length--;
-							return *this;
-						}
-						else
-						{
-							delete p;
-							this->head = nullptr;
-							this->tail = nullptr;
-							this->length--;
-							return *this;
-						}
+						p->next->prev = nullptr;
+						this->head = p->next;
+						delete p;
+						this->length--;
+						return *this;
 					}
-					if (p == this->tail)
+					else
 					{
-						if (p->prev != nullptr)
-						{
-							p->prev->next = nullptr;
-							this->tail = p->prev;
-							delete p;
-							this->length--;
-							return *this;
-						}
-						else
-						{
-							delete p;
-							this->head = nullptr;
-							this->tail = nullptr;
-							this->length--;
-							return *this;
-						}
+						delete p;
+						this->head = nullptr;
+						this->tail = nullptr;
+						this->length--;
+						return *this;
 					}
-					p->next->prev = p->prev;
-					p->prev->next = p->next;
-					delete p;
-					this->length--;
-					return *this;
 				}
-				i++;
+				if (p == this->tail)
+				{
+					if (p->prev != nullptr)
+					{
+						p->prev->next = nullptr;
+						this->tail = p->prev;
+						delete p;
+						this->length--;
+						return *this;
+					}
+					else
+					{
+						delete p;
+						this->head = nullptr;
+						this->tail = nullptr;
+						this->length--;
+						return *this;
+					}
+				}
+				p->next->prev = p->prev;
+				p->prev->next = p->next;
+				delete p;
+				this->length--;
+				return *this;
 			}
-			return *this;
+			i++;
 		}
-		else
-		{
-#if _WARNING
-			std::cout << "[Error] Size overflow\n";
-#endif
-			return *this;
-		}
+		return *this;
 	}
 
 	template <class T>
-	list<T> &list<T>::erase(iterator &it, size_t N)
+	list<T>& list<T>::erase(iterator& it, size_t N)
 	{
 		return erase(it.ptr_onNode, N);
 	}
 
 	template <class T>
-	size_t list<T>::erase_all(bool (*condition)(T &stock_val))
+	size_t list<T>::erase_all(bool (*condition)(T& stock_val))
 	{
 		size_t remove_num = 0;
-		for (ListNode<T> *p = this->head; p != nullptr;)
+		for (auto p = this->head; p != nullptr;)
 		{
 			if (condition(p->data))
 			{
-				ListNode<T> *tmp = p->next;
+				auto tmp = p->next;
 				erase(p, 0);
 				remove_num++;
 				p = tmp;
@@ -468,7 +426,7 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T> &list<T>::clear()
+	list<T>& list<T>::clear()
 	{
 		if (!this->empty())
 		{
@@ -480,7 +438,7 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T> &list<T>::destroy(ListNode<T> *start_node, ListNode<T> *end_node)
+	list<T>& list<T>::destroy(ListNode<T> *start_node, ListNode<T> *end_node)
 	{
 		if (this->head != nullptr && start_node != nullptr && end_node != nullptr && !this->empty())
 		{
@@ -488,7 +446,7 @@ namespace nuts
 			i64 end_index = this->get_length() - get_length(end_node);
 			for (i64 i = end_index; i >= start_index; --i)
 				erase(head, i);
-			for (ListNode<T> *p = this->head; p != nullptr; p = p->next)
+			for (auto p = this->head; p != nullptr; p = p->next)
 			{
 				if (p->next == nullptr)
 					this->tail = p;
@@ -499,46 +457,40 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T> &list<T>::push_back(size_t num)
+	list<T>& list<T>::push_back()
 	{
 		if (!this->empty())
 		{
-			ListNode<T> *p = this->tail;
-			for (int i = 0; i < num; i++)
-			{
-				p->next = new ListNode<T>;
-				p->next->prev = p;
-				p = p->next;
-				p->next = nullptr;
-				this->length++;
-			}
+			auto p = this->tail;
+			p->next = new ListNode<T>;
+			p->next->prev = p;
+			p = p->next;
+			p->next = nullptr;
 			this->tail = p;
+			this->length++;
 			return *this;
 		}
-		else // If it's an empty list,add several node.
+		else // If it's an empty list,add a node.
 		{
-			auto *p = new node<T>;
+			auto p = new ListNode<T>;
 			this->head = p;
 			this->length++;
-			for (int i = 1; i < num; i++)
-			{
-				p->next = new ListNode<T>;
-				p->next->prev = p;
-				p = p->next;
-				p->next = nullptr;
-				this->length++;
-			}
+			p->next = new ListNode<T>;
+			p->next->prev = p;
+			p = p->next;
+			p->next = nullptr;
 			this->tail = p;
+			this->length++;
 			return *this;
 		}
 	}
 
 	template <class T>
-	list<T> &list<T>::push_back(const T &obj, size_t num)
+	list<T>& list<T>::push_back(const T& obj, size_t num)
 	{
 		if (!this->empty())
 		{
-			ListNode<T> *p = this->tail;
+			auto p = this->tail;
 			for (int i = 0; i < num; i++)
 			{
 				p->next = new ListNode<T>(obj);
@@ -552,7 +504,7 @@ namespace nuts
 		}
 		else // If it's an empty list,add several node.
 		{
-			auto *p = new node<T>(obj);
+			auto p = new ListNode<T>(obj);
 			this->head = p;
 			this->length++;
 			for (int i = 1; i < num; i++)
@@ -569,12 +521,12 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T> &list<T>::push_front(size_t num)
+	list<T>& list<T>::push_front()
 	{
 		if (!this->empty())
 		{
-			ListNode<T> *tmp = this->head;
-			this->head = new node<T>;
+			auto tmp = this->head;
+			this->head = new ListNode<T>;
 			this->head->next = tmp;
 			tmp->prev = this->head;
 			this->length++;
@@ -582,7 +534,7 @@ namespace nuts
 		}
 		else
 		{
-			this->head = new node<T>;
+			this->head = new ListNode<T>;
 			this->tail = this->head;
 			this->length++;
 			return *this;
@@ -590,14 +542,14 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T> &list<T>::push_front(const T &obj, size_t num)
+	list<T>& list<T>::push_front(const T& obj, size_t num)
 	{
 		if (!this->empty())
 		{
-			ListNode<T> *tmp = this->head;
+			auto tmp = this->head;
 			this->head = new ListNode<T>(obj);
 			this->length++;
-			ListNode<T> *p = this->head;
+			auto p = this->head;
 			for (int i = 1; i < num; i++)
 			{
 				p->next = new ListNode<T>(obj);
@@ -612,7 +564,7 @@ namespace nuts
 		}
 		else // If it's an empty list,add several node.
 		{
-			auto *p = new node<T>(obj);
+			auto *p = new ListNode<T>(obj);
 			this->head = p;
 			this->length++;
 			for (int i = 1; i < num; i++)
@@ -629,21 +581,21 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T> &list<T>::pop_back()
+	list<T>& list<T>::pop_back()
 	{
 		this->erase(this->tail);
 		return *this;
 	}
 
 	template <class T>
-	list<T> &list<T>::pop_front()
+	list<T>& list<T>::pop_front()
 	{
 		this->erase(this->head);
 		return *this;
 	}
 
 	template <class T>
-	list<T> &list<T>::merge(list<T> &after)
+	list<T>& list<T>::merge(list<T>& after)
 	{
 		if (!after.empty())
 		{
@@ -673,20 +625,15 @@ namespace nuts
 		}
 		else
 		{
-#if _WARNING
-			std::cout << "[Error] Empty list\n";
-#endif
 			return *this;
 		}
+
 	}
 
 	template <class T>
-	list<T> &list<T>::move(list<T> &after)
+	list<T>& list<T>::move(list<T>& after)
 	{
-		if (!this->empty())
-		{
-			this->clear();
-		}
+		if (!this->empty()) { this->clear(); }
 
 		// Pass ownership.
 		this->length = after.length;
@@ -700,15 +647,15 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T> &list<T>::insert(node<T> *position, const T &obj, size_t num)
+	list<T>& list<T>::insert(ListNode<T> *position, const T& obj, size_t num)
 	{
 		if (num != 0)
 		{
-			for (ListNode<T> *p = this->head; p != nullptr; p = p->next)
+			for (auto p = this->head; p != nullptr; p = p->next)
 			{
 				if (p == position)
 				{
-					ListNode<T> *temp = p->next;
+					auto temp = p->next;
 					for (int i = 0; i < num; i++)
 					{
 						p->next = new ListNode<T>(obj);
@@ -729,30 +676,24 @@ namespace nuts
 					return *this;
 				}
 			}
-#if _WARNING
-			std::cout << "[Error] Position not found\n";
 			return *this;
-#endif
 		}
-#if _WARNING
 		else
 		{
-			std::cout << "[Error] NUM < 1\n";
 			return *this;
 		}
-#endif
 	}
 
 	template <class T>
-	typename list<T>::iterator list<T>::insert(const iterator &position, const T &obj, size_t num)
+	typename list<T>::iterator list<T>::insert(const iterator& position, const T& obj, size_t num)
 	{
 		if (num != 0)
 		{
-			for (node<T> *p = this->head; p != nullptr; p = p->next)
+			for (auto p = this->head; p != nullptr; p = p->next)
 			{
 				if (p == position.ptr_onNode)
 				{
-					ListNode<T> *temp = p->next;
+					auto temp = p->next;
 					for (int i = 0; i < num; i++)
 					{
 						p->next = new ListNode<T>(obj);
@@ -779,32 +720,23 @@ namespace nuts
 				this->push_back(obj, num);
 				return this->end();
 			}
-
-#if _WARNING
-			std::cout << "[Error] Position not found\n";
 			return iterator(nullptr);
-#endif
+
 		}
-#if _WARNING
 		else
 		{
-			std::cout << "[Error] NUM < 1\n";
 			return iterator(nullptr);
 		}
-#endif
 	}
 
 	template <class T>
-	ListNode<T> *list<T>::find(bool (*condition)(T &stock_val))
+	ListNode<T> *list<T>::find(bool (*condition)(T& stock_val))
 	{
-		for (ListNode<T> *p = this->head; p != nullptr; p = p->next)
+		for (auto p = this->head; p != nullptr; p = p->next)
 		{
 			if (condition(p->data))
 				return p;
 		}
-#if _WARNING
-		std::cout << "[Error] Element not found!\n";
-#endif
 		return nullptr;
 	}
 

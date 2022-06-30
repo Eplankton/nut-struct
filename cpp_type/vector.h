@@ -29,30 +29,31 @@ namespace nuts
 		size_t v_capacity = 0;
 
 	public:
-		vector() = default;											   // Void constructor
-		explicit vector(size_t userInputSize);						   // Init by size
+		vector() = default;                                               // Void constructor
+		explicit vector(size_t userInputSize);                           // Init by size
 		explicit vector(size_t userInputSize, const T &userInputData); // Init by size and value
-		vector(const vector<T> &obj);								   // Copy constructor
-		vector(std::initializer_list<T> ilist);						   // Init by a {ilist}
+		vector(const vector<T> &obj);                                   // Copy constructor
+		vector(std::initializer_list<T> ilist);                           // Init by a {ilist}
 		~vector() { this->destroy(); }
 
-		size_t size() const { return this->v_size; }			 // Return the number of elements
-		size_t capacity() const { return this->v_capacity; }	 // Return the current capacity
-		bool empty() const { return this->v_size == 0; }		 // Check whether the vector is empty
+		size_t size() const { return this->v_size; }             // Return the number of elements
+		size_t capacity() const { return this->v_capacity; }     // Return the current capacity
+		bool empty() const { return this->v_size == 0; }         // Check whether the vector is empty
 		bool exist() const { return this->data_ptr != nullptr; } // Check whether the vector is existed
-		void clear();											 // Clear all values, but don't destroy
-		void destroy();											 // Clear the contents and release memory, contain exist()
-		vector<T> &shrink_to_fit();								 // Reduce memory usage by freeing unused memory
-		vector<T> &resize(size_t N);							 // Reduce or expand capacity
+		void clear();                                             // Clear all values, but don't destroy
+		void destroy();                                             // Clear the contents and release memory, contain exist()
+		vector<T> &shrink_to_fit();                                 // Reduce memory usage by freeing unused memory
+		vector<T> &resize(size_t N);                             // Reduce or expand capacity
 
 		vector<T> &push_back(const T &obj); // Add an element to the end
-		vector<T> &pop_back();				// Remove the last element
-		vector<T> &move(vector<T> &after);	// Deprive other's ownership
+		vector<T> &pop_back();                // Remove the last element
+		vector<T> &move(vector<T> &after);    // Deprive other's ownership
 
-		T &operator[](size_t N);							  // Access specified element
-		vector<T> &operator=(const vector<T> &obj);			  // Deep copy operator
+		T &operator[](size_t N); // Access specified element
+		const T &operator[](size_t N) const;
+		vector<T> &operator=(const vector<T> &obj);              // Deep copy operator
 		vector<T> &operator=(std::initializer_list<T> ilist); // Covered by a {inlist}
-		bool operator==(const vector<T> &obj);				  // Compare two vectors in same type
+		bool operator==(const vector<T> &obj) const;          // Compare two vectors in same type
 
 #if _DEBUG
 		friend std::ostream &operator<<(std::ostream &output, const vector<T> &obj)
@@ -161,7 +162,8 @@ namespace nuts
 			T *operator->() { return ptr_onNode; }
 
 			template <class>
-			friend class vector;
+			friend
+			class vector;
 		};
 
 		iterator begin() // Return iterator to the first element
@@ -341,6 +343,14 @@ namespace nuts
 	}
 
 	template <class T>
+	const T &vector<T>::operator[](const size_t N) const
+	{
+		assert(N < this->v_size);
+		// return this->data_ptr[N];
+		return this->data_ptr[N];
+	}
+
+	template <class T>
 	vector<T> &vector<T>::operator=(const vector<T> &obj)
 	{
 		this->destroy();
@@ -369,7 +379,7 @@ namespace nuts
 	}
 
 	template <class T>
-	bool vector<T>::operator==(const vector<T> &obj)
+	bool vector<T>::operator==(const vector<T> &obj) const
 	{
 		size_t count = 0;
 		for (size_t i = 0; i < this->v_size && i < obj.v_size; i++)

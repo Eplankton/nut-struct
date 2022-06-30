@@ -37,13 +37,14 @@ namespace nuts
 		void destroy();
 		void clear();
 
-        T& front() { return this->data_ptr[0]; }
-        T& back() { return this->data_ptr[this->size() - 1]; }
+		T &front() { return this->data_ptr[0]; }
+		T &back() { return this->data_ptr[this->size() - 1]; }
 
-        const T& front() const { return this->data_ptr[0]; }
-        const T& back() const { return this->data_ptr[this->size() - 1]; }
+		const T &front() const { return this->data_ptr[0]; }
+		const T &back() const { return this->data_ptr[this->size() - 1]; }
 
 		T &operator[](size_t N);
+		const T &operator[](size_t N) const;
 		array<T> &operator=(const array &obj);
 		array<T> &operator=(std::initializer_list<T> ilist);
 
@@ -199,6 +200,13 @@ namespace nuts
 
 	template <class T>
 	T &array<T>::operator[](size_t N)
+	{
+		assert(N < this->len);
+		return this->data_ptr[N];
+	}
+
+	template <class T>
+	const T &array<T>::operator[](size_t N) const
 	{
 		assert(N < this->len);
 		return this->data_ptr[N];
