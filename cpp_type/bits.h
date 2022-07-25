@@ -3,17 +3,29 @@
 
 #include <iostream>
 #include <cmath>
-#include "list.h"
-#include "vector.h"
-#include "basic_string.h"
-#include "array.h"
-#include "stack.h"
-#include "queue.h"
-#include "algorithm.h"
+
+using std::cin;
+using std::cout;
+using std::endl;
+
+#include "utility.h"
 #include "memory.h"
 #include "functional.h"
-#include "hash_table.h"
+#include "tuple.h"
+#include "algorithm.h"
+
 #include "type.h"
+
+#include "array.h"
+#include "vector.h"
+#include "list.h"
+#include "stack.h"
+#include "queue.h"
+#include "basic_string.h"
+
+#include "unordered_set.h"
+#include "unordered_map.h"
+
 #include "binary_tree.h"
 #include "set.h"
 #include "map.h"

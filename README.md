@@ -1,7 +1,43 @@
 # Nutstruct
 
 #### **介绍**
-#### Nutstruct 是一组泛型容器和算法，包含数据增删查改实现 ，模拟了所有权的概念，使用 RAII 对内存进行管理。
+#### Nutstruct 是一组泛型容器和算法，实现了数据元素的增删查改功能，使用 RAII 对动态内存进行自动管理。
+
+## 标准库容器与算法
+|  序列容器   |       文件        |
+|:-------:|:-----------------:|
+|数组     |[array.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/array.h)|
+|字符串     |[basic_string.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/basic_string.h)|
+|向量     |[vector.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/vector.h)|
+|栈       |[stack.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/stack.h)|
+|双向链表 |[list.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/list.h)|
+|队列     |[queue.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/queue.h)|
+
+
+|  关联容器   |       文件        |
+|:-------:|:-----------------:|
+|集合     |[set.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/set.h)|
+|映射表     |[map.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/map.h)|
+|无序集合|[unordered_set.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/unordered_set.h)|
+|无序表|[unordered_map.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/unordered_map.h)|
+
+
+| 标准库算法 |       文件        |
+|:-----------:|:-----------------:|
+|通用算法|[algorithm.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/algorithm.h)|
+
+
+| 其他组件 |       文件        |
+|:-----------:|:-----------------:|
+|标准类型|[type.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/type.h)|
+|函数对象|[functional.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/functional.h)|
+|智能指针|[memory.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/memory.h)|
+|多用途对象|[utility.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/utility.h)|
+|元组|[tuple.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/tuple.h)|
+
+
+
+
 #### **安装**
 
  1. `git clone https://gitee.com/Eplankton/nut-struct.git  ` 克隆到本地，在代码中引用相应版本的头文件即可
@@ -12,7 +48,7 @@
 
 ​	`数据节点`是储存数据的基础元素，是储存的**最小单位**，如以下代码中的 `链表节点`类，包含储存的数据值、前后指针和构造函数。
 
-类似于节点这样的自定义泛型数据类型不需要提供析构函数，因为在节点类中没有任何一个成员函数有过申请动态内存的行为，自然不需要任何释放行为，若使用自己的析构函数也无需加入`delete`关键字，事实上，`data`变量的生存期和实例化的对象的生存期是一致的。
+类似于节点这样的自定义泛型数据类型不需要提供自定义析构函数，因为在节点类中没有任何一个成员函数有过申请动态内存的行为，自然不需要任何释放行为，若使用自己的析构函数也无需加入`delete`关键字，事实上，`data`变量的生命周期和实例化的对象的生命周期是一致的。
 
 ```cpp
 template <class T>
@@ -105,33 +141,4 @@ template <class T>
 
 
 
-#### **使用**
 
-**一、节点操作**
-
-1.  `ListNode()`	构造函数，构造一个空节点单元，使用时需要指明类型 `Type`
-2.  `explicit ListNode(const T &userInputData) : data(userInputData), prev(NULL), next(NULL){}`    构造函数，用输入数据构造一个节点单元，使用时需要指明类型 `Type`
-
-**二、链表操作**
-
-4.  `LINKED_LIST()`    构造函数，构造一个空单链表，使用时需要指明类型 `Type`
-5.  `explicit LINKED_LIST(unsigned int userInputlength)`    构造函数，构造一个长度为 `userInputlength` 空链表，使用时需要指明类型 `Type`
-6.  `explicit LINKED_LIST(const T &userInputData, unsigned int userInputlength = 1)`    构造函数，以 ` obj` 为初始化值构造一个长度为 `userInputlength` 的链表，使用时需要指明类型 `Type`
-7.  `LINKED_LIST(const LL<T> &obj)`    构造函数，**深拷贝**另一个链表，使用时需要指明类型 `Type`
-8.  `~LINKED_LIST()`   析构函数，销毁实体和管理类
-9.  `void print(void)`    打印函数，把一个非空链表打印到屏幕
-10.  `ListNode<T> *begin(void)`    返回头节点指针
-11.  `ListNode<T> *end(void)`    返回尾节点指针
-12.  `bool empty()` 返回链表是否为空
-13.  `unsigned int get_length(void)`    返回链表的长度
-14.  `unsigned int get_length(const ListNode<T> *start_node)`    返回从 ` start_node` 开始链表的长度
-15.  `bool remove(ListNode<T> *start_node, int N)`    删除从 ` start_node ` 数起第 N 个节点
-16.  `int remove_all(bool (*condition)(T stock_val))`    删除链表中所有符合 `condition` 条件的节点，返回被删除的数量
-17.  `bool destroy(void)`    删除一个非空链表，失败返回 `false`  
-18.  `bool destroy(ListNode<T> *start_node, ListNode<T> *end_node)`    以 ` start_node` 为首节点，以 ` end_node` 为尾节点删除一个非空链表的一部分，失败返回 `false`  
-19.  `ListNode<T> *push_back(unsigned int num = 1)`    在链表最后加上 `num` 个空节点，返回尾指针
-20.  `ListNode<T> *push_back(const T &obj, unsigned int num = 1)`    在链表最后加上 `num` 个节点，初始化值为`obj`，返回尾指针
-21.  `ListNode<T> *push_front(unsigned int num = 1)`    在链表最前加上 `num` 个空节点，返回头指针
-22.  `ListNode<T> *push_front(const T &obj, unsigned int num = 1)`    在链表最前加上 `num` 个节点，初始化值为`obj`，返回头指针
-23.  `ListNode<T> *find(bool (*condition)(T stock_val))`    查找符合 `condition` 条件的第一个节点，返回指针
-25.  迭代器 `iterator` 操作 ` ==  !=  ++  --  *`

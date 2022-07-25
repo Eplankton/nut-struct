@@ -32,10 +32,11 @@ namespace nuts
 		~array() { this->destroy(); }
 
 		size_t size() const { return this->len; }
-		bool exist() { return this->data_ptr != nullptr; }
+		bool exist() const { return this->data_ptr != nullptr; }
 		array<T> &fill(const T &val, size_t _l);
 		void destroy();
 		void clear();
+		void print();
 
 		T &front() { return this->data_ptr[0]; }
 		T &back() { return this->data_ptr[this->size() - 1]; }
@@ -46,47 +47,48 @@ namespace nuts
 		T &operator[](size_t N);
 		const T &operator[](size_t N) const;
 		array<T> &operator=(const array &obj);
-		array<T> &operator=(std::initializer_list<T> ilist);
+		T *data() const { return this->data_ptr; }
 
 		class iterator
 		{
 		protected:
-			T *ptr_onNode = nullptr;
+			T *_ptr = nullptr;
 
 		public:
 			iterator() = default;
 			iterator(T *obj)
 			{
-				this->ptr_onNode = obj;
+				this->_ptr = obj;
 			}
 			iterator(const iterator &obj)
 			{
-				this->ptr_onNode = obj.ptr_onNode;
+				this->_ptr = obj._ptr;
 			}
 
-			T &operator*() { return *ptr_onNode; }
+			T &operator*() { return *_ptr; }
+			const T &operator*() const { return *_ptr; }
 
 			iterator &operator=(T *obj)
 			{
-				this->ptr_onNode = obj;
+				this->_ptr = obj;
 				return *this;
 			}
 
 			iterator &operator=(const iterator &obj)
 			{
-				this->ptr_onNode = obj.ptr_onNode;
+				this->_ptr = obj._ptr;
 				return *this;
 			}
 
-			bool operator==(T *obj) const { return this->ptr_onNode == obj; }
-			bool operator!=(T *obj) const { return this->ptr_onNode != obj; }
+			bool operator==(T *obj) const { return this->_ptr == obj; }
+			bool operator!=(T *obj) const { return this->_ptr != obj; }
 
-			bool operator==(const iterator &obj) const { return this->ptr_onNode == obj.ptr_onNode; }
-			bool operator!=(const iterator &obj) const { return this->ptr_onNode != obj.ptr_onNode; }
+			bool operator==(const iterator &obj) const { return this->_ptr == obj._ptr; }
+			bool operator!=(const iterator &obj) const { return this->_ptr != obj._ptr; }
 
 			iterator &operator++()
 			{
-				this->ptr_onNode++;
+				this->_ptr++;
 				return *this;
 			}
 
@@ -99,7 +101,7 @@ namespace nuts
 
 			iterator &operator--()
 			{
-				this->ptr_onNode--;
+				this->_ptr--;
 				return *this;
 			}
 
@@ -110,35 +112,33 @@ namespace nuts
 				return res;
 			}
 
-			iterator operator+(int bias)
+			iterator operator+(int bias) const
 			{
-				return iterator(this->ptr_onNode + bias);
+				return iterator(this->_ptr + bias);
 			}
 
 			void operator+=(int bias)
 			{
-				ptr_onNode += bias;
+				_ptr += bias;
 			}
 
-			iterator operator-(int bias)
+			iterator operator-(int bias) const
 			{
-				return iterator(this->ptr_onNode - bias);
+				return iterator(this->_ptr - bias);
 			}
 
 			void operator-=(int bias)
 			{
-				ptr_onNode -= bias;
+				_ptr -= bias;
 			}
 
-			int operator-(const iterator &b)
+			int operator-(const iterator &b) const
 			{
-				return this->ptr_onNode - b.ptr_onNode;
+				return this->_ptr - b._ptr;
 			}
 
-			T *operator->() { return ptr_onNode; }
-
-			template <class>
-			friend class array;
+			T *operator->() { return _ptr; }
+			const T *operator->() const { return _ptr; }
 		};
 
 		iterator begin() // Return iterator to the first element
@@ -147,6 +147,16 @@ namespace nuts
 		}
 
 		iterator end() // Return iterator to the last element
+		{
+			return iterator(&this->data_ptr[this->size() - 1]);
+		}
+
+		const iterator begin() const
+		{
+			return iterator(this->data_ptr);
+		}
+
+		const iterator end() const
 		{
 			return iterator(&this->data_ptr[this->size() - 1]);
 		}
@@ -254,19 +264,17 @@ namespace nuts
 	}
 
 	template <class T>
-	array<T> &array<T>::operator=(const std::initializer_list<T> ilist)
+	void array<T>::print()
 	{
-		if (this->exist())
-			this->destroy();
-		this->data_ptr = new T[ilist.size()];
-		this->len = ilist.size();
-		T *q = this->data_ptr;
-		for (auto p = ilist.begin(); p != ilist.end(); ++p)
+		auto print = [this](const auto &x)
 		{
-			*q = *p;
-			q++;
-		}
-		return *this;
+			std::cout << x;
+			if (x != this->back())
+				std::cout << ", ";
+		};
+		printf("\narray@%#llx = [", (u64)this->data_ptr);
+		for_each(begin(), end(), print);
+		std::cout << "]\n";
 	}
 
 }

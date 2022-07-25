@@ -14,11 +14,7 @@ namespace nuts
 		set() { this->root = nullptr, this->_size = 0; }
 		set(std::initializer_list<T> ilist);
 		~set() { this->_size = 0; }
-
-		bool contains(const T &_k)
-		{
-			return AVL<T, Compare>::find(_k) != this->npos;
-		}
+		void print() const;
 	};
 
 	template <typename T, class Compare>
@@ -26,8 +22,29 @@ namespace nuts
 	{
 		for (auto it = ilist.begin(); it != ilist.end(); it++)
 		{
-			AVL<T>::insert(*it);
+			this->insert(*it);
 		}
+	}
+
+	// template <typename T, class Compare>
+	// bool set<T, Compare>::contains(const T &_k) const
+	// {
+	// 	return AVL<T, Compare>::find(_k) != this->npos;
+	// }
+
+	template <typename T, class Compare>
+	void set<T, Compare>::print() const
+	{
+		auto pr = [this](const auto &x)
+		{
+			std::cout << x;
+			if (x != this->max())
+				printf(", ");
+		};
+
+		printf("\nset@%#llx = {", (u64)this->root.get());
+		for_each(this->begin(), this->end(), pr);
+		printf("}\n");
 	}
 }
 

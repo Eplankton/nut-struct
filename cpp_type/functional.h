@@ -14,8 +14,8 @@ namespace nuts
 
 	public:
 		function() = default;
-		function(const FuncType& R) : fn(R) {}
-		function(const function<FuncType>& OBJ) : fn(OBJ.fn) {}
+		function(const FuncType &R) : fn(R) {}
+		function(const function<FuncType> &OBJ) : fn(OBJ.fn) {}
 		~function() { fn = nullptr; }
 
 		template <typename... _ArgTypes>
@@ -25,29 +25,34 @@ namespace nuts
 	template <typename T>
 	struct less
 	{
-		bool operator()(const T& a, const T& b) const { return a < b; }
+		bool operator()(const T &a, const T &b)
+			const { return a < b; }
 	};
 
 	template <typename T>
 	struct greater
 	{
-		bool operator()(const T& a, const T& b) const { return a > b; }
+		bool operator()(const T &a, const T &b)
+			const { return a > b; }
 	};
 
 	template <typename T>
 	struct equal
 	{
-		bool operator()(const T& a, const T& b) const { return a == b; }
+		bool operator()(const T &a, const T &b)
+			const { return a == b; }
 	};
 
-	template <typename Key> // Abstract hash function
+	/* HASHER */
+
+	template <typename x> // Abstract hash function
 	struct hash;
 
 	// Full specialization of hash function
 	template <>
 	struct hash<u32>
 	{
-		u32 operator()(u32 x)
+		u64 operator()(u32 x) const
 		{
 			x = ((x >> 16) ^ x) * 0x45d9f3b;
 			x = ((x >> 16) ^ x) * 0x45d9f3b;
@@ -59,7 +64,7 @@ namespace nuts
 	template <>
 	struct hash<u64>
 	{
-		u64 operator()(u64 x)
+		u64 operator()(u64 x) const
 		{
 			x = (x ^ (x >> 30)) * u64(0xbf58476d1ce4e5b9);
 			x = (x ^ (x >> 27)) * u64(0x94d049bb133111eb);
@@ -71,20 +76,26 @@ namespace nuts
 	template <>
 	struct hash<i32>
 	{
-		u32 operator()(i32 x)
+		u64 operator()(i32 x) const
 		{
 			x = x & 0x7fffffff;
-			x = ((x >> 16) ^ x) * 0x45d9f3b;
-			x = ((x >> 16) ^ x) * 0x45d9f3b;
-			x = (x >> 16) ^ x;
+			// x = ((x >> 15) ^ x) * 0x45d9f3b;
+			x = ((x >> 15) ^ x) * 0x45d3f3b;
+			x ^= (x << 6);
 			return x;
+
+			// x = x & 0x7fffffff;
+			// x = ((x >> 16) ^ x) * 0x45d9f3b;
+			// x = ((x >> 16) ^ x) * 0x45d9f3b;
+			// x = (x >> 16) ^ x;
+			// return x;
 		}
 	};
 
 	template <>
 	struct hash<i64>
 	{
-		u64 operator()(i64 x)
+		u64 operator()(i64 x) const
 		{
 			x = x & 0x7fffffffffffffff;
 			x = (x ^ (x >> 30)) * u64(0xbf58476d1ce4e5b9);
@@ -93,18 +104,6 @@ namespace nuts
 			return x;
 		}
 	};
-
-	template <typename K, typename V>
-	struct hash<pair<K, V>>     // For pair<K, V>
-	{
-		using Ty = pair<K, V>;
-		u64 operator()(const Ty& x)
-		{
-			return hash(x.first);
-		}
-	};
-
-
 }
 
 #endif

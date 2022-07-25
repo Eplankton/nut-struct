@@ -3,23 +3,16 @@
 
 #include <cassert>
 #include "type.h"
-#include "algorithm.h"
+#include "functional.h"
 
 namespace nuts
 {
-	// template <typename T>
-	// bool less(const T &a, const T &b) { return a < b; }
-
-	// template <typename T>
-	// bool greater(const T &a, const T &b) { return a > b; }
-
 	template <typename Itr, class Visitor>
 	void for_each(Itr st, Itr ed, const Visitor &fn)
 	{
-		auto _st = st, _ed = ed + 1;
-		for (; _st != _ed; ++_st)
+		for (; st != ed + 1; ++st)
 		{
-			fn(*_st);
+			fn(*st);
 		}
 	}
 
@@ -52,31 +45,31 @@ namespace nuts
 	}
 
 	template <typename T>
-	T min(const T &a, const T &b) // Return the minimum
+	T min(const T& a, const T& b) // Return the minimum
 	{
 		return (a < b) ? a : b;
 	}
 
 	template <typename T>
-	T max(const T &a, const T &b) // Return the maximum
+	T max(const T& a, const T& b) // Return the maximum
 	{
 		return (a > b) ? a : b;
 	}
 
 	template <typename Itr>
-	Itr min_in(Itr st, Itr ed) // Give range by itr: st && ed
+	Itr min_in(Itr st, Itr ed) // Give range by itr: st && ed -> O(N)
 	{
-		Itr res = st;
+		Itr tmp = st;
 		for (auto i = st; i != ed + 1; i++)
 		{
-			if (*i < *res)
-				res = i;
+			if (*i < *tmp)
+				tmp = i;
 		}
-		return res;
+		return tmp;
 	}
 
 	template <typename Itr>
-	Itr max_in(Itr st, Itr ed) // Give range by itr: st && ed
+	Itr max_in(Itr st, Itr ed) // Give range by itr: st && ed -> O(N)
 	{
 		Itr tmp = st;
 		for (auto i = st; i != ed + 1; i++)
@@ -88,7 +81,7 @@ namespace nuts
 	}
 
 	template <typename T>
-	void swap(T &a, T &b) // Swap two val by refer
+	void swap(T &a, T &b) // Swap value by copy
 	{
 		T tmp = b;
 		b = a;
@@ -96,7 +89,7 @@ namespace nuts
 	}
 
 	template <typename Itr>
-	void itr_swap(Itr a_itr, Itr b_itr) // Swap two val by itr
+	void itr_swap(Itr a_itr, Itr b_itr) // Swap two val by itr or ptr
 	{
 		swap(*a_itr, *b_itr);
 	}
@@ -114,38 +107,27 @@ namespace nuts
 			itr_swap(st, ed);
 	}
 
-	// template <typename Seq>
-	// bool is_sorted(Seq &arr) // default a < b
-	// {
-	//     for (auto it = arr.begin() + 1; it != arr.end() + 1; it++)
-	//     {
-	//         if (*it < *(it - 1))
-	//             return false;
-	//     }
-	//     return true;
-	// }
+	template <typename T, typename Itr, class Comp = nuts::less<T>>
+	bool is_sorted(Itr st, Itr ed, Comp cmp = nuts::less<T>())
+	{
+		for (auto it = st + 1; it != ed + 1; it++)
+		{
+			if (cmp(*it, *(it - 1)))
+				return false;
+		}
+		return true;
+	}
 
-	// template <typename Itr>
-	// bool is_sorted(Itr st, Itr ed) // default a < b
-	// {
-	//     for (auto it = st + 1; it != ed + 1; it++)
-	//     {
-	//         if (*it < *(it - 1))
-	//             return false;
-	//     }
-	//     return true;
-	// }
-
-	// template <typename Itr, typename T>
-	// bool is_sorted(Itr st, Itr ed, bool (*cmp)(const T &a, const T &b))
-	// {
-	//     for (auto it = st + 1; it != ed + 1; it++)
-	//     {
-	//         if (cmp(*it, *(it - 1)))
-	//             return false;
-	//     }
-	//     return true;
-	// }
+	template <typename T, typename Container, class Comp = nuts::less<T>>
+	bool is_sorted(const Container &x, Comp cmp = nuts::less<T>())
+	{
+		for (auto it = x.begin() + 1; it != x.end() + 1; it++)
+		{
+			if (cmp(*it, *(it - 1)))
+				return false;
+		}
+		return true;
+	}
 
 	template <typename Itr, typename T>
 	Itr search(Itr st, Itr ed, const T &val) // Basic linear version -> O(N)
@@ -160,7 +142,8 @@ namespace nuts
 	}
 
 	template <typename Itr, typename T>
-	Itr lower_bound(Itr st, Itr ed, const T &val) // Return itr:none if not found && must be random_access -> O(logN)
+	Itr lower_bound(Itr st, Itr ed, const T &val)
+	// Return itr:none if not found && must be random_access -> O(logN)
 	{
 		Itr it, cpy = st;
 		u64 count = distance(st, ed), step;
@@ -184,14 +167,16 @@ namespace nuts
 	}
 
 	template <typename Itr, typename T>
-	bool binary_search(Itr st, Itr ed, const T &val) // Return false if not found -> O(logN)
+	bool binary_search(Itr st, Itr ed, const T &val)
+	// Return false if not found -> O(logN)
 	{
 		st = lower_bound(st, ed, val);
 		return st != nullptr && val == *st;
 	}
 
 	template <typename Seq, typename T>
-	bool binary_search(Seq &arr, const T &val) // For seq version -> O(logN)
+	bool binary_search(Seq &arr, const T &val)
+	// For seq version -> O(logN)
 	{
 		return binary_search(arr.begin(), arr.end(), val);
 	}
@@ -213,9 +198,10 @@ namespace nuts
 		}
 	}
 
-	template <typename Itr, typename T>
+	template <typename Itr, typename T, class Compare = nuts::less<T>>
 	// General itr version with cmp() -> O(N^2)
-	void insertion_sort(Itr st, Itr ed, bool (*cmp)(const T &a, const T &b))
+	void insertion_sort(Itr st, Itr ed,
+						Compare cmp = nuts::less<T>())
 	{
 		for (Itr i = st + 1; i != ed + 1; i++)
 		{
@@ -248,9 +234,9 @@ namespace nuts
 		}
 	}
 
-	template <typename Seq, typename T>
+	template <typename Seq, typename T, class Compare = nuts::less<T>>
 	// General seq version with cmp() -> O(N^2)
-	void insertion_sort(Seq &arr, bool (*cmp)(const T &a, const T &b))
+	void insertion_sort(Seq &arr, Compare cmp = nuts::less<T>())
 	{
 		auto st = arr.begin(), ed = arr.end();
 		for (auto i = st + 1; i != ed + 1; i++)
@@ -266,9 +252,9 @@ namespace nuts
 		}
 	}
 
-	template <typename Seq, typename Compare>
+	template <typename T, typename Seq, typename Compare = nuts::less<T>>
 	// General seq version with Compare():cmp -> O(N^2)
-	void insertion_sort(Seq &arr, Compare cmp)
+	void insertion_sort(Seq &arr, Compare cmp = nuts::less<T>())
 	{
 		auto st = arr.begin(), ed = arr.end();
 		for (auto i = st + 1; i != ed + 1; i++)
@@ -284,9 +270,9 @@ namespace nuts
 		}
 	}
 
-	template <typename Itr, typename Compare>
+	template <typename T, typename Itr, typename Compare = nuts::less<T>>
 	// General itr version with Compare():cmp -> O(N^2)
-	void insertion_sort(Itr st, Itr ed, Compare cmp)
+	void insertion_sort(Itr st, Itr ed, Compare cmp = nuts::less<T>())
 	{
 		for (Itr i = st + 1; i != ed + 1; i++)
 		{
@@ -325,20 +311,23 @@ namespace nuts
 	}
 
 	template <typename Itr>
-	void selection_sort(Itr st, Itr ed) // General itr version -> O(N^2)
+	void selection_sort(Itr st, Itr ed)
+	// General itr version -> O(N^2)
 	{
 		for (auto i = st; i != ed + 1; i++)
 			itr_swap(i, min_in(i, ed));
 	}
 
 	template <typename Seq>
-	void selection_sort(Seq &arr) // General itr version -> O(N^2)
+	void selection_sort(Seq &arr)
+	// General itr version -> O(N^2)
 	{
 		selection_sort(arr.begin(), arr.end());
 	}
 
 	template <typename Seq>
-	void shell_sort(Seq &arr) // General seq version -> O(nlog(N)^2)
+	void shell_sort(Seq &arr)
+	// General seq version -> O(nlog(N)^2)
 	{
 		i64 n = arr.size();
 		for (i64 step = n / 2; step > 0; step /= 2)
@@ -390,7 +379,8 @@ namespace nuts
 	}
 
 	template <typename Seq>
-	void quick_sort(Seq &arr) // General seq version -> O(nlogN)
+	void quick_sort(Seq &arr)
+	// General seq version -> O(nlogN)
 	{
 		quick_sort_helper(arr, 0, arr.size() - 1);
 	}
