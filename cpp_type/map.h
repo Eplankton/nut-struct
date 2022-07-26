@@ -1,5 +1,5 @@
 #ifndef _NUTS_MAP_
-#define _NUTS_MAP_
+#define _NUTS_MAP_ 1
 
 #include <cassert>
 #include "type.h"
@@ -25,14 +25,13 @@ namespace nuts
 	class map : public set<pair<Key, Value>, Compare>
 	{
 		using itr_type = typename AVL<pair<Key, Value>,
-									  Compare>::const_iterator;
+									  Compare>::iterator;
 
 		using base_type = set<pair<Key, Value>, Compare>;
 
 	public:
 		map() = default;
 		~map() = default;
-		static itr_type npos;
 
 		void print() const;
 
@@ -48,22 +47,22 @@ namespace nuts
 			return base_type::erase(tmp);
 		}
 
-		itr_type find(const Key &_k)
+		const itr_type find(const Key &_k) const
 		{
 			pair<Key, Value> tmp;
 			tmp.first = _k;
 			return base_type::find(tmp);
 		}
 
-		bool contains(const Key &_k)
+		bool contains(const Key &_k) const
 		{
-			return this->find(_k) != npos;
+			return this->find(_k) != this->npos;
 		}
 
 		Value &at(const Key &_k)
 		{
 			auto loc = this->find(_k);
-			if (loc == npos)
+			if (loc == this->npos)
 			{
 				pair<Key, Value> tmp;
 				tmp.first = _k;
@@ -74,28 +73,20 @@ namespace nuts
 				return loc->second;
 		}
 
-		Value &operator[](const Key &_k)
-		{
-			return this->at(_k);
-		}
+		Value &
+		operator[](const Key &_k) { return this->at(_k); }
 
 		const Value &at(const Key &_k) const
 		{
 			auto loc = this->find(_k);
-			assert(loc != npos);
+			assert(loc != this->npos);
 			auto shit = loc.get();
 			return loc->second;
 		}
 
-		const Value &operator[](const Key &_k) const
-		{
-			return this->at(_k);
-		}
+		const Value &
+		operator[](const Key &_k) const { return this->at(_k); }
 	};
-
-	template <typename Key, typename Val, class Compare>
-	typename AVL<pair<Key, Val>, Compare>::const_iterator
-		map<Key, Val, Compare>::npos;
 
 	template <typename Key, typename Val, class Compare>
 	void map<Key, Val, Compare>::print() const
@@ -107,8 +98,9 @@ namespace nuts
 				printf(", ");
 		};
 
-		printf("\nmap@%#llx = {", (u64)this->root.get());
-		for_each(this->begin(), this->end(), pr);
+		printf("\nmap @%#llx = {", (u64)this->root.get());
+		if (!this->empty())
+			for_each(this->begin(), this->end(), pr);
 		printf("}\n");
 	}
 }

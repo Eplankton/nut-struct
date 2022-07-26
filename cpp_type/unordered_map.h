@@ -1,5 +1,5 @@
 #ifndef _NUTS_UNO_MAP_
-#define _NUTS_UNO_MAP_
+#define _NUTS_UNO_MAP_ 1
 
 #include "unordered_set.h"
 
@@ -21,7 +21,6 @@ namespace nuts
 
         Self_Type &move(Self_Type &src);
         void rehash();
-
         bool contains(const Key &_k) const;
         typename UOS::iterator find(const Key &_k) const;
         Val &at(const Key &_k);
@@ -41,7 +40,8 @@ namespace nuts
     }
 
     template <class Key, class Val, class Hasher>
-    unordered_map<Key, Val, Hasher>::unordered_map(const Self_Type &src)
+    unordered_map<Key, Val, Hasher>::
+        unordered_map(const Self_Type &src)
     {
         this->bucket_size = src.bucket_size;
         this->bucket(src.bucket);
@@ -49,8 +49,8 @@ namespace nuts
     }
 
     template <class Key, class Val, class Hasher>
-    unordered_map<Key, Val, Hasher> &unordered_map<Key, Val, Hasher>::
-        move(Self_Type &src)
+    unordered_map<Key, Val, Hasher> &
+    unordered_map<Key, Val, Hasher>::move(Self_Type &src)
     {
         this->bucket_size = src.bucket_size;
         this->bucket.move(src.bucket);
@@ -82,12 +82,13 @@ namespace nuts
              res != this->bucket[index].end() + 1;
              res++)
         {
-            if (res != nullptr && (*res).first == _k)
-                return typename UOS::iterator{this->bucket.begin() + index,
-                                              res,
-                                              this->bucket.end()};
+            if (res != nullptr &&
+                (*res).first == _k)
+                return {this->bucket.begin() + index,
+                        res,
+                        this->bucket.end()};
         }
-        return UOS::npos;
+        return UOS::npos; // if not found
     }
 
     template <class Key, class Val, class Hasher>
@@ -95,15 +96,16 @@ namespace nuts
     {
         auto it = this->find(_k);
         assert(it != UOS::npos);
-        return (*it).second;
+        return it->second;
     }
 
     template <class Key, class Val, class Hasher>
-    const Val &unordered_map<Key, Val, Hasher>::at(const Key &_k) const
+    const Val &unordered_map<Key, Val, Hasher>::
+        at(const Key &_k) const
     {
         auto it = this->find(_k);
         assert(it != UOS::npos);
-        return (*it).second;
+        return it->second;
     }
 
     template <class Key, class Val, class Hasher>
@@ -111,7 +113,7 @@ namespace nuts
     {
         auto it = this->find(_k);
         if (it != UOS::npos)
-            return (*it).second;
+            return it->second;
         else
         {
             if (this->_size == *this->bucket_size - 1)
@@ -128,7 +130,7 @@ namespace nuts
     const Val &unordered_map<Key, Val, Hasher>::
     operator[](const Key &_k) const
     {
-        assert(this->find(_k) != this->npos);
+        assert(this->find(_k) != UOS::npos);
         return (*this)[_k];
     }
 
@@ -150,19 +152,9 @@ namespace nuts
     bool unordered_map<Key, Val, Hasher>::
         erase(const Key &_k)
     {
-        u64 index = this->hash_fn(_k) % *this->bucket_size;
-        for (auto res = this->bucket[index].begin();
-             res != this->bucket[index].end() + 1;
-             res++)
-        {
-            if (res->first == _k)
-            {
-                this->bucket[index].erase(res);
-                this->_size--;
-                return true;
-            }
-        }
-        return false;
+        pair<Key, Val> tmp;
+        tmp.first = _k;
+        return UOS::erase(tmp);
     }
 
     template <class Key, class Val, class Hasher>

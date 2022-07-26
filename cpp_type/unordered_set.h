@@ -1,5 +1,5 @@
 #ifndef _NUTS_UNO_SET_
-#define _NUTS_UNO_SET_
+#define _NUTS_UNO_SET_ 1
 
 #include "utility.h"
 #include "vector.h"
@@ -55,7 +55,10 @@ namespace nuts
             ~iterator() = default;
 
             Key &operator*() { return *in_itr; }
-            const Key &operator*() const { return *in_itr; }
+            Key &operator*() const { return *in_itr; }
+
+            Inside &operator->() { return in_itr; }
+            Inside &operator->() const { return in_itr; }
 
             iterator &operator++()
             {
@@ -156,19 +159,21 @@ namespace nuts
 
         unordered_set();
         unordered_set(const Self_Type &src);
-        unordered_set(std::initializer_list<Key> ilist);
+        unordered_set(const std::initializer_list<Key> &ilist);
         ~unordered_set() { this->clear(); }
 
-        Self_Type &move(Self_Type &src);
         u64 size() const { return _size; }
         bool empty() const { return _size == 0; }
+        void rehash();
+        Self_Type &move(Self_Type &src);
+
         iterator find(const Key &_k) const;
         bool contains(const Key &_k) const;
-        void rehash();
         void insert(const Key &_k);
         bool erase(const Key &_k);
         void clear();
-        void print();
+        void print() const;
+        void print_as_table() const;
     };
 
     template <class Key, class Hasher>
@@ -188,20 +193,21 @@ namespace nuts
         unordered_set(const Self_Type &src)
     {
         this->bucket_size = src.bucket_size;
-        this->bucket(src.bucket);
+        this->bucket(src.bucket); // Copy constructor
         this->_size = src._size;
     }
 
     template <class Key, class Hasher>
     unordered_set<Key, Hasher>::
-        unordered_set(std::initializer_list<Key> ilist)
+        unordered_set(const std::initializer_list<Key> &ilist)
     {
         while (ilist.size() > *bucket_size)
             bucket_size++;
         vector<Bucket_Type> tmp(*bucket_size);
         tmp.shrink_to_fit();
         this->bucket.move(tmp);
-        for_each(ilist.begin(), ilist.end() - 1, [this](const Key &x)
+        for_each(ilist.begin(), ilist.end() - 1,
+                 [this](const Key &x)
                  { this->insert(x); });
     }
 
@@ -215,11 +221,11 @@ namespace nuts
              res++)
         {
             if (res != nullptr && *res == _k)
-                return iterator{bucket.begin() + index,
-                                res,
-                                bucket.end()};
+                return {bucket.begin() + index,
+                        res,
+                        bucket.end()};
         }
-        return npos;
+        return npos; // if not found
     }
 
     template <class Key, class Hasher>
@@ -247,13 +253,13 @@ namespace nuts
         if (it == npos)
         {
             if (_size == *bucket_size - 1)
-                // if (_size >= *bucket_size - 1)
                 this->rehash();
             u64 index = this->hash_fn(_k) % *this->bucket_size;
             this->bucket[index].push_back();
             this->bucket[index].back() = _k;
             this->_size++;
         }
+        // else do nothing.
     }
 
     template <class Key, class Hasher>
@@ -287,28 +293,6 @@ namespace nuts
     }
 
     template <class Key, class Hasher>
-    void unordered_set<Key, Hasher>::print()
-    {
-        printf("\n");
-        u64 collison = 0;
-        for (u64 n = 0; n < *bucket_size; n++)
-        {
-            if (!bucket[n].empty())
-            {
-                collison += bucket[n].size() - 1;
-                std::cout << '#' << n << ": ";
-                for_each(bucket[n].begin(), bucket[n].end(),
-                         [](const auto &x)
-                         { std::cout << x << " ~ "; });
-                std::cout << '\n';
-            }
-        }
-        printf("[Buckect: %lld || Collision: %.2lf%% || Load: %.2lf%% ]\n",
-               *bucket_size, (f64)collison * 100.0 / _size,
-               (f64)_size * 100.0 / *bucket_size);
-    }
-
-    template <class Key, class Hasher>
     void unordered_set<Key, Hasher>::rehash()
     {
         bucket_size++;
@@ -323,6 +307,43 @@ namespace nuts
 
         for_each(begin(), end(), fv);
         this->bucket.move(tmp);
+    }
+
+    template <class Key, class Hasher>
+    void unordered_set<Key, Hasher>::print() const
+    {
+        auto pr = [this](const auto &x)
+        {
+            std::cout << x;
+            if (x != *this->end())
+                printf(", ");
+        };
+
+        printf("\nhash_table @%#llx = {", (u64)bucket.data());
+        for_each(begin(), end(), pr);
+        printf("}\n");
+    }
+
+    template <class Key, class Hasher>
+    void unordered_set<Key, Hasher>::print_as_table() const
+    {
+        printf("\n");
+        u64 collison = 0;
+        for (u64 n = 0; n < *bucket_size; n++)
+        {
+            if (!bucket[n].empty())
+            {
+                collison += bucket[n].size() - 1;
+                printf("#%lld: ", n);
+                for_each(bucket[n].begin(), bucket[n].end(),
+                         [](const auto &x)
+                         { std::cout << x << " ~ "; });
+                printf("\n");
+            }
+        }
+        printf("[Buckect: %lld || Collision: %.2lf%% || Average: %.2lf ]\n",
+               *bucket_size, static_cast<f64>(collison) * 100 / _size,
+               static_cast<f64>(_size) / *bucket_size);
     }
 }
 

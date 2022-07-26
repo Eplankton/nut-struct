@@ -1,5 +1,5 @@
 #ifndef _NUTS_SET_
-#define _NUTS_SET_
+#define _NUTS_SET_ 1
 
 #include "type.h"
 #include "functional.h"
@@ -12,25 +12,18 @@ namespace nuts
 	{
 	public:
 		set() { this->root = nullptr, this->_size = 0; }
-		set(std::initializer_list<T> ilist);
+		set(const std::initializer_list<T> &ilist);
 		~set() { this->_size = 0; }
 		void print() const;
 	};
 
 	template <typename T, class Compare>
-	set<T, Compare>::set(std::initializer_list<T> ilist)
+	set<T, Compare>::set(const std::initializer_list<T> &ilist)
 	{
-		for (auto it = ilist.begin(); it != ilist.end(); it++)
-		{
-			this->insert(*it);
-		}
+		for_each(ilist.begin(), ilist.end() - 1,
+				 [this](const T &x)
+				 { this->insert(x); });
 	}
-
-	// template <typename T, class Compare>
-	// bool set<T, Compare>::contains(const T &_k) const
-	// {
-	// 	return AVL<T, Compare>::find(_k) != this->npos;
-	// }
 
 	template <typename T, class Compare>
 	void set<T, Compare>::print() const
@@ -42,8 +35,9 @@ namespace nuts
 				printf(", ");
 		};
 
-		printf("\nset@%#llx = {", (u64)this->root.get());
-		for_each(this->begin(), this->end(), pr);
+		printf("\nset @%#llx = {", (u64)this->root.get());
+		if (!this->empty())
+			for_each(this->begin(), this->end(), pr);
 		printf("}\n");
 	}
 }

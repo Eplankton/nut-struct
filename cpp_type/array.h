@@ -1,53 +1,38 @@
 #ifndef _NUTS_ARRAY_
-#define _NUTS_ARRAY_
-
-#ifndef _DEBUG
-#define _DEBUG 1
-#endif
-
-#ifndef _WARNING
-#define _WARNING 1
-#endif
+#define _NUTS_ARRAY_ 1
 
 #include <iostream>
-#include <cstddef>
 #include <cassert>
+
+#include "type.h"
 
 namespace nuts
 {
-	template <class T>
+	template <typename T, u64 N>
 	class array
 	{
-	private:
-		T *data_ptr = nullptr;
-		size_t len = 0;
+	protected:
+		T data_ptr[N];
 
 	public:
 		array() = default;
-		explicit array(size_t length);
-		explicit array(size_t length, const T &val);
-		array(const array &obj);
-		array(const T *obj, size_t length);
-		array(std::initializer_list<T> ilist);
-		~array() { this->destroy(); }
+		explicit array(const T& _val);
+		array(const std::initializer_list<T>& ilist);
+		~array() = default;
 
-		size_t size() const { return this->len; }
-		bool exist() const { return this->data_ptr != nullptr; }
-		array<T> &fill(const T &val, size_t _l);
-		void destroy();
-		void clear();
-		void print();
-
-		T &front() { return this->data_ptr[0]; }
-		T &back() { return this->data_ptr[this->size() - 1]; }
-
-		const T &front() const { return this->data_ptr[0]; }
-		const T &back() const { return this->data_ptr[this->size() - 1]; }
-
-		T &operator[](size_t N);
-		const T &operator[](size_t N) const;
-		array<T> &operator=(const array &obj);
-		T *data() const { return this->data_ptr; }
+		array<T, N>& fill(const T& _val);
+		T *data() const { return data_ptr; }
+		u64 size() const { return N; }
+		u64 empty() const { return size() == 0; }
+		T& front() { return data_ptr[0]; }
+		T& back() { return data_ptr[this->size() - 1]; }
+		const T& front() const { return data_ptr[0]; }
+		const T& back() const { return data_ptr[this->size() - 1]; }
+		T& operator[](u64 _n) { return data_ptr[_n]; }
+		const T& operator[](u64 _n) const { return data_ptr[_n]; }
+		T& at(u64 _n);
+		const T& at(u64 _n) const;
+		void print() const;
 
 		class iterator
 		{
@@ -56,25 +41,21 @@ namespace nuts
 
 		public:
 			iterator() = default;
-			iterator(T *obj)
-			{
-				this->_ptr = obj;
-			}
-			iterator(const iterator &obj)
-			{
-				this->_ptr = obj._ptr;
-			}
+			iterator(T *obj) { this->_ptr = obj; }
+			iterator(const iterator& obj) { this->_ptr = obj._ptr; }
 
-			T &operator*() { return *_ptr; }
-			const T &operator*() const { return *_ptr; }
+			T *get() const { return _ptr; }
 
-			iterator &operator=(T *obj)
+			T& operator*() { return *_ptr; }
+			const T& operator*() const { return *_ptr; }
+
+			iterator& operator=(T *obj)
 			{
 				this->_ptr = obj;
 				return *this;
 			}
 
-			iterator &operator=(const iterator &obj)
+			iterator& operator=(const iterator& obj)
 			{
 				this->_ptr = obj._ptr;
 				return *this;
@@ -83,200 +64,112 @@ namespace nuts
 			bool operator==(T *obj) const { return this->_ptr == obj; }
 			bool operator!=(T *obj) const { return this->_ptr != obj; }
 
-			bool operator==(const iterator &obj) const { return this->_ptr == obj._ptr; }
-			bool operator!=(const iterator &obj) const { return this->_ptr != obj._ptr; }
+			bool operator==(const iterator& obj) const { return this->_ptr == obj._ptr; }
+			bool operator!=(const iterator& obj) const { return this->_ptr != obj._ptr; }
 
-			iterator &operator++()
+			iterator& operator++()
 			{
 				this->_ptr++;
 				return *this;
 			}
 
-			const iterator operator++(int)
+			iterator operator++(int) const
 			{
 				iterator res = *this;
 				++(*this);
 				return res;
 			}
 
-			iterator &operator--()
+			iterator& operator--()
 			{
 				this->_ptr--;
 				return *this;
 			}
 
-			const iterator operator--(int)
+			iterator operator--(int) const
 			{
 				iterator res = *this;
 				--(*this);
 				return res;
 			}
 
-			iterator operator+(int bias) const
-			{
-				return iterator(this->_ptr + bias);
-			}
+			iterator operator+(i64 bias)
+			const { return iterator(this->_ptr + bias); }
 
-			void operator+=(int bias)
-			{
-				_ptr += bias;
-			}
+			void operator+=(i64 bias) { _ptr += bias; }
 
-			iterator operator-(int bias) const
-			{
-				return iterator(this->_ptr - bias);
-			}
+			iterator operator-(i64 bias)
+			const { return iterator(this->_ptr - bias); }
 
-			void operator-=(int bias)
-			{
-				_ptr -= bias;
-			}
+			void operator-=(i64 bias) { _ptr -= bias; }
 
-			int operator-(const iterator &b) const
-			{
-				return this->_ptr - b._ptr;
-			}
+			friend
+			i64 operator-(const iterator& a,
+			              const iterator& b) { return a.get() - b.get(); }
 
 			T *operator->() { return _ptr; }
 			const T *operator->() const { return _ptr; }
 		};
 
-		iterator begin() // Return iterator to the first element
-		{
-			return iterator(this->data_ptr);
-		}
+		iterator begin() { return iterator {(T *) data_ptr}; }
+		// Return iterator to the first element
 
-		iterator end() // Return iterator to the last element
-		{
-			return iterator(&this->data_ptr[this->size() - 1]);
-		}
+		iterator end() { return iterator((T *) &data_ptr[size() - 1]); }
+		// Return iterator to the last element
 
-		const iterator begin() const
-		{
-			return iterator(this->data_ptr);
-		}
+		iterator begin()
+		const { return iterator {(T *) data_ptr}; }
 
-		const iterator end() const
-		{
-			return iterator(&this->data_ptr[this->size() - 1]);
-		}
+		iterator end()
+		const { return iterator((T *) &data_ptr[size() - 1]); }
 	};
 
-	template <class T>
-	array<T>::array(size_t length)
+	template <typename T, nuts::u64 N>
+	array<T, N>::array(const T& val)
 	{
-		this->data_ptr = new T[length];
-		this->len = length;
+		std::fill_n(data_ptr, size(), val);
 	}
 
-	template <class T>
-	array<T>::array(size_t length, const T &val)
+	template <typename T, nuts::u64 N>
+	array<T, N>::array(const std::initializer_list<T>& ilist)
 	{
-		this->data_ptr = new T[length];
-		this->len = length;
-		std::fill_n(this->data_ptr, length, val);
+		auto st = ilist.begin();
+		for (u64 i = 0; i < size(); ++i)
+			data_ptr[i] = *(st++);
 	}
 
-	template <class T>
-	array<T>::array(const array &obj)
+	template <typename T, nuts::u64 N>
+	T& array<T, N>::at(u64 _n)
 	{
-		this->data_ptr = new T[obj.len];
-		this->len = obj.len;
-		for (int i = 0; i < len; i++)
-			this->data_ptr[i] = obj[i];
+		assert(_n < size());
+		return data_ptr[_n];
 	}
 
-	template <class T>
-	array<T>::array(const T *obj, size_t length)
+	template <typename T, nuts::u64 N>
+	const T& array<T, N>::at(u64 _n) const
 	{
-		this->data_ptr = new T[length];
-		this->len = length;
-		for (int i = 0; i < length; i++)
-			this->data_ptr[i] = obj[i];
+		assert(_n < size());
+		return data_ptr[_n];
 	}
 
-	template <class T>
-	array<T>::array(const std::initializer_list<T> ilist)
+	template <typename T, nuts::u64 N>
+	void array<T, N>::print() const
 	{
-		this->data_ptr = new T[ilist.size()];
-		this->len = ilist.size();
-		T *q = this->data_ptr;
-		for (auto p = ilist.begin(); p != ilist.end(); ++p)
-		{
-			*q = *p;
-			q++;
-		}
-	}
-
-	template <class T>
-	T &array<T>::operator[](size_t N)
-	{
-		assert(N < this->len);
-		return this->data_ptr[N];
-	}
-
-	template <class T>
-	const T &array<T>::operator[](size_t N) const
-	{
-		assert(N < this->len);
-		return this->data_ptr[N];
-	}
-
-	template <class T>
-	array<T> &array<T>::fill(const T &val, size_t _l)
-	{
-		std::fill_n(this->data_ptr, _l, val);
-	}
-
-	template <class T>
-	void array<T>::destroy()
-	{
-		if (this->exist())
-		{
-			delete[] this->data_ptr;
-			this->data_ptr = nullptr;
-			this->len = 0;
-		}
-	}
-
-	template <class T>
-	void array<T>::clear()
-	{
-		if (this->exist())
-		{
-			T VOID;
-			for (int i = 0; i < this->len; i++)
-				this->data_ptr[i] = VOID;
-			this->len = 0;
-		}
-	}
-
-	template <class T>
-	array<T> &array<T>::operator=(const array &obj)
-	{
-		if (this->exist())
-			this->destroy();
-		this->data_ptr = new T[obj.len];
-		this->len = obj.len;
-		for (int i = 0; i < len; i++)
-			this->data_ptr[i] = obj[i];
-		return *this;
-	}
-
-	template <class T>
-	void array<T>::print()
-	{
-		auto print = [this](const auto &x)
-		{
+		auto print = [this](const auto& x) {
 			std::cout << x;
-			if (x != this->back())
-				std::cout << ", ";
+			if (&x != &this->back())
+				printf(", ");
 		};
-		printf("\narray@%#llx = [", (u64)this->data_ptr);
-		for_each(begin(), end(), print);
-		std::cout << "]\n";
+		printf("\narray @%#llx = [", (u64) this->data());
+		if (!empty())
+			for_each(begin(), end(), print);
+		printf("]\n");
 	}
-
+	template <typename T, u64 N>
+	array<T, N>& array<T, N>::fill(const T& _val)
+	{
+		return std::fill_n(data_ptr, N, _val);
+	}
 }
 
 #endif

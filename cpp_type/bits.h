@@ -1,5 +1,5 @@
 #ifndef _NUTS_BITS_
-#define _NUTS_BITS_
+#define _NUTS_BITS_ 1
 
 #include <iostream>
 #include <cmath>
@@ -19,6 +19,7 @@ using std::endl;
 #include "array.h"
 #include "vector.h"
 #include "list.h"
+#include "deque.h"
 #include "stack.h"
 #include "queue.h"
 #include "basic_string.h"
@@ -29,6 +30,8 @@ using std::endl;
 #include "binary_tree.h"
 #include "set.h"
 #include "map.h"
+
+#include "matrix.h"
 
 //	string in = "pi";
 //	// std::cout << "\nPlease enter a name: ";

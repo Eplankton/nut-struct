@@ -1,5 +1,5 @@
 #ifndef _NUTS_FUNC_
-#define _NUTS_FUNC_
+#define _NUTS_FUNC_ 1
 
 #include "type.h"
 #include "utility.h"
@@ -66,8 +66,8 @@ namespace nuts
 	{
 		u64 operator()(u64 x) const
 		{
-			x = (x ^ (x >> 30)) * u64(0xbf58476d1ce4e5b9);
-			x = (x ^ (x >> 27)) * u64(0x94d049bb133111eb);
+			x = (x ^ (x >> 30)) * static_cast<u64>(0xbf58476d1ce4e5b9);
+			x = (x ^ (x >> 27)) * static_cast<u64>(0x94d049bb133111eb);
 			x = x ^ (x >> 31);
 			return x;
 		}
@@ -78,17 +78,19 @@ namespace nuts
 	{
 		u64 operator()(i32 x) const
 		{
-			x = x & 0x7fffffff;
-			// x = ((x >> 15) ^ x) * 0x45d9f3b;
-			x = ((x >> 15) ^ x) * 0x45d3f3b;
-			x ^= (x << 6);
-			return x;
+			// x = x & 0x7fffffff;
+			// // x = ((x >> 15) ^ x) * 0x45d9f3b;
+			// x = ((x >> 15) ^ x) * 0x45d3f3b;
+			// x ^= (x << 6);
+			// return x;
 
 			// x = x & 0x7fffffff;
 			// x = ((x >> 16) ^ x) * 0x45d9f3b;
 			// x = ((x >> 16) ^ x) * 0x45d9f3b;
 			// x = (x >> 16) ^ x;
 			// return x;
+
+			return static_cast<u64>(x);
 		}
 	};
 
@@ -98,8 +100,8 @@ namespace nuts
 		u64 operator()(i64 x) const
 		{
 			x = x & 0x7fffffffffffffff;
-			x = (x ^ (x >> 30)) * u64(0xbf58476d1ce4e5b9);
-			x = (x ^ (x >> 27)) * u64(0x94d049bb133111eb);
+			x = (x ^ (x >> 30)) * static_cast<u64>(0xbf58476d1ce4e5b9);
+			x = (x ^ (x >> 27)) * static_cast<u64>(0x94d049bb133111eb);
 			x = x ^ (x >> 31);
 			return x;
 		}

@@ -1,5 +1,5 @@
 #ifndef _NUTS_ALG_
-#define _NUTS_ALG_
+#define _NUTS_ALG_ 1
 
 #include <cassert>
 #include "type.h"
@@ -45,13 +45,13 @@ namespace nuts
 	}
 
 	template <typename T>
-	T min(const T& a, const T& b) // Return the minimum
+	T min(const T &a, const T &b) // Return the minimum
 	{
 		return (a < b) ? a : b;
 	}
 
 	template <typename T>
-	T max(const T& a, const T& b) // Return the maximum
+	T max(const T &a, const T &b) // Return the maximum
 	{
 		return (a > b) ? a : b;
 	}

@@ -1,5 +1,5 @@
 #ifndef _NUTS_VECTOR_
-#define _NUTS_VECTOR_
+#define _NUTS_VECTOR_ 1
 
 #ifndef _DEBUG
 #define _DEBUG 1
@@ -34,7 +34,7 @@ namespace nuts
 		explicit vector(u64 userInputSize);							// Init by size
 		explicit vector(u64 userInputSize, const T &userInputData); // Init by size and value
 		vector(const vector<T> &obj);								// Copy constructor
-		vector(std::initializer_list<T> ilist);						// Init by a {ilist}
+		vector(const std::initializer_list<T> &ilist);				// Init by a {ilist}
 		~vector() { this->destroy(); }
 
 		u64 size() const { return this->v_size; }				 // Return the number of elements
@@ -45,7 +45,7 @@ namespace nuts
 		void destroy();											 // Clear the contents and release memory, contain exist()
 		vector<T> &shrink_to_fit();								 // Reduce memory usage by freeing unused memory
 		vector<T> &resize(u64 N);								 // Reduce or expand capacity
-		void print();
+		void print() const;
 		void sort();
 		T *data() const { return this->data_ptr; }
 
@@ -56,9 +56,9 @@ namespace nuts
 		T &operator[](u64 N); // Access specified element
 		const T &operator[](u64 N) const;
 
-		vector<T> &operator=(const vector<T> &obj);			  // Deep copy operator
-		vector<T> &operator=(std::initializer_list<T> ilist); // Covered by a {inlist}
-		bool operator==(const vector<T> &obj) const;		  // Compare two vectors in same type
+		vector<T> &operator=(const vector<T> &obj);					 // Deep copy operator
+		vector<T> &operator=(const std::initializer_list<T> &ilist); // Covered by a {inlist}
+		bool operator==(const vector<T> &obj) const;				 // Compare two vectors in same type
 
 		class iterator
 		{
@@ -82,6 +82,8 @@ namespace nuts
 			{
 				this->_ptr = obj._ptr;
 			}
+			
+			T *get() const { return _ptr; }
 
 			T *operator->() { return _ptr; }
 			const T *operator->() const { return _ptr; }
@@ -139,29 +141,30 @@ namespace nuts
 				return res;
 			}
 
-			iterator operator+(const int &bias) const
+			iterator operator+(i64 bias) const
 			{
 				return iterator(this->_ptr + bias);
 			}
 
-			void operator+=(const int &bias)
+			void operator+=(i64 bias)
 			{
 				_ptr += bias;
 			}
 
-			iterator operator-(const int &bias) const
+			iterator operator-(i64 bias) const
 			{
 				return iterator(this->_ptr - bias);
 			}
 
-			void operator-=(const int &bias)
+			void operator-=(i64 bias)
 			{
 				_ptr -= bias;
 			}
 
-			i64 operator-(const iterator &b) const
+			friend i64 operator-(const iterator &a,
+								 const iterator &b)
 			{
-				return this->_ptr - b._ptr;
+				return a.get() - b.get();
 			}
 		};
 
@@ -175,12 +178,12 @@ namespace nuts
 			return iterator(&this->data_ptr[this->size() - 1]);
 		}
 
-		const iterator begin() const
+		iterator begin() const
 		{
 			return iterator(this->data_ptr);
 		}
 
-		const iterator end() const
+		iterator end() const
 		{
 			return iterator(&this->data_ptr[this->size() - 1]);
 		}
@@ -226,14 +229,16 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T>::vector(const std::initializer_list<T> ilist)
+	vector<T>::vector(const std::initializer_list<T> &ilist)
 	{
 		this->v_size = ilist.size();
 		this->v_capacity = this->v_size + STD_CAPACITY;
 		this->data_ptr = new T[v_size + STD_CAPACITY];
 		T *q = this->data_ptr;
-		for (auto p = ilist.begin(); p != ilist.end(); ++p, q++)
+		for (auto p = ilist.begin(); p != ilist.end(); ++p, ++q)
+		{
 			*q = *p;
+		}
 	}
 
 	template <class T>
@@ -320,10 +325,8 @@ namespace nuts
 	template <class T>
 	vector<T> &vector<T>::pop_back()
 	{
-		if (this->exist())
+		if (!this->empty())
 		{
-			T tmp;
-			this->data_ptr[this->v_size - 1] = tmp;
 			this->v_size--;
 			return *this;
 		}
@@ -357,7 +360,6 @@ namespace nuts
 	const T &vector<T>::operator[](const u64 N) const
 	{
 		assert(N < this->v_size);
-		// return this->data_ptr[N];
 		return this->data_ptr[N];
 	}
 
@@ -374,18 +376,16 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T> &vector<T>::operator=(const std::initializer_list<T> ilist)
+	vector<T> &
+	vector<T>::operator=(const std::initializer_list<T> &ilist)
 	{
 		this->destroy();
 		this->v_size = ilist.size();
 		this->v_capacity = this->v_size + STD_CAPACITY;
 		this->data_ptr = new T[v_size + STD_CAPACITY];
-		T *p = this->data_ptr;
-		for (auto q = ilist.begin(); q != ilist.end(); ++q)
-		{
-			*p = *q;
-			p++;
-		}
+		auto st = ilist.begin();
+		for (u64 i = 0; i < size(); ++i)
+			data_ptr[i] = *(st++);
 		return *this;
 	}
 
@@ -393,23 +393,26 @@ namespace nuts
 	bool vector<T>::operator==(const vector<T> &obj) const
 	{
 		u64 count = 0;
-		for (u64 i = 0; i < this->v_size && i < obj.v_size; i++)
+		for (u64 i = 0; i < this->v_size &&
+						i < obj.v_size;
+			 i++)
 			if (this->data_ptr[i] == obj.data_ptr[i])
 				count++;
 		return count == this->v_size;
 	}
 
 	template <class T>
-	void vector<T>::print()
+	void vector<T>::print() const
 	{
 		auto print = [this](const auto &x)
 		{
 			std::cout << x;
-			if (x != this->back())
-				std::cout << ", ";
+			if (&x != &this->back())
+				printf(", ");
 		};
 
-		printf("\nvector@%#llx = [", (u64)this->data_ptr);
+		printf("\nvector @%#llx = [",
+			   (u64)(this->data_ptr));
 		for_each(begin(), end(), print);
 		printf("]\n");
 	}

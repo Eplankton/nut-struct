@@ -1,7 +1,7 @@
 #ifndef _NUTS_TYPE_
-#define _NUTS_TYPE_
+#define _NUTS_TYPE_ 1
 
-// Basic data types
+// Primitive data types
 
 namespace nuts
 {

@@ -1,5 +1,5 @@
 #ifndef _NUTS_UTILI_
-#define _NUTS_UTILI_
+#define _NUTS_UTILI_ 1
 
 #include <iostream>
 
@@ -57,7 +57,8 @@ namespace nuts
 			return *this;
 		}
 
-		friend std::ostream& operator<<(std::ostream& output, const pair<T1, T2>& obj)
+		friend std::ostream& 
+		operator<<(std::ostream& output, const pair<T1, T2>& obj)
 		{
 			std::cout << '(' << obj.first << ", " << obj.second << ')';
 			return output;
