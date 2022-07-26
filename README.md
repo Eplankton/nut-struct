@@ -1,7 +1,7 @@
 # Nutstruct
 
 #### **介绍**
-#### Nutstruct 是一组泛型容器和算法，实现了数据元素的增删查改功能，使用 RAII 对动态内存进行自动管理。
+#### Nutstruct 是泛型容器和算法库，使用 RAII 对动态内存进行管理。
 
 ## 标准库容器与算法
 |  序列容器   |       文件        |
@@ -9,8 +9,9 @@
 |数组     |[array.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/array.h)|
 |字符串     |[basic_string.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/basic_string.h)|
 |向量     |[vector.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/vector.h)|
-|栈       |[stack.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/stack.h)|
 |双向链表 |[list.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/list.h)|
+|双端队列     |[deque.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/deque.h)|
+|栈       |[stack.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/stack.h)|
 |队列     |[queue.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/queue.h)|
 
 
@@ -22,18 +23,20 @@
 |无序表|[unordered_map.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/unordered_map.h)|
 
 
-| 标准库算法 |       文件        |
+| 迭代器和标准库算法 |       文件        |
 |:-----------:|:-----------------:|
+|迭代器|[iterator.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/iterator.h)|
 |通用算法|[algorithm.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/algorithm.h)|
 
 
 | 其他组件 |       文件        |
 |:-----------:|:-----------------:|
-|标准类型|[type.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/type.h)|
+|基本类型|[type.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/type.h)|
 |函数对象|[functional.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/functional.h)|
 |智能指针|[memory.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/memory.h)|
 |多用途对象|[utility.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/utility.h)|
 |元组|[tuple.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/tuple.h)|
+|矩阵|[matrix.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/matrix.h)|
 
 
 
