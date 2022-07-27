@@ -1,7 +1,7 @@
-# Nutstruct
+# Nut-struct
 
 #### **介绍**
-#### Nutstruct 是泛型容器和算法库，使用 RAII 对动态内存进行管理。
+#### Nut-struct 是泛型容器和算法库，使用 RAII 对动态内存进行管理。
 
 
 
@@ -42,6 +42,7 @@
 | 多用途对象 |    [utility.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/utility.h)    |
 |    元组    |      [tuple.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/tuple.h)      |
 |    矩阵    |     [matrix.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/matrix.h)     |
+|    异常    |     [option.h](https://gitee.com/Eplankton/nut-struct/blob/master/cpp_type/option.h)     |
 
 <br>
 
