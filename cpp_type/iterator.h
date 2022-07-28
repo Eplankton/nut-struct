@@ -3,13 +3,6 @@
 
 namespace nuts
 {
-	template <typename Itr>
-	auto iterator_traits(const Itr& x)
-	{
-		using itr_type = typename Itr::Category;
-		return itr_type();
-	}
-
 	struct bidirectional_iterator_tag
 	{
 		// Allow ++/--it
@@ -60,6 +53,16 @@ namespace nuts
 	{
 		static const bool value = true;
 	};
-}// namespace nuts
+
+
+	// Get traits
+	template <typename Itr>
+	auto iterator_category(const Itr& x)
+	{
+		// itr_type is one of these 'tags'
+		using itr_type = typename Itr::Category;
+		return itr_type();
+	}
+}
 
 #endif

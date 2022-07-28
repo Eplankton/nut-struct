@@ -6,11 +6,11 @@
 #include "list.h"
 #include "type.h"
 
-#define DEQUE_BUF_SIZE 64
+#define DEQUE_BUF_SIZE 8
 
 namespace nuts
 {
-	template <typename T, u64 Buf = DEQUE_BUF_SIZE>
+	template <typename T, u64 Buf = sizeof(T) * DEQUE_BUF_SIZE>
 	class deque
 	{
 	public:

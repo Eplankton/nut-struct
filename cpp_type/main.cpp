@@ -13,30 +13,33 @@ int main()
 	// A.print_as_tree();
 	// B.print();
 
+	deque<i32> a = {1, 2, 3, 4, 5, 6, 7};
+	auto d = distance(a.begin(), a.begin());
+
 	map<i32, bool> m;
 	for_each(A.begin(), A.end(),
 	         [&m, &B](const auto& x) { m[x] = !B.contains(x); });
 
-	auto opt = make_option(m.find(555),
-	                       [&m](const auto& it) {
+	auto detect_scheme = [&m](const auto& it) {
 					if (it == m.npos)
-		        		return make_pair(Panic, (string)"at npos!");
+		        		return make_pair(Panic, (string)"Get npos iterator!");
 		            else 
-						return make_pair(Success, (string)"Mooooo!"); })
-	                   .get_info();
+						return make_pair(Success, (string)"Mooooo!"); };
 
-	opt.handle([&opt, &m] {
-		if (opt.elem == m.npos) m.insert(555, 0);
-		else m[555] = 1;
-			return opt; });
+	auto opt = make_option(m.find(555), detect_scheme).print_info();
+
+	auto handle_scheme = [&opt, &m] {
+					if (opt.elem == m.npos) m.insert(555, 0);
+					else m[555] = 1;
+						return opt; };
+	opt.handle(handle_scheme);
+
 	// m.print();
 
 	unordered_map<i32, bool> hmap;
 	auto cptr = [&hmap](const auto& x) { hmap.insert(x); };
 	for_each(m.begin(), m.end(), cptr);
-
-	// hmap.erase(4);
-	// hmap[555] = 0;
+	hmap.insert({555, 1});
 	// hmap.print_as_table();
 
 	// auto get_key_set = [](const unordered_map<i32, bool> &H)
@@ -49,9 +52,9 @@ int main()
 	// };
 	// get_key_set(hmap).print();
 
-	stack<string> s {"human", "dog", "cat", "cow",
-	                 "sheep", "monkey", "turtle",
-	                 "elephant"};
+	// deque<string> s {"human", "dog", "cat", "cow",
+	//                  "sheep", "monkey", "turtle",
+	//                  "elephant"};
 	// s.print();
 
 	return 0;

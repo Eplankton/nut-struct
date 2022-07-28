@@ -4,7 +4,6 @@
 #include "iterator.h"
 #include "type.h"
 #include <cassert>
-#include <iostream>
 
 namespace nuts
 {
@@ -13,9 +12,11 @@ namespace nuts
 	{
 	public:
 		using value_type = T;
+		using pointer = T*;
+		using const_pointer = const T*;
 
 	protected:
-		T data_ptr[N];
+		value_type data_ptr[N];
 
 	public:
 		array() = default;
@@ -24,7 +25,7 @@ namespace nuts
 		~array() = default;
 
 		array<T, N>& fill(const T& _val);
-		T* data() const { return const_cast<T*>(data_ptr); }
+		pointer data() const { return const_cast<pointer>(data_ptr); }
 		u64 size() const { return N; }
 		u64 empty() const { return size() == 0; }
 		T& front() { return data_ptr[0]; }
@@ -37,21 +38,24 @@ namespace nuts
 		const T& at(u64 _n) const;
 		void print() const;
 
-		class iterator : public random_access_iterator
+		class iterator
+		    : public random_access_iterator
 		{
 		public:
 			using value_type = T;
+			using pointer = T*;
+			using const_pointer = const T*;
 
 		protected:
-			T* _ptr = nullptr;
+			pointer _ptr = nullptr;
 
 		public:
 			iterator() = default;
-			iterator(T* obj) { this->_ptr = obj; }
+			iterator(const_pointer obj) { this->_ptr = const_cast<pointer>(obj); }
+			iterator(pointer obj) { this->_ptr = obj; }
 			iterator(const iterator& obj) { this->_ptr = obj._ptr; }
 
-			T* get() const { return _ptr; }
-
+			T* get() const { return const_cast<pointer>(_ptr); }
 			T& operator*() { return *_ptr; }
 			const T& operator*() const { return *_ptr; }
 
@@ -112,8 +116,8 @@ namespace nuts
 			friend i64 operator-(const iterator& a,
 			                     const iterator& b) { return a.get() - b.get(); }
 
-			T* operator->() { return _ptr; }
-			const T* operator->() const { return _ptr; }
+			pointer operator->() { return _ptr; }
+			const_pointer operator->() const { return _ptr; }
 		};
 
 		iterator begin() { return {data()}; }
@@ -123,10 +127,10 @@ namespace nuts
 		// Return iterator to the last element
 
 		iterator begin()
-		        const { return {const_cast<T*>(data())}; }
+		        const { return {const_cast<pointer>(data())}; }
 
 		iterator end()
-		        const { return {const_cast<T*>(&data_ptr[size() - 1])}; }
+		        const { return {const_cast<pointer>(&data_ptr[size() - 1])}; }
 	};
 
 	template <typename T, nuts::u64 N>
@@ -146,14 +150,14 @@ namespace nuts
 	template <typename T, nuts::u64 N>
 	T& array<T, N>::at(u64 _n)
 	{
-		assert(_n < size());
+		assert(_n < size() && "Index_Bound");
 		return data_ptr[_n];
 	}
 
 	template <typename T, nuts::u64 N>
 	const T& array<T, N>::at(u64 _n) const
 	{
-		assert(_n < size());
+		assert(_n < size() && "Index_Bound");
 		return data_ptr[_n];
 	}
 

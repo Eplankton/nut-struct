@@ -68,7 +68,7 @@ namespace nuts
 			       tail == nullptr;
 		}
 
-		node_ptr data() const { return const_cast<T*>(head); }
+		node_ptr data() const { return const_cast<node_ptr>(head); }
 		bool exist() const { return this->empty(); }// Whether the list exists
 		u64 size() const { return length; }         // Get the length of the whole list
 		void print() const;                         // Print a list in console

@@ -21,33 +21,34 @@ namespace nuts
 	template <typename Itr>
 	i64 distance(Itr st, Itr ed)
 	{
-		return distance(st, ed, iterator_traits(st));
+		return distance(st, ed, iterator_category(st));
 	}
 
 	template <typename Bid_Itr>
 	i64 distance(Bid_Itr st, Bid_Itr ed,
 	             bidirectional_iterator_tag)
 	{
-		u64 n = 0;
+		if (st == ed) return 0;
+		i64 n = 0;
 		while (st != ed + 1)
 		{
 			++st;
 			++n;
 		}
-		return n - 1;
+		return n;
 	}
 
-	template <typename Bid_Itr>
-	i64 distance(Bid_Itr st, Bid_Itr ed,
+	template <typename Random_Itr>
+	i64 distance(Random_Itr st, Random_Itr ed,
 	             random_access_iterator_tag)
 	{
-		return ed - st;
+		return (st == ed) ? 0 : ed - st + 1;
 	}
 
 	template <typename Itr>
-	Itr advance(Itr it, int n)
+	Itr advance(Itr it, i64 n)
 	{
-		return advance(it, n, iterator_traits(it));
+		return advance(it, n, iterator_category(it));
 	}
 
 	template <typename Itr>
@@ -123,7 +124,7 @@ namespace nuts
 	                  std::enable_if<is_bidirectional_iterator<typename Itr::Category>::value>>
 	void reverse(Itr st, Itr ed)// Give range by itr: st && ed -> O(N)
 	{
-		while (st != ed && st + 1 != ed)
+		while (st != ed && st != ed - 1)
 		{
 			itr_swap(st, ed);
 			st++;
@@ -180,7 +181,7 @@ namespace nuts
 	// Return itr:none if not found && must be random_access -> O(logN)
 	{
 		Itr it, cpy = st;
-		u64 count = distance(st, ed), step;
+		u64 count = distance(st, ed), step = 0;
 		while (count > 0)
 		{
 			it = st;

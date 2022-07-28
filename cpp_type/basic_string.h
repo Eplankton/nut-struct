@@ -82,7 +82,7 @@ namespace nuts
 		}
 
 		template <class Type>
-		friend basic_string<Type> operator+(const Type* array, basic_string<Type>& str);// Connect two strings
+		friend basic_string<Type> operator+(const Type* array, const basic_string<Type>& str);// Connect two strings
 
 		friend std::ostream&
 		operator<<(std::ostream& output, const basic_string<T>& obj)
@@ -363,8 +363,7 @@ namespace nuts
 	{
 		if (this->exist())
 		{
-			T VOID = '\0';
-			this->data_ptr[this->v_size - 1] = VOID;
+			this->data_ptr[this->v_size - 1] = '\0';
 			this->v_size--;
 			return *this;
 		}
@@ -553,9 +552,9 @@ namespace nuts
 	}
 
 	template <class Type>
-	basic_string<Type> operator+(const Type* array, basic_string<Type>& str)
+	basic_string<Type> operator+(const Type* array, const basic_string<Type>& str)
 	{
-		str._POP_EXC_0();
+		// str._POP_EXC_0();
 		size_t a_len = 0;
 		for (size_t i = 0; array[i] != '\0'; i++)
 			a_len++;

@@ -30,7 +30,7 @@ namespace nuts
 		Option(const T& _x, Option_case _case = Success, const string& _text = "")
 		    : elem(_x), code(_case), info(_text) {}
 
-		Option<T>& get_info()
+		Option<T>& print_info()
 		{
 			switch (code)
 			{
@@ -46,6 +46,19 @@ namespace nuts
 			}
 			std::cout << info << '\n';
 			return *this;
+		}
+
+		string get_info() const
+		{
+			switch (code)
+			{
+				case Success:
+					return "\n[Success]: " + info;
+				case Panic:
+					return "\n[Panic]: " + info;
+				case Error:
+					return "\n[Error]: " + info;
+			}
 		}
 
 		template <class Helper>
