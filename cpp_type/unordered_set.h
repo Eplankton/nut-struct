@@ -34,6 +34,7 @@ namespace nuts
 
 	public:
 		class iterator
+		    : public forward_iterator
 		{
 		public:
 			using value_type = Key;
@@ -90,11 +91,8 @@ namespace nuts
 			iterator operator+(i64 bias) const
 			{
 				iterator res = *this;
-				while (bias > 0)
-				{
+				while (bias--)
 					++res;
-					--bias;
-				}
 				return res;
 			}
 
@@ -109,9 +107,11 @@ namespace nuts
 			}
 		};
 
+		static const iterator npos;
+
 		iterator begin()
 		{
-			auto ed = bucket.begin() + 1;
+			auto ed = bucket.end() + 1;
 			for (auto o = bucket.begin(); o != ed; ++o)
 			{
 				if (!o->empty())
@@ -119,12 +119,12 @@ namespace nuts
 					return {o, bucket.end(), o->begin()};
 				}
 			}
-			return iterator();
+			return npos;
 		}
 
 		iterator begin() const
 		{
-			auto ed = bucket.begin() + 1;
+			auto ed = bucket.end() + 1;
 			for (auto o = bucket.begin(); o != ed; ++o)
 			{
 				if (!o->empty())
@@ -132,7 +132,7 @@ namespace nuts
 					return {o, bucket.end(), o->begin()};
 				}
 			}
-			return iterator();
+			return npos;
 		}
 
 		iterator end()
@@ -145,7 +145,7 @@ namespace nuts
 					return {o, bucket.end(), o->begin()};
 				}
 			}
-			return iterator();
+			return npos;
 		}
 
 		iterator end() const
@@ -158,10 +158,8 @@ namespace nuts
 					return {o, bucket.end(), o->begin()};
 				}
 			}
-			return iterator();
+			return npos;
 		}
-
-		static const iterator npos;
 
 		unordered_set();
 		unordered_set(const Self_Type& src);
@@ -178,6 +176,7 @@ namespace nuts
 		void insert(const Key& _k);
 		bool erase(const Key& _k);
 		void clear();
+
 		void print() const;
 		void print_as_table() const;
 	};

@@ -55,11 +55,11 @@ namespace nuts
 			iterator(pointer obj) { this->_ptr = obj; }
 			iterator(const iterator& obj) { this->_ptr = obj._ptr; }
 
-			T* get() const { return const_cast<pointer>(_ptr); }
+			pointer get() const { return const_cast<pointer>(_ptr); }
 			T& operator*() { return *_ptr; }
 			const T& operator*() const { return *_ptr; }
 
-			iterator& operator=(T* obj)
+			iterator& operator=(pointer obj)
 			{
 				this->_ptr = obj;
 				return *this;
@@ -71,8 +71,8 @@ namespace nuts
 				return *this;
 			}
 
-			bool operator==(T* obj) const { return this->_ptr == obj; }
-			bool operator!=(T* obj) const { return this->_ptr != obj; }
+			bool operator==(pointer obj) const { return this->_ptr == obj; }
+			bool operator!=(pointer obj) const { return this->_ptr != obj; }
 
 			bool operator==(const iterator& obj) const { return this->_ptr == obj._ptr; }
 			bool operator!=(const iterator& obj) const { return this->_ptr != obj._ptr; }

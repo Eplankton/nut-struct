@@ -1,10 +1,10 @@
 #ifndef _NUTS_DEQUE_
 #define _NUTS_DEQUE_ 1
 
-#include "array.h"
-#include "iterator.h"
-#include "list.h"
 #include "type.h"
+#include "iterator.h"
+#include "array.h"
+#include "list.h"
 
 #define DEQUE_BUF_SIZE 8
 
@@ -19,11 +19,6 @@ namespace nuts
 		using const_pointer = const T*;
 		using buf_type = array<T, Buf>;
 		using map_type = list<array<T, Buf>>;
-
-	protected:
-		map_type map;
-		u64 _size = 0;
-		pointer first = nullptr, last = nullptr;
 
 	private:
 		bool is_back_full() const;
@@ -209,7 +204,7 @@ namespace nuts
 			return {cur, st, ed, map.end()};
 		}
 
-		deque() { static_assert(Buf > 0, "Buf_size should be greater than 0."); }
+		deque() { assert(Buf > 0 && "Buf_size should be greater than 0."); }
 		deque(const std::initializer_list<T>& ilist);
 		deque(const deque<T, Buf>& src);
 		~deque() { clear(); }
@@ -248,6 +243,11 @@ namespace nuts
 
 		void print() const;
 		void print_detail() const;
+
+	protected:
+		map_type map;
+		u64 _size = 0;
+		pointer first = nullptr, last = nullptr;
 	};
 
 	template <class T, u64 Buf>
@@ -286,7 +286,7 @@ namespace nuts
 	deque<T, Buf>& deque<T, Buf>::operator=(const deque<T, Buf>& src)
 	{
 		this->clear();
-		map = src.map;
+		map = src.map; // Copy
 		this->first = src.first;
 		this->last = src.last;
 		this->_size = src._size;
@@ -374,9 +374,9 @@ namespace nuts
 	template <typename T, u64 Buf>
 	T& deque<T, Buf>::operator[](u64 _n)
 	{
-		u64 head_len = &map.front().back() - begin().get() + 1,
-		    tail_len = end().get() - &map.back().front() + 1,
-		    mid_len = Buf * (map.size() - 2);
+		u64 head_len = (&map.front().back() - begin().get()) + 1,
+		    tail_len = (end().get() - &map.back().front()) + 1,
+		    mid_len = (map.size() < 2) ? 0 : Buf * (map.size() - 2);
 		if (_n < head_len)
 		{
 			return map.front()[_n + Buf - head_len];
@@ -485,6 +485,7 @@ namespace nuts
 			if (&x != &this->back())
 				printf(", ");
 		};
+
 		printf("\ndeque @%#llx = [", (u64) map.data());
 		if (!empty())
 			for_each(begin(), end(), print);
@@ -494,18 +495,23 @@ namespace nuts
 	template <typename T, u64 Buf>
 	void deque<T, Buf>::print_detail() const
 	{
-		auto array_print = [](const buf_type& arr) {
+		auto array_print = [this](const buf_type& arr) {
 			printf("[");
 			nuts::for_each(arr.begin(), arr.end(),
-			               [&arr](const T& x) { std::cout << x; 
+			               [&arr, this](const T& x) { 
+							   	if (&x == this->begin().get() ||
+									&x == this->end().get())
+                                    printf("*");
+								std::cout << x; 
                                 if (&x != &arr.back())
                                     printf(", "); });
 			printf("]\n");
 		};
-		printf("\ndeque @%#llx = \n", (u64) map.data());
+		
+		printf("\ndeque @%#llx : \n", (u64) map.data());
 		if (!empty())
 			nuts::for_each(map.begin(), map.end(), array_print);
 	}
-}// namespace nuts
+}
 
 #endif

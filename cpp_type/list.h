@@ -73,10 +73,9 @@ namespace nuts
 		u64 size() const { return length; }         // Get the length of the whole list
 		void print() const;                         // Print a list in console
 
-		T& operator[](u64 N);                  // Access to the address(return pointer) of node {WARNING: NOT A GOOD DESIGN}
 		list<T>& operator=(const list<T>& obj);// Assign deeply
 		list<T>& clear();                      // Clear the whole list, release all nodes
-		// list<T> &destroy(ListNode<T> *start_node, ListNode<T> *end_node); // Clear a part of the list(release nodes partly)
+
 		list<T>& push_back();                         // Add back an empty node
 		list<T>& push_back(const T& obj, u64 num = 1);// Add back several nodes(add by init calue)
 
@@ -252,19 +251,6 @@ namespace nuts
 		for (auto p = ilist.begin(); p != ilist.end(); ++p)
 			this->push_back(*p);
 	}
-
-	// #ifdef _DEBUG
-	// 	template <class T>
-	// 	T &list<T>::operator[](u64 N)
-	// 	{
-	// 		assert(N < this->size());
-	// 		auto p = this->head;
-	// 		for (int i = 0; i < N; i++)
-	// 			p = p->next;
-	// 		T &tmp = p->data;
-	// 		return tmp;
-	// 	}
-	// #endif
 
 	template <class T>
 	list<T>& list<T>::operator=(const list<T>& obj)

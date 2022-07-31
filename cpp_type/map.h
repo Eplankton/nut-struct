@@ -53,7 +53,7 @@ namespace nuts
 			return base_type::erase(tmp);
 		}
 
-		const itr_type find(const Key& _k) const
+		itr_type find(const Key& _k) const
 		{
 			pair<Key, Val> tmp;
 			tmp.first = _k;

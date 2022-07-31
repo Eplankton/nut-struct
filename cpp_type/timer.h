@@ -26,9 +26,11 @@ public:
 		return std::chrono::milliseconds((clock_type::now() - m_beg).count()).count();
 	}
 
-	void print()
+	double print()
 	{
 		auto tmd = elapsed();
 		std::cout << "\nTime count: " << tmd * 1000.0 << "(ms)\n";
+		reset();
+		return tmd;
 	}
 };

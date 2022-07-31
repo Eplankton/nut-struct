@@ -3,7 +3,13 @@
 
 namespace nuts
 {
+	struct forward_iterator_tag
+	{
+		// Allow ++it
+	};
+
 	struct bidirectional_iterator_tag
+	    : public forward_iterator_tag
 	{
 		// Allow ++/--it
 	};
@@ -14,14 +20,28 @@ namespace nuts
 		// Allow it+/-_n
 	};
 
+	struct forward_iterator
+	{
+		using Category = forward_iterator_tag;
+	};
+
 	struct bidirectional_iterator
+	    : public forward_iterator
+
 	{
 		using Category = bidirectional_iterator_tag;
 	};
 
 	struct random_access_iterator
+	    : public bidirectional_iterator
 	{
 		using Category = random_access_iterator_tag;
+	};
+
+	template <typename T>
+	struct is_forward_iterator
+	{
+		static const bool value = true;
 	};
 
 	template <typename T>
@@ -53,7 +73,6 @@ namespace nuts
 	{
 		static const bool value = true;
 	};
-
 
 	// Get traits
 	template <typename Itr>

@@ -993,7 +993,7 @@ namespace nuts
 	template <typename T, class Compare>
 	void binary_tree<T, Compare>::print_as_tree() const
 	{
-		printf("\nbinary_tree @%#llx", (u64) this->root.get());
+		printf("\nbinary_tree @%#llx :", (u64) this->root.get());
 		if (this->root != nullptr)
 			printBT("", this->root, false);
 		else
