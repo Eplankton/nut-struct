@@ -167,12 +167,15 @@ namespace nuts
 		prime_pointer bucket_size = PRIME_LIST;
 		u64 _size = 0;
 		vector<Bucket_Type> bucket;
-		Hasher hash_fn;
+		static const Hasher hash_fn;
 	};
 
 	template <class Key, class Hasher>
 	const typename unordered_set<Key, Hasher>::iterator
 	        unordered_set<Key, Hasher>::npos;
+
+	template <class Key, class Hasher>
+	const Hasher unordered_set<Key, Hasher>::hash_fn;
 
 	template <class Key, class Hasher>
 	unordered_set<Key, Hasher>::unordered_set()

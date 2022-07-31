@@ -689,8 +689,7 @@ namespace nuts
 	        -> itr_type
 	{
 		auto tmp = find(_val);
-		if (tmp == this->npos)
-			return npos;
+		if (tmp == this->npos) return npos;
 		iterator res {tmp.get()->prev.get()};
 		node_raw_ptr target = tmp.get();
 		if (target->lc == nullptr && target->rc == nullptr)
@@ -851,11 +850,9 @@ namespace nuts
 	template <typename T, class Compare>
 	void AVL<T, Compare>::update_all()
 	{
-		if (this->root == nullptr)
-			return;
+		if (this->root == nullptr) return;
 		for (auto it = BST<T, Compare>::begin();
-		     it != this->npos;
-		     ++it)
+		     it != this->npos; ++it)
 		{
 			it.get()->bf = get_bf(it.get());
 			if (it.get()->lc != nullptr)
@@ -868,8 +865,7 @@ namespace nuts
 	template <typename T, class Compare>
 	void AVL<T, Compare>::update_upon(const node_ptr& ptr)
 	{
-		if (ptr == nullptr)
-			return;
+		if (ptr == nullptr) return;
 		node_ptr it(ptr.get());
 		while (it != nullptr)
 		{

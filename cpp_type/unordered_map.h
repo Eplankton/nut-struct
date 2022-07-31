@@ -24,7 +24,6 @@ namespace nuts
 		Self_Type& move(Self_Type& src);
 
 		void rehash();
-
 		bool contains(const Key& _k) const;
 		itr_type find(const Key& _k) const;
 
@@ -36,7 +35,6 @@ namespace nuts
 
 		void insert(const Key& _k, const Val& _val);
 		void insert(const pair<Key, Val>& _p);
-
 		bool erase(const Key& _k);
 
 		Self_Type& operator=(const Self_Type& src);
