@@ -102,8 +102,6 @@ namespace nuts
 			}
 		};
 
-		static const iterator npos;// Null-pos
-
 		iterator begin()
 		{
 			auto ed = bucket.end() + 1;
@@ -168,6 +166,7 @@ namespace nuts
 		u64 _size = 0;
 		vector<Bucket_Type> bucket;
 		static const Hasher hash_fn;
+		static const iterator npos;// Null-pos
 	};
 
 	template <class Key, class Hasher>
