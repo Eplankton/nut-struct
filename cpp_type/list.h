@@ -57,9 +57,13 @@ namespace nuts
 		list() = default;                                              // Void constructor
 		explicit list(u64 userInputlength);                            // Init by several empty nodes
 		explicit list(const T& userInputData, u64 userInputlength = 1);// Init by several valued nodes
+		
 		list(const list<T>& obj);                                      // Init by another list(deep copy)
-		list(const std::initializer_list<T>& ilist);                   // Init by a {ilist}
-		~list() { this->clear(); }                                     // Clear and gain back memory
+		list(list<T>&& src) { this->move(src); }
+		
+		list(const std::initializer_list<T>& ilist);// Init by a {ilist}
+		
+		~list() { this->clear(); }                  // Clear and gain back memory
 
 		bool empty() const// Whether the list is empty
 		{
@@ -73,8 +77,10 @@ namespace nuts
 		u64 size() const { return length; }         // Get the length of the whole list
 		void print() const;                         // Print a list in console
 
-		list<T>& operator=(const list<T>& obj);// Assign deeply
-		list<T>& clear();                      // Clear the whole list, release all nodes
+		list<T>& operator=(const list<T>& obj);// Copy
+		list<T>& operator=(list<T>&& src) { return this->move(src); }
+
+		list<T>& clear();// Clear the whole list, release all nodes
 
 		list<T>& push_back();                         // Add back an empty node
 		list<T>& push_back(const T& obj, u64 num = 1);// Add back several nodes(add by init calue)
@@ -86,7 +92,7 @@ namespace nuts
 		list<T>& pop_front();// Remove first element
 
 		list<T>& merge(list<T>& after);// Merge lists together, the latter lost ownership
-		list<T>& move(list<T>& after); // A void manager can deprive other's ownership
+		list<T>& move(list<T>& src); // A void manager can deprive other's ownership
 
 		class iterator : public bidirectional_iterator
 		{
@@ -522,18 +528,18 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T>& list<T>::move(list<T>& after)
+	list<T>& list<T>::move(list<T>& src)
 	{
-		if (!this->empty())
+		if (!this->empty())// Pass ownership.
 			this->clear();
-		// Pass ownership.
-		this->length = after.length;
-		this->head = after.head;
-		this->tail = after.tail;
-		// Release the ownership of after.
-		after.head = nullptr;
-		after.tail = nullptr;
-		after.length = 0;
+
+		this->length = src.length;// Release the ownership of after.
+		this->head = src.head;
+		this->tail = src.tail;
+
+		src.head = nullptr;
+		src.tail = nullptr;
+		src.length = 0;
 		return *this;
 	}
 

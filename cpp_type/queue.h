@@ -19,16 +19,11 @@ namespace nuts
 		using value_type = T;
 		using itr_type = typename base::iterator;
 
-	protected:
-		base container;
-
 	public:
 		queue() = default;
 		queue(const std::initializer_list<T>& ilist);
-		queue(const queue<T, base>& src)
-		{
-			container = src.container;
-		}
+		queue(const queue<T, base>& src) { container = src.container; }
+		queue(queue<T, base>&& src) { this->move(src); }
 		~queue() = default;
 
 		queue<T, base>& push(const T& obj);
@@ -41,7 +36,9 @@ namespace nuts
 		T& back() { return container.back(); }
 		const T& front() const { return container.front(); }
 		const T& back() const { return container.back(); }
-		queue<T, base>& operator=(queue<T, base>& obj);
+		queue<T, base>& operator=(const queue<T, base>& obj);
+		queue<T, base>& operator=(queue<T, base>&& src) { return this->move(src); }
+		queue<T, base>& move(queue<T, base>& src);
 
 		itr_type begin();
 		itr_type end();
@@ -50,6 +47,9 @@ namespace nuts
 		itr_type end() const;
 
 		void print() const;
+
+	protected:
+		base container;
 	};
 
 	template <class T, class base>
@@ -106,10 +106,18 @@ namespace nuts
 	}
 
 	template <class T, class base>
-	queue<T, base>& queue<T, base>::operator=(queue<T, base>& obj)
+	queue<T, base>& queue<T, base>::operator=(const queue<T, base>& obj)
 	{
 		this->clear();
 		container = obj.container;
+		return *this;
+	}
+
+	template <class T, class base>
+	queue<T, base>& queue<T, base>::move(queue<T, base>& src)
+	{
+		this->clear();
+		container.move(src.container);
 		return *this;
 	}
 

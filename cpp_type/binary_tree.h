@@ -68,11 +68,6 @@ namespace nuts
 		using node_ptr = nuts::unique_ptr<tree_node>;
 		using node_raw_ptr = binary_tree_node<T>*;
 
-	protected:
-		node_ptr root;
-		u64 _size = 0;
-		Compare cmp;
-
 	private:
 		template <class vistor>
 		void pre_order_trav(node_ptr& st, const vistor& func);
@@ -204,71 +199,59 @@ namespace nuts
 		binary_tree() : root(nullptr), _size(0) {}
 		binary_tree(const std::initializer_list<T>& ilist);
 		binary_tree(const binary_tree<T, Compare>& src);
-		virtual ~binary_tree();
+		binary_tree(binary_tree<T, Compare>&& src) { this->move(src); }
+		~binary_tree();
 
 		bool empty() const { return _size == 0 && root == nullptr; }
 		u64 size() const { return _size; }
 
 		iterator begin()
 		{
-			if (this->empty())
-				return npos;
+			if (this->empty()) return npos;
 			else
-			{
-				auto res = min(root);
-				return iterator(res);
-			}
+				return iterator {min(root)};
 		}
 
 		iterator end()
 		{
-			if (this->empty())
-				return npos;
+			if (this->empty()) return npos;
 			else
-			{
-				auto res = max(root);
-				return iterator(res);
-			}
+				return iterator {max(root)};
 		}
 
 		iterator begin() const
 		{
-			if (this->empty())
-				return npos;
+			if (this->empty()) return npos;
 			else
-			{
-				auto res = min(root);
-				return iterator(res);
-			}
+				return iterator {min(root)};
 		}
 
 		iterator end() const
 		{
-			if (this->empty())
-				return npos;
+			if (this->empty()) return npos;
 			else
-			{
-				auto res = max(root);
-				return iterator(res);
-			}
+				return iterator {max(root)};
 		}
 
-		const T& min() const { return min(this->root)->data; }
-		const T& max() const { return max(this->root)->data; }
+		const T& min() const { return min(root)->data; }
+		const T& max() const { return max(root)->data; }
 
-		virtual bool insert(const T& _val);
+		bool insert(const T& _val);
 		auto insert_ret_pos(const T& _val) -> iterator;
-		auto find(const T& _val) const -> iterator;
 
+		bool erase(const T& _val);
+		auto erase_ret_pos(const T& _val) -> iterator;
+
+		auto find(const T& _val) const -> iterator;
+		bool contains(const T& _val)
+		        const { return find(_val) != this->npos; };
 		auto lower_bound(const T& _val) const -> iterator;
 		auto upper_bound(const T& _val) const -> iterator;
-		virtual bool erase(const T& _val);
 
 		binary_tree<T, Compare>& move(binary_tree<T, Compare>& src);
 		binary_tree<T, Compare>& operator=(const binary_tree<T, Compare>& src);
-
-		bool contains(const T& _val)
-		        const { return find(_val) != this->npos; };
+		binary_tree<T, Compare>&
+		operator=(binary_tree<T, Compare>&& src) { return this->move(src); }
 
 		void print_as_tree() const;
 		void clear();
@@ -285,6 +268,11 @@ namespace nuts
 
 		void printBT(const std::string& prefix, const node_ptr& st, bool isLeft) const;
 		void printBT(const iterator& st) const;
+
+	protected:
+		node_ptr root = nullptr;
+		u64 _size = 0;
+		Compare cmp;
 	};
 
 	template <typename T, class Compare>
@@ -292,9 +280,28 @@ namespace nuts
 	        binary_tree<T, Compare>::npos;
 
 	template <typename T, class Compare>
+	binary_tree_node<T>* binary_tree<T, Compare>::min(const node_ptr& st) const
+	{
+		auto res = st.get();
+		while (res != nullptr && res->lc != nullptr)
+			res = (res->lc).get();
+		return res;
+	}
+
+	template <typename T, class Compare>
+	binary_tree_node<T>* binary_tree<T, Compare>::max(const node_ptr& st) const
+	{
+		auto res = get_raw(st);
+		while (res != nullptr && res->rc != nullptr)
+			res = get_raw(res->rc);
+		return res;
+	}
+
+	template <typename T, class Compare>
 	binary_tree<T, Compare>::binary_tree(const binary_tree<T, Compare>& src)
 	{
-		for_each(src.begin(), src.end(), [this](const auto& x) { this->insert(x); });
+		for_each(src.begin(), src.end(),
+		         [this](const auto& x) { this->insert(x); });
 	}
 
 	template <typename T, class Compare>
@@ -335,13 +342,11 @@ namespace nuts
 	binary_tree<T, Compare>::binary_tree(const std::initializer_list<T>& ilist)
 	{
 		for (auto it = ilist.begin(); it != ilist.end(); it++)
-		{
 			this->insert(*it);
-		}
 	}
 
 	template <typename T, class Compare>
-	binary_tree<T, Compare>::~binary_tree()
+	inline binary_tree<T, Compare>::~binary_tree()
 	{
 		this->clear();
 	}
@@ -361,7 +366,7 @@ namespace nuts
 
 		if (root == nullptr)// if the tree is empty, then store value in the root node
 		{
-			root = new_node;
+			root.move(new_node);
 			++_size;
 			return true;
 		}
@@ -402,7 +407,7 @@ namespace nuts
 
 		if (root == nullptr)// if the tree is empty, then store value in the root node
 		{
-			root = new_node;
+			root.move(new_node);
 			++_size;
 			return iterator(root.get());
 		}
@@ -557,14 +562,13 @@ namespace nuts
 	typename binary_tree<T, Compare>::iterator
 	binary_tree<T, Compare>::find(const T& _val) const
 	{
-		binary_tree_node<T>* st = get_raw(root);
+		node_raw_ptr st = root.get();
 		while (st != nullptr)
 		{
 			if (!cmp(_val, st->data) &&
 			    !cmp(st->data, _val))// Found or duplicated
 			{
-				iterator res(st);
-				return res;
+				return iterator {st};
 			}
 			if (cmp(_val, st->data))// Go left
 			{
@@ -577,34 +581,15 @@ namespace nuts
 				continue;
 			}
 		}
-		return this->npos;// Not Found
-	}
-
-	template <typename T, class Compare>
-	binary_tree_node<T>* binary_tree<T, Compare>::min(const node_ptr& st) const
-	{
-		auto res = st.get();
-		while (res != nullptr && res->lc != nullptr)
-			res = (res->lc).get();
-		return res;
-	}
-
-	template <typename T, class Compare>
-	binary_tree_node<T>* binary_tree<T, Compare>::max(const node_ptr& st) const
-	{
-		auto res = get_raw(st);
-		while (res != nullptr && res->rc != nullptr)
-			res = get_raw(res->rc);
-		return res;
+		return npos;// Not Found
 	}
 
 	template <typename T, class Compare>
 	bool binary_tree<T, Compare>::erase(const T& _val)
 	{
 		auto tmp = find(_val);
-		if (tmp == this->npos)
-			return false;
-		binary_tree_node<T>* target = tmp.get();
+		if (tmp == this->npos) return false;
+		node_raw_ptr target = tmp.get();
 		if (target->lc == nullptr && target->rc == nullptr)
 		{
 			node_ptr Delete_X;
@@ -631,11 +616,11 @@ namespace nuts
 		}
 		if (target->lc != nullptr && target->rc == nullptr)
 		{
-			binary_tree_node<T>* L_MAX = max(target->lc);
+			target->lc.get()->prev = target;
+			node_raw_ptr L_MAX = max(target->lc);
 			node_ptr rec;
 			rec.move(L_MAX->lc);
 			swap(target->data, L_MAX->data);
-			// this->swap(target, L_MAX);
 			node_ptr Delete_X;
 			if (L_MAX == L_MAX->prev->lc.get())
 				Delete_X.move(L_MAX->prev->lc);
@@ -643,18 +628,21 @@ namespace nuts
 				Delete_X.move(L_MAX->prev->rc);
 			Delete_X->prev = nullptr;
 			if (rec != nullptr)
+			{
 				target->lc.move(rec);
+				target->lc.get()->prev = target;
+			}
 			rec = nullptr;
 			--_size;
 			return true;
 		}
 		if (target->lc == nullptr && target->rc != nullptr)
 		{
-			binary_tree_node<T>* R_MIN = min(target->rc);
+			target->rc.get()->prev = target;
+			node_raw_ptr R_MIN = min(target->rc);
 			node_ptr rec;
 			rec.move(R_MIN->rc);
 			swap(target->data, R_MIN->data);
-			// this->swap(target, R_MIN);
 			node_ptr Delete_X;
 			if (R_MIN == R_MIN->prev->rc.get())
 				Delete_X.move(R_MIN->prev->rc);
@@ -662,18 +650,22 @@ namespace nuts
 				Delete_X.move(R_MIN->prev->lc);
 			Delete_X->prev = nullptr;
 			if (rec != nullptr)
+			{
 				target->rc.move(rec);
+				target->rc.get()->prev = target;
+			}
 			rec = nullptr;
 			--_size;
 			return true;
 		}
 		if (target->lc != nullptr && target->rc != nullptr)
 		{
-			binary_tree_node<T>* L_MAX = max(target->lc);
+			target->lc.get()->prev = target;
+			target->rc.get()->prev = target;
+			node_raw_ptr L_MAX = max(target->lc);
 			node_ptr rec;
 			rec.move(L_MAX->lc);
 			swap(target->data, L_MAX->data);
-			// this->swap(target, L_MAX);
 			node_ptr Delete_X;
 			if (L_MAX == L_MAX->prev->lc.get())
 				Delete_X.move(L_MAX->prev->lc);
@@ -681,12 +673,118 @@ namespace nuts
 				Delete_X.move(L_MAX->prev->rc);
 			Delete_X->prev = nullptr;
 			if (rec != nullptr)
+			{
 				target->lc.move(rec);
+				target->lc.get()->prev = target;
+			}
 			rec = nullptr;
 			--_size;
 			return true;
 		}
 		return false;
+	}
+
+	template <typename T, class Compare>
+	auto binary_tree<T, Compare>::erase_ret_pos(const T& _val)
+	        -> itr_type
+	{
+		auto tmp = find(_val);
+		if (tmp == this->npos)
+			return npos;
+		iterator res {tmp.get()->prev.get()};
+		node_raw_ptr target = tmp.get();
+		if (target->lc == nullptr && target->rc == nullptr)
+		{
+			node_ptr Delete_X;
+			if (target->prev.get() != nullptr)
+			{
+				if (target == target->prev->lc.get())
+				{
+					Delete_X.move(target->prev->lc);
+					Delete_X->prev = nullptr;
+				}
+				else
+				{
+					Delete_X.move(target->prev->rc);
+					Delete_X->prev = nullptr;
+				}
+			}
+			else
+			{
+				Delete_X.move(this->root);
+				this->root = nullptr;
+			}
+			--_size;
+			return res;
+		}
+		if (target->lc != nullptr && target->rc == nullptr)
+		{
+			target->lc.get()->prev = target;
+			node_raw_ptr L_MAX = max(target->lc);
+			node_ptr rec;
+			rec.move(L_MAX->lc);
+			swap(target->data, L_MAX->data);
+			node_ptr Delete_X;
+			if (L_MAX == L_MAX->prev->lc.get())
+				Delete_X.move(L_MAX->prev->lc);
+			else
+				Delete_X.move(L_MAX->prev->rc);
+			Delete_X->prev = nullptr;
+			if (rec != nullptr)
+			{
+				target->lc.move(rec);
+				target->lc.get()->prev = target;
+			}
+			rec = nullptr;
+			--_size;
+			return res;
+		}
+		if (target->lc == nullptr && target->rc != nullptr)
+		{
+			target->rc.get()->prev = target;
+			node_raw_ptr R_MIN = min(target->rc);
+			node_ptr rec;
+			rec.move(R_MIN->rc);
+			swap(target->data, R_MIN->data);
+			node_ptr Delete_X;
+			if (R_MIN == R_MIN->prev->rc.get())
+				Delete_X.move(R_MIN->prev->rc);
+			else
+				Delete_X.move(R_MIN->prev->lc);
+			Delete_X->prev = nullptr;
+			if (rec != nullptr)
+			{
+				target->rc.move(rec);
+				target->rc.get()->prev = target;
+			}
+			rec = nullptr;
+			--_size;
+			return res;
+		}
+		if (target->lc != nullptr && target->rc != nullptr)
+		{
+			target->lc.get()->prev = target;
+			target->rc.get()->prev = target;
+			node_raw_ptr L_MAX = max(target->lc);
+			node_ptr rec;
+			rec.move(L_MAX->lc);
+			swap(target->data, L_MAX->data);
+			node_ptr Delete_X;
+			if (L_MAX == L_MAX->prev->lc.get())
+				Delete_X.move(L_MAX->prev->lc);
+			else
+				Delete_X.move(L_MAX->prev->rc);
+			Delete_X->prev = nullptr;
+			if (rec != nullptr)
+			{
+				target->lc.move(rec);
+				target->lc.get()->prev = target;
+			}
+			rec = nullptr;
+			--_size;
+			return res;
+		}
+		return npos;
 	}
 
 	template <typename T, class Compare = nuts::less<T>>
@@ -711,20 +809,35 @@ namespace nuts
 
 	public:
 		AVL() { this->root = nullptr, this->_size = 0; }
+
 		AVL(const std::initializer_list<T>& ilist);
+
 		AVL(const AVL<T, Compare>& src);
+		AVL(AVL<T, Compare>&& src) { BST<T, Compare>::move(src); }
+
 		~AVL() { this->_size = 0; }
 
 		bool insert(const T& _val);
 		bool erase(const T& _val);
 		itr_type insert_ret_pos(const T& _val);
+		itr_type erase_ret_pos(const T& _val);
+
 		AVL<T, Compare>& operator=(const AVL<T, Compare>& src);
+		AVL<T, Compare>& operator=(AVL<T, Compare>&& src) { return BST<T, Compare>::move(src); }
 	};
 
 	template <typename T, class Compare>
 	AVL<T, Compare>::AVL(const AVL<T, Compare>& src)
 	{
-		for_each(src.begin(), src.end(), [this](const T& x) { this->insert(x); });
+		for_each(src.begin(), src.end(),
+		         [this](const T& x) { this->insert(x); });
+	}
+
+	template <typename T, class Compare>
+	AVL<T, Compare>::AVL(const std::initializer_list<T>& ilist)
+	{
+		for (auto it = ilist.begin(); it != ilist.end(); it++)
+			AVL<T>::insert(*it);
 	}
 
 	template <typename T, class Compare>
@@ -760,11 +873,12 @@ namespace nuts
 		node_ptr it(ptr.get());
 		while (it != nullptr)
 		{
-			it->bf = get_bf(it);
 			if (it->lc != nullptr)
 				it->lc->prev = it.get();
 			if (it->rc != nullptr)
 				it->rc->prev = it.get();
+
+			it->bf = get_bf(it);
 			it = it->prev.get();
 		}
 		it = nullptr;
@@ -865,8 +979,7 @@ namespace nuts
 	template <typename T, class Compare>
 	void AVL<T, Compare>::balance(node_ptr& ptr)
 	{
-		if (ptr == nullptr)
-			return;
+		if (ptr == nullptr) return;
 		if (get_w(ptr->lc) >= get_w(ptr->rc) + 1)
 		{
 			if (get_w(ptr->lc->lc) >= get_w(ptr->lc->rc))
@@ -887,10 +1000,10 @@ namespace nuts
 	template <typename T, class Compare>
 	bool AVL<T, Compare>::insert(const T& _val)
 	{
-		auto option = BST<T, Compare>::insert_ret_pos(_val);
-		if (option != this->npos)
+		auto opt = BST<T, Compare>::insert_ret_pos(_val);
+		if (opt != this->npos)
 		{
-			node_ptr loc(option.get());
+			node_ptr loc(opt.get());
 			this->update_upon(loc);
 			while (loc != nullptr)
 			{
@@ -913,10 +1026,10 @@ namespace nuts
 	typename BST<T, Compare>::iterator
 	AVL<T, Compare>::insert_ret_pos(const T& _val)
 	{
-		auto option = BST<T, Compare>::insert_ret_pos(_val);
-		if (option != this->npos)
+		auto opt = BST<T, Compare>::insert_ret_pos(_val);
+		if (opt != this->npos)
 		{
-			node_ptr loc(option.get());
+			node_ptr loc(opt.get());
 			this->update_upon(loc);
 			while (loc != nullptr)
 			{
@@ -929,45 +1042,61 @@ namespace nuts
 				balance(loc);
 				loc = nullptr;
 			}
-			return option;
+			return opt;
 		}
 		else
-			return option;
-	}
-
-	template <typename T, class Compare>
-	AVL<T, Compare>::AVL(const std::initializer_list<T>& ilist)
-	{
-		for (auto it = ilist.begin(); it != ilist.end(); it++)
-		{
-			AVL<T>::insert(*it);
-		}
+			return opt;
 	}
 
 	template <typename T, class Compare>
 	bool AVL<T, Compare>::erase(const T& _val)
 	{
-		if (BST<T, Compare>::erase(_val))
+		auto opt = BST<T, Compare>::erase_ret_pos(_val);
+		if (opt != this->npos)
 		{
-			if (this->root == nullptr)
-				return true;
-			this->update_all();
-			node_ptr loc(nullptr);
-			for (auto it = this->begin();
-			     it != this->npos;
-			     ++it) {
-				if (it.get()->bf == 2 || it.get()->bf == -2)
-				{
-					loc = it.get();
-					balance(loc);
-					loc = nullptr;
-					return true;
-				}
+			node_ptr loc(opt.get());
+			this->update_upon(loc);
+			while (loc != nullptr)
+			{
+				if (loc->bf == 2 || loc->bf == -2)
+					break;
+				loc = loc->prev.get();
+			}
+			if (loc != nullptr)
+			{
+				balance(loc);
+				loc = nullptr;
 			}
 			return true;
 		}
 		else
 			return false;
+	}
+
+	template <typename T, class Compare>
+	typename BST<T, Compare>::iterator
+	AVL<T, Compare>::erase_ret_pos(const T& _val)
+	{
+		auto opt = BST<T, Compare>::erase_ret_pos(_val);
+		if (opt != this->npos)
+		{
+			node_ptr loc(opt.get());
+			this->update_upon(loc);
+			while (loc != nullptr)
+			{
+				if (loc->bf == 2 || loc->bf == -2)
+					break;
+				loc = loc->prev.get();
+			}
+			if (loc != nullptr)
+			{
+				balance(loc);
+				loc = nullptr;
+			}
+			return opt;
+		}
+		else
+			return opt;
 	}
 
 	template <typename T, class Compare>
@@ -983,7 +1112,7 @@ namespace nuts
 			else
 				printf("%s", (isLeft ? "├── " : "└── "));
 			std::cout << st->data
-			          // << (i16)st->bf
+			          // << '$' << (i16) st->bf
 			          << '\n';
 			printBT(prefix + (isLeft ? "│   " : "    "), st->lc, true);
 			printBT(prefix + (isLeft ? "│   " : "    "), st->rc, false);
@@ -993,7 +1122,7 @@ namespace nuts
 	template <typename T, class Compare>
 	void binary_tree<T, Compare>::print_as_tree() const
 	{
-		printf("\nbinary_tree @%#llx :", (u64) this->root.get());
+		printf("\nbinary_tree @%#llx:", (u64) this->root.get());
 		if (this->root != nullptr)
 			printBT("", this->root, false);
 		else

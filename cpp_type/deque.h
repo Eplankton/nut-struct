@@ -1,10 +1,10 @@
 #ifndef _NUTS_DEQUE_
 #define _NUTS_DEQUE_ 1
 
-#include "type.h"
-#include "iterator.h"
 #include "array.h"
+#include "iterator.h"
 #include "list.h"
+#include "type.h"
 
 #define DEQUE_BUF_SIZE 8
 
@@ -206,7 +206,10 @@ namespace nuts
 
 		deque() { assert(Buf > 0 && "Buf_size should be greater than 0."); }
 		deque(const std::initializer_list<T>& ilist);
+
 		deque(const deque<T, Buf>& src);
+		deque(deque<T, Buf>&& src) { this->move(src); }
+
 		~deque() { clear(); }
 
 		deque<T, Buf>& move(deque<T, Buf>& src)
@@ -214,6 +217,8 @@ namespace nuts
 			this->map.move(src.map);
 			this->_size = src.size();
 			this->first = src.first, this->last = src.last;
+			src._size = 0;
+			src.first = nullptr, src.last = nullptr;
 			return *this;
 		}
 
@@ -222,19 +227,27 @@ namespace nuts
 		bool empty() const { return size() == 0; }
 		void clear()
 		{
-			map.clear();
-			first = nullptr, last = nullptr, _size = 0;
+			if (!empty())
+			{
+				map.clear();
+				first = nullptr, last = nullptr, _size = 0;
+			}
 		}
 
 		T& front() { return *begin(); }
 		T& back() { return *end(); }
+
 		const T& front() const { return *begin(); }
+
 		const T& back() const { return *end(); }
 		T& operator[](u64 _n);
 		const T& operator[](u64 _n) const;
+
 		T& at(u64 _n);
 		const T& at(u64 _n) const;
+
 		deque<T, Buf>& operator=(const deque<T, Buf>& src);
+		deque<T, Buf>& operator=(deque<T, Buf>&& src) { return this->move(src); }
 
 		void push_back(const T& _val);
 		void push_front(const T& _val);
@@ -261,24 +274,21 @@ namespace nuts
 	template <class T, u64 Buf>
 	deque<T, Buf>::deque(const deque<T, Buf>& src)
 	{
-		auto ed = src.end() + 1;
-		for (auto p = src.begin(); p != ed; ++p)
-			this->push_back(*p);
+		for_each(src.begin(), src.end(),
+		         [this](const auto& x) { this->push_back(x); });
 	}
 
 	template <typename T, u64 Buf>
 	bool deque<T, Buf>::is_back_full() const
 	{
-		auto tmp = (&map.back()[0]);
-		tmp--;
+		auto tmp = (&map.back()[0]) - 1;
 		return last == &map.back()[Buf - 1] || last == tmp;
 	}
 
 	template <typename T, u64 Buf>
 	bool deque<T, Buf>::is_front_full() const
 	{
-		auto tmp = (&map.front()[Buf - 1]);
-		tmp++;
+		auto tmp = (&map.front()[Buf - 1]) + 1;
 		return first == &map.front()[0] || first == tmp;
 	}
 
@@ -286,10 +296,8 @@ namespace nuts
 	deque<T, Buf>& deque<T, Buf>::operator=(const deque<T, Buf>& src)
 	{
 		this->clear();
-		map = src.map; // Copy
-		this->first = src.first;
-		this->last = src.last;
-		this->_size = src._size;
+		for_each(src.begin(), src.end(),
+		         [this](const auto& x) { this->push_back(x); });
 		return *this;
 	}
 
@@ -402,7 +410,7 @@ namespace nuts
 	{
 		u64 head_len = &map.front().back() - begin().get() + 1,
 		    tail_len = end().get() - &map.back().front() + 1,
-		    mid_len = Buf * (map.size() - 2);
+		    mid_len = (map.size() < 2) ? 0 : Buf * (map.size() - 2);
 		if (_n < head_len)
 		{
 			return map.front()[_n + Buf - head_len];
@@ -429,7 +437,7 @@ namespace nuts
 		assert(_n > size());
 		u64 head_len = &map.front().back() - begin().get() + 1,
 		    tail_len = end().get() - &map.back().front() + 1,
-		    mid_len = Buf * (map.size() - 2);
+		    mid_len = (map.size() < 2) ? 0 : Buf * (map.size() - 2);
 		if (_n < head_len)
 		{
 			return map.front()[_n + Buf - head_len];
@@ -456,7 +464,7 @@ namespace nuts
 		assert(_n < size());
 		u64 head_len = &map.front().back() - begin().get() + 1,
 		    tail_len = end().get() - &map.back().front() + 1,
-		    mid_len = Buf * (map.size() - 2);
+		    mid_len = (map.size() < 2) ? 0 : Buf * (map.size() - 2);
 		if (_n < head_len)
 		{
 			return map.front()[_n + Buf - head_len];
@@ -507,8 +515,8 @@ namespace nuts
                                     printf(", "); });
 			printf("]\n");
 		};
-		
-		printf("\ndeque @%#llx : \n", (u64) map.data());
+
+		printf("\ndeque @%#llx: \n", (u64) map.data());
 		if (!empty())
 			nuts::for_each(map.begin(), map.end(), array_print);
 	}

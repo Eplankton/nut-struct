@@ -33,12 +33,31 @@ namespace nuts
 
 	public:
 		map() = default;
+
+		map(const map<Key, Val, Compare>& src)
+		{
+			for_each(this->begin(), this->end(),
+			         [this](const auto& x) { this->insert(x); });
+		}
+
+		map(map<Key, Val, Compare>&& src)
+		{
+			base_type::move(src);
+		}
 		~map() = default;
+
+		map<Key, Val, Compare>& operator=(const map<Key, Val, Compare>& src);
+		map<Key, Val, Compare>& operator=(map<Key, Val, Compare>&& src)
+		{
+			base_type::move(src);
+			return *this;
+		}
+
 		void print() const;
 
 		bool insert(const Key& _k, const Val& _v)
 		{
-			return base_type::insert(make_pair(_k, _v));
+			return base_type::insert({_k, _v});
 		}
 
 		bool insert(const pair<Key, Val>& _p)
@@ -106,6 +125,14 @@ namespace nuts
 		if (!this->empty())
 			for_each(this->begin(), this->end(), pr);
 		printf("}\n");
+	}
+	template <typename Key, typename Val, class Compare>
+	map<Key, Val, Compare>& map<Key, Val, Compare>::
+	operator=(const map<Key, Val, Compare>& src)
+	{
+		for_each(this->begin(), this->end(),
+		         [this](const auto& x) { this->insert(x); });
+		return *this;
 	}
 }
 

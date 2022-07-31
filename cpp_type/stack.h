@@ -19,16 +19,11 @@ namespace nuts
 		using value_type = T;
 		using itr_type = typename base::iterator;
 
-	protected:
-		base container;
-
 	public:
 		stack() = default;
 		stack(const std::initializer_list<T>& ilist);
-		stack(const stack<T, base>& src)
-		{
-			container = src.container;
-		};
+		stack(stack<T, base>&& src) { this->move(src); }
+		stack(const stack<T, base>& src) { container = src.container; }
 		~stack() = default;
 
 		stack<T, base>& push(const T& obj);
@@ -44,7 +39,9 @@ namespace nuts
 		T& back() { return container.back(); }
 		const T& front() const { return container.front(); }
 		const T& back() const { return container.back(); }
-		stack<T, base>& operator=(stack<T, base>& obj);
+		stack<T, base>& operator=(const stack<T, base>& obj);
+		stack<T, base>& operator=(stack<T, base>&& src) { return this->move(src); }
+		stack<T, base>& move(stack<T, base>& obj);
 
 		itr_type begin();
 		itr_type end();
@@ -53,6 +50,9 @@ namespace nuts
 		itr_type end() const;
 
 		void print() const;
+
+	protected:
+		base container;
 	};
 
 	template <class T, class base>
@@ -63,10 +63,18 @@ namespace nuts
 	}
 
 	template <class T, class base>
-	stack<T, base>& stack<T, base>::operator=(stack<T, base>& obj)
+	stack<T, base>& stack<T, base>::operator=(const stack<T, base>& obj)
 	{
 		this->clear();
 		container = obj.container;
+		return *this;
+	}
+
+	template <class T, class base>
+	stack<T, base>& stack<T, base>::move(stack<T, base>& obj)
+	{
+		this->clear();
+		container.move(obj.container);
 		return *this;
 	}
 

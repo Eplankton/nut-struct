@@ -22,15 +22,10 @@ namespace nuts
 	class unordered_set
 	{
 	public:
+		using prime_pointer = const u64*;
 		using value_type = Key;
 		using Self_Type = unordered_set<Key, Hasher>;
 		using Bucket_Type = list<Key>;
-
-	protected:
-		const u64* bucket_size = PRIME_LIST;
-		u64 _size = 0;
-		vector<Bucket_Type> bucket;
-		Hasher hash_fn;
 
 	public:
 		class iterator
@@ -107,18 +102,14 @@ namespace nuts
 			}
 		};
 
-		static const iterator npos;
+		static const iterator npos;// Null-pos
 
 		iterator begin()
 		{
 			auto ed = bucket.end() + 1;
 			for (auto o = bucket.begin(); o != ed; ++o)
-			{
 				if (!o->empty())
-				{
 					return {o, bucket.end(), o->begin()};
-				}
-			}
 			return npos;
 		}
 
@@ -126,12 +117,8 @@ namespace nuts
 		{
 			auto ed = bucket.end() + 1;
 			for (auto o = bucket.begin(); o != ed; ++o)
-			{
 				if (!o->empty())
-				{
 					return {o, bucket.end(), o->begin()};
-				}
-			}
 			return npos;
 		}
 
@@ -139,12 +126,8 @@ namespace nuts
 		{
 			auto ed = bucket.begin() - 1;
 			for (auto o = bucket.end(); o != ed; --o)
-			{
 				if (!o->empty())
-				{
 					return {o, bucket.end(), o->begin()};
-				}
-			}
 			return npos;
 		}
 
@@ -152,17 +135,14 @@ namespace nuts
 		{
 			auto ed = bucket.begin() - 1;
 			for (auto o = bucket.end(); o != ed; --o)
-			{
 				if (!o->empty())
-				{
 					return {o, bucket.end(), o->begin()};
-				}
-			}
 			return npos;
 		}
 
 		unordered_set();
 		unordered_set(const Self_Type& src);
+		unordered_set(Self_Type&& src) { this->move(src); }
 		unordered_set(const std::initializer_list<Key>& ilist);
 		~unordered_set() { this->clear(); }
 
@@ -177,8 +157,17 @@ namespace nuts
 		bool erase(const Key& _k);
 		void clear();
 
+		Self_Type& operator=(const Self_Type& src);
+		Self_Type& operator=(Self_Type&& src) { return this->move(src); }
+
 		void print() const;
 		void print_as_table() const;
+
+	protected:
+		prime_pointer bucket_size = PRIME_LIST;
+		u64 _size = 0;
+		vector<Bucket_Type> bucket;
+		Hasher hash_fn;
 	};
 
 	template <class Key, class Hasher>
@@ -189,7 +178,6 @@ namespace nuts
 	unordered_set<Key, Hasher>::unordered_set()
 	{
 		vector<Bucket_Type> tmp(*bucket_size);
-		tmp.shrink_to_fit();
 		this->bucket.move(tmp);
 	}
 
@@ -220,9 +208,9 @@ namespace nuts
 	unordered_set<Key, Hasher>::find(const Key& _k) const
 	{
 		u64 index = hash_fn(_k) % *bucket_size;
+		auto ed = bucket[index].end() + 1;
 		for (auto res = bucket[index].begin();
-		     res != bucket[index].end() + 1;
-		     res++)
+		     res != ed; res++)
 		{
 			if (res != nullptr && *res == _k)
 				return {bucket.begin() + index, bucket.end(), res};
@@ -234,10 +222,20 @@ namespace nuts
 	unordered_set<Key, Hasher>& unordered_set<Key, Hasher>::
 	        move(Self_Type& src)
 	{
-		this->bucket_size = src.bucket_size;
-		this->bucket.move(src.bucket);
-		this->_size = src._size;
+		bucket_size = src.bucket_size;
+		bucket.move(src.bucket);
+		_size = src._size;
 		src._size = 0;
+		return *this;
+	}
+
+	template <class Key, class Hasher>
+	unordered_set<Key, Hasher>& unordered_set<Key, Hasher>::
+	operator=(const Self_Type& src)
+	{
+		bucket_size = src.bucket_size;
+		bucket = src.bucket;
+		_size = src._size;
 		return *this;
 	}
 
@@ -256,10 +254,10 @@ namespace nuts
 		{
 			if (_size == *bucket_size - 1)
 				this->rehash();
-			u64 index = this->hash_fn(_k) % *this->bucket_size;
-			this->bucket[index].push_back();
-			this->bucket[index].back() = _k;
-			this->_size++;
+			u64 index = hash_fn(_k) % *bucket_size;
+			bucket[index].push_back();
+			bucket[index].back() = _k;
+			_size++;
 		}
 		// else do nothing.
 	}
@@ -268,11 +266,11 @@ namespace nuts
 	bool unordered_set<Key, Hasher>::erase(const Key& _k)
 	{
 		u64 index = hash_fn(_k) % *bucket_size;
+		auto ed = bucket[index].end() + 1;
 		for (auto res = bucket[index].begin();
-		     res != bucket[index].end() + 1;
-		     res++)
+		     res != ed && res != nullptr; res++)
 		{
-			if (res != nullptr && *res == _k)
+			if (*res == _k)
 			{
 				bucket[index].erase(res);
 				_size--;
@@ -288,7 +286,7 @@ namespace nuts
 		if (!this->empty())
 		{
 			for_each(bucket.begin(), bucket.end(),
-			         [](Bucket_Type& x) { x.clear(); });
+			         [](Bucket_Type& cc) { cc.clear(); });
 			_size = 0;
 		}
 	}
@@ -301,12 +299,12 @@ namespace nuts
 		tmp.shrink_to_fit();
 
 		auto fv = [this, &tmp](const Key& x) {
-			u64 index = this->hash_fn(x) % (*this->bucket_size);
+			u64 index = hash_fn(x) % (*bucket_size);
 			tmp[index].push_back(x);
 		};
 
 		for_each(begin(), end(), fv);
-		this->bucket.move(tmp);
+		bucket.move(tmp);
 	}
 
 	template <class Key, class Hasher>

@@ -15,13 +15,22 @@ namespace nuts
 		pair(const T1& _first, const T2& _last)
 		    : first(_first), second(_last) {}
 
-		pair(const pair& obj)
+		pair(const pair<T1, T2>& obj)
 		    : first(obj.first), second(obj.second) {}
+
+		pair(pair<T1, T2>&& src) { this->move(src); }
 
 		T1& get_first() { return first; }
 		T2& get_second() { return second; }
 		const T1& get_first() const { return first; }
 		const T2& get_second() const { return second; }
+
+		pair<T1, T2>& move(pair<T1, T2>& src)
+		{
+			first = std::move(src.first);
+			second = std::move(src.second);
+			return *this;
+		}
 
 		bool operator<(const pair<T1, T2>& after) const
 		{
@@ -55,6 +64,11 @@ namespace nuts
 		{
 			first = obj.first, second = obj.second;
 			return *this;
+		}
+
+		pair<T1, T2>& operator=(pair<T1, T2>&& src)
+		{
+			return this->move(src);
 		}
 
 		friend std::ostream&

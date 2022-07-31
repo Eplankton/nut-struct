@@ -22,28 +22,34 @@ namespace nuts
 
 	protected:
 		T* data_ptr = nullptr;
-		u64 v_size = 0;
-		u64 v_capacity = 0;
+		u64 v_size = 0, v_capacity = 0;
 
 	public:
-		vector() = default;                                        // Void constructor
+		vector() = default;// Void constructor
+
 		explicit vector(u64 userInputSize);                        // Init by size
 		explicit vector(u64 userInputSize, const T& userInputData);// Init by size and value
-		vector(const vector<T>& obj);                              // Copy constructor
-		vector(const std::initializer_list<T>& ilist);             // Init by a {ilist}
+
+		vector(const vector<T>& obj);               // Copy constructor
+		vector(vector<T>&& src) { this->move(src); }// Move constructor
+
+		vector(const std::initializer_list<T>& ilist);// Init by a {ilist}
+
 		~vector() { this->destroy(); }
 
-		u64 size() const { return this->v_size; }               // Return the number of elements
-		u64 capacity() const { return this->v_capacity; }       // Return the current capacity
-		bool empty() const { return this->v_size == 0; }        // Check whether the vector is empty
-		bool exist() const { return this->data_ptr != nullptr; }// Check whether the vector is existed
-		void clear();                                           // Clear all values, but don't destroy
-		void destroy();                                         // Clear the contents and release memory, contain exist()
-		vector<T>& shrink_to_fit();                             // Reduce memory usage by freeing unused memory
-		vector<T>& resize(u64 N);                               // Reduce or expand capacity
+		T* data() const { return const_cast<T*>(data_ptr); }
+
+		u64 size() const { return v_size; }               // Return the number of elements
+		u64 capacity() const { return v_capacity; }       // Return the current capacity
+		bool empty() const { return v_size == 0; }        // Check whether the vector is empty
+		bool exist() const { return data_ptr != nullptr; }// Check whether the vector is existed
+
+		vector<T>& shrink_to_fit();// Reduce memory usage by freeing unused memory
+		vector<T>& resize(u64 N);  // Reduce or expand capacity
+
+		void clear();  // Clear all values, but don't destroy
+		void destroy();// Clear the contents and release memory, contain exist()
 		void print() const;
-		void sort();
-		T* data() const { return const_cast<T*>(this->data_ptr); }
 
 		vector<T>& push_back(const T& obj);// Add an element to the end
 		vector<T>& pop_back();             // Remove the last element
@@ -52,9 +58,8 @@ namespace nuts
 		T& operator[](u64 N);// Access specified element
 		const T& operator[](u64 N) const;
 
-		vector<T>& operator=(const vector<T>& obj);                 // Deep copy operator
-		vector<T>& operator=(const std::initializer_list<T>& ilist);// Covered by a {inlist}
-		bool operator==(const vector<T>& obj) const;                // Compare two vectors in same type
+		vector<T>& operator=(const vector<T>& obj);// Deep copy operator
+		vector<T>& operator=(vector<T>&& src) { return this->move(src); }
 
 		class iterator : public random_access_iterator
 		{
@@ -66,21 +71,17 @@ namespace nuts
 
 		public:
 			iterator() = default;
-			explicit iterator(T* obj) { this->_ptr = obj; }
-			explicit iterator(std::nullptr_t obj) { this->_ptr = obj; }
-
-			iterator(const iterator& obj)
-			{
-				this->_ptr = obj._ptr;
-			}
+			iterator(T* obj) { _ptr = obj; }
+			iterator(std::nullptr_t obj) : _ptr(obj) {}
+			iterator(const iterator& obj) : _ptr(obj._ptr) {}
 
 			T* get() const { return _ptr; }
 
-			T* operator->() { return _ptr; }
-			const T* operator->() const { return _ptr; }
-
 			T& operator*() { return *_ptr; }
 			const T& operator*() const { return *_ptr; }
+
+			T* operator->() { return _ptr; }
+			const T* operator->() const { return _ptr; }
 
 			iterator& operator=(T* obj)
 			{
@@ -219,14 +220,12 @@ namespace nuts
 	template <class T>
 	vector<T>::vector(const std::initializer_list<T>& ilist)
 	{
-		this->v_size = ilist.size();
-		this->v_capacity = this->v_size + STD_CAPACITY;
-		this->data_ptr = new T[v_size + STD_CAPACITY];
-		T* q = this->data_ptr;
+		v_size = ilist.size();
+		v_capacity = v_size + STD_CAPACITY;
+		data_ptr = new T[v_size + STD_CAPACITY];
+		T* q = data_ptr;
 		for (auto p = ilist.begin(); p != ilist.end(); ++p, ++q)
-		{
 			*q = *p;
-		}
 	}
 
 	template <class T>
@@ -262,14 +261,14 @@ namespace nuts
 	template <class T>
 	vector<T>& vector<T>::shrink_to_fit()
 	{
-		if (this->v_capacity > this->v_size)
+		if (v_capacity > v_size)
 		{
-			T* tmp = new T[this->v_size];
-			for (u64 i = 0; i < this->v_size; i++)
-				tmp[i] = this->data_ptr[i];
-			delete[] this->data_ptr;
-			this->data_ptr = tmp;
-			this->v_capacity = this->v_size;
+			T* tmp = new T[v_size];
+			for (u64 i = 0; i < v_size; i++)
+				tmp[i] = data_ptr[i];
+			delete[] data_ptr;
+			data_ptr = tmp;
+			v_capacity = v_size;
 		}
 		return *this;
 	}
@@ -323,15 +322,17 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T>& vector<T>::move(vector<T>& after)
+	vector<T>& vector<T>::move(vector<T>& src)
 	{
-		this->destroy();                // Self destroy
-		this->data_ptr = after.data_ptr;// Pass ownership
-		this->v_size = after.v_size;
-		this->v_capacity = after.v_capacity;
-		after.data_ptr = nullptr;// Set invalid
-		after.v_size = 0;
-		after.v_capacity = 0;
+		this->destroy();// Self destroy
+
+		this->data_ptr = src.data_ptr;// Pass ownership
+		this->v_size = src.v_size;
+		this->v_capacity = src.v_capacity;
+
+		src.data_ptr = nullptr;// Set invalid
+		src.v_size = 0;
+		src.v_capacity = 0;
 		return *this;
 	}
 
@@ -364,32 +365,6 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T>&
-	vector<T>::operator=(const std::initializer_list<T>& ilist)
-	{
-		this->destroy();
-		this->v_size = ilist.size();
-		this->v_capacity = this->v_size + STD_CAPACITY;
-		this->data_ptr = new T[v_size + STD_CAPACITY];
-		auto st = ilist.begin();
-		for (u64 i = 0; i < size(); ++i)
-			data_ptr[i] = *(st++);
-		return *this;
-	}
-
-	template <class T>
-	bool vector<T>::operator==(const vector<T>& obj) const
-	{
-		u64 count = 0;
-		for (u64 i = 0; i < this->v_size &&
-		                i < obj.v_size;
-		     i++)
-			if (this->data_ptr[i] == obj.data_ptr[i])
-				count++;
-		return count == this->v_size;
-	}
-
-	template <class T>
 	void vector<T>::print() const
 	{
 		auto print = [this](const auto& x) {
@@ -405,16 +380,10 @@ namespace nuts
 	}
 
 	template <class T>
-	void vector<T>::sort()
-	{
-		nuts::quick_sort(*this);
-	}
-
-	template <class T>
 	template <typename Itr>
 	void vector<T>::assign(Itr st, Itr ed)
 	{
-		for_each(st, ed, [=](const auto& x) { this->push_back(x); });
+		for_each(st, ed, [this](const auto& x) { this->push_back(x); });
 	}
 }
 

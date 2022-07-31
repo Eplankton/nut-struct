@@ -28,7 +28,8 @@ namespace nuts
 
 	public:
 		basic_string() = default;                                   // Void constructor
-		basic_string(const basic_string<T>& obj);                   // Copy constructor, copy another string
+		basic_string(const basic_string<T>& src);                   // Copy constructor
+		basic_string(basic_string<T>&& src) { this->move(src); }    // Move constructor
 		basic_string(const basic_string<T>& obj, T* start, T* stop);// Copy part of string range in [start, stop]
 		basic_string(const T* obj);                                 // Init by a cstring with '\0'
 		basic_string(const std::initializer_list<T>& ilist);        // Init by a {ilist}
@@ -44,6 +45,7 @@ namespace nuts
 		basic_string<T>& resize(size_t N);                  // Reduce or expand capacity
 		basic_string<T>& push_back(const T& obj);           // Add an element to the end
 		basic_string<T>& pop_back();                        // Remove the last element
+		basic_string<T>& move(basic_string<T>& src);
 
 		T* get() const { return data_ptr; }
 		T& front() { return this->data_ptr[0]; }
@@ -54,6 +56,7 @@ namespace nuts
 		T& operator[](size_t N);// Access specified element in index
 		const T& operator[](size_t N) const;
 		basic_string<T>& operator=(const basic_string<T>& obj);           // Deep copy operator
+		basic_string<T>& operator=(basic_string<T>&& src) { return this->move(src); }
 		basic_string<T>& operator=(const T* obj);                         // Covered by a cstring
 		basic_string<T>& operator=(const std::initializer_list<T>& ilist);// Covered by a {ilist}
 		bool operator==(const basic_string<T>& obj) const;                // Compare two strings
@@ -122,7 +125,7 @@ namespace nuts
 				this->_ptr = obj._ptr;
 			}
 
-			T* get() const { return _ptr; }
+			T* get() const { return const_cast<T*>(_ptr); }
 
 			T& operator*() { return *_ptr; }
 			const T& operator*() const { return *_ptr; }
@@ -226,13 +229,13 @@ namespace nuts
 	// typedef basic_string<char> string;
 
 	template <class T>
-	basic_string<T>::basic_string(const basic_string<T>& obj)
+	basic_string<T>::basic_string(const basic_string<T>& src)
 	{
-		this->data_ptr = new T[obj.size() + STD_EXPAN];
-		this->v_size = obj.size();
+		this->data_ptr = new T[src.size() + STD_EXPAN];
+		this->v_size = src.size();
 		this->v_capacity = this->v_size + STD_EXPAN;
 		for (size_t i = 0; i < this->v_size; i++)
-			this->data_ptr[i] = obj.data_ptr[i];
+			this->data_ptr[i] = src.data_ptr[i];
 		_POP_EXC_0();
 	}
 
@@ -282,6 +285,21 @@ namespace nuts
 			q++;
 		}
 		_POP_EXC_0();
+	}
+
+	template <class T>
+	basic_string<T>& basic_string<T>::move(basic_string<T>& src)
+	{
+		this->destroy();// Self destroy
+
+		this->data_ptr = src.data_ptr;// Pass ownership
+		this->v_size = src.v_size;
+		this->v_capacity = src.v_capacity;
+
+		src.data_ptr = nullptr;// Set invalid
+		src.v_size = 0;
+		src.v_capacity = 0;
+		return *this;
 	}
 
 	template <class T>
@@ -596,7 +614,7 @@ namespace nuts
 	basic_string<T>
 	basic_string<T>::operator()(const T* obj) const
 	{
-		return string(obj);
+		return basic_string<T>(obj);
 	}
 
 	template <class T>

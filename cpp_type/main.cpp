@@ -8,9 +8,9 @@ int main()
 	// set<i32> A = {7, 8, 0, 4, 2, 6, 9, 3, 5, 1};
 	set<i32> A;
 	set<i32> B = {1, 4, 7, 10, 13, 16, 19, 22, 25, 28};
-	for (i32 i = 0; i < 100; ++i)
+	for (i32 i = 0; i < 25; ++i)
 		A.insert(i);
-	// A.print_as_tree();
+	A.print_as_tree();
 	// B.print();
 
 	map<i32, bool> m;
@@ -36,10 +36,11 @@ int main()
 	for_each(m.begin(), m.end(), cptr);
 	// hmap.print_as_table();
 
-	// deque<string> s {"human", "dog", "cat", "cow",
-	//                  "sheep", "monkey", "turtle",
-	//                  "elephant"};
-	// s.print();
+	deque<string> s {"human", "dog", "cat", "cow",
+	                 "sheep", "monkey", "turtle",
+	                 "elephant"};
+	reverse(s.begin(), s.end());
+	s.print();
 
 	return 0;
 }

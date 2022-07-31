@@ -7,7 +7,7 @@
 namespace nuts
 {
 	template <class T>
-	struct default_delete
+	struct default_executor
 	{
 		void operator()(T* _ptr) const
 		{
@@ -17,20 +17,22 @@ namespace nuts
 		}
 	};
 
-	template <typename T, class Dx = default_delete<T>>
+	template <typename T, class Dx = default_executor<T>>
 	class unique_ptr
 	{
 	public:
 		using value_type = T;
+		using pointer = T*;
+		using const_pointer = const T*;
 
 	protected:
-		T* _ptr = nullptr;
-		Dx deleter;
+		pointer _ptr = nullptr;
+		static const Dx deleter;
 
 	public:
 		unique_ptr() = default;
-		unique_ptr(T* obj) : _ptr(obj) {}
-		unique_ptr(const T* obj) : _ptr(const_cast<T*>(obj)) {}
+		unique_ptr(pointer obj) : _ptr(obj) {}
+		unique_ptr(const_pointer obj) : _ptr(const_cast<pointer>(obj)) {}
 		unique_ptr(std::nullptr_t _p) : _ptr(_p) {}
 		unique_ptr(unique_ptr<T, Dx>& src)
 		{
@@ -56,20 +58,21 @@ namespace nuts
 			return *_ptr;
 		}
 
-		T* operator->()
+		pointer operator->()
 		{
 			assert(_ptr != nullptr);
 			return _ptr;
 		}
 
-		const T* operator->() const
+		const_pointer operator->() const
 		{
 			assert(_ptr != nullptr);
 			return _ptr;
 		}
 
-		T* get() const { return _ptr; }
-		T* release()
+		pointer get() const { return const_cast<pointer>(_ptr); }
+
+		pointer release()
 		{
 			auto tmp = _ptr;
 			_ptr = nullptr;
@@ -111,7 +114,7 @@ namespace nuts
 			return this->_ptr != obj._ptr;
 		}
 
-		bool operator!=(const T* obj) const
+		bool operator!=(const_pointer obj) const
 		{
 			return this->_ptr != obj;
 		}
@@ -143,22 +146,31 @@ namespace nuts
 		}
 	};
 
+	template <typename T, class Dx>
+	const Dx unique_ptr<T, Dx>::deleter;// Shared deleter for T
+
 	template <typename T>
 	class shared_ptr
 	{
+	public:
+		using value_type = T;
+		using pointer = T*;
+		using const_pointer = const T*;
+		using cntor = u64*;
+
 	protected:
-		T* _ptr = nullptr;
-		u64* _cnt = nullptr;
+		pointer _ptr = nullptr;
+		cntor _cnt = nullptr;
 
 	public:
 		shared_ptr() = default;
-		shared_ptr(T* obj) : _ptr(obj)
+		shared_ptr(pointer obj) : _ptr(obj)
 		{
 			_cnt = new u64(0);
 			(*_cnt)++;
 		}
 
-		shared_ptr(const T* obj) : _ptr(const_cast<T*>(obj))
+		shared_ptr(const_pointer obj) : _ptr(const_cast<pointer>(obj))
 		{
 			_cnt = new u64(0);
 			(*_cnt)++;
@@ -277,13 +289,13 @@ namespace nuts
 	template <class T>
 	T* get_raw(const unique_ptr<T>& src)
 	{
-		return src.get();
+		return const_cast<T*>(src.get());
 	}
 
 	template <class T>
 	T* get_raw(const shared_ptr<T>& src)
 	{
-		return src.get();
+		return const_cast<T*>(src.get());
 	}
 }
 

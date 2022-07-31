@@ -106,11 +106,11 @@ namespace nuts
 	}
 
 	template <typename T>
-	void swap(T& a, T& b)// Swap value by copy
+	void swap(T& a, T& b)// Swap value
 	{
-		T tmp = b;
-		b = a;
-		a = tmp;
+		auto tmp = std::move(b);
+		b = std::move(a);
+		a = std::move(tmp);
 	}
 
 	template <typename Itr>
@@ -119,9 +119,9 @@ namespace nuts
 		swap(*a_itr, *b_itr);
 	}
 
-	template <typename Itr,
-	          typename =
-	                  std::enable_if<is_bidirectional_iterator<typename Itr::Category>::value>>
+	template <typename Itr, typename =
+	                                std::enable_if<
+	                                        is_bidirectional_iterator<typename Itr::Category>::value>>
 	void reverse(Itr st, Itr ed)// Give range by itr: st && ed -> O(N)
 	{
 		while (st != ed && st != ed - 1)
