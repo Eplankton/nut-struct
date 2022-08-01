@@ -10,12 +10,13 @@ int main()
 	set<i32> B = {1, 4, 7, 10, 13, 16, 19, 22, 25, 28};
 	for (i32 i = 0; i < 25; ++i)
 		A.insert(i);
-	A.print_as_tree();
+	// A.print_as_tree();
 	// B.print();
 
 	map<i32, bool> m;
 	for_each(A.begin(), A.end(),
 	         [&m, &B](const auto& x) { m[x] = !B.contains(x); });
+	// m.print();
 
 	// auto detect_scheme = [&m](const auto& it) {
 	// 				if (it == m.npos)
@@ -40,7 +41,7 @@ int main()
 	                 "sheep", "monkey", "turtle",
 	                 "elephant"};
 	reverse(s.begin(), s.end());
-	s.print();
-
+	// s.print();
+	
 	return 0;
 }

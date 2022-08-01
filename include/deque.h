@@ -14,7 +14,7 @@ namespace nuts
 	class deque
 	{
 	public:
-		using value_type = T;
+		using Value_type = T;
 		using pointer = T*;
 		using const_pointer = const T*;
 		using buf_type = array<T, Buf>;
@@ -29,7 +29,7 @@ namespace nuts
 		    : public bidirectional_iterator
 		{
 		public:
-			using value_type = T;
+			using Value_type = T;
 			using out_itr = typename map_type::iterator;
 
 		protected:

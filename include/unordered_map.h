@@ -11,21 +11,21 @@ namespace nuts
 	    : public unordered_set<pair<Key, Val>, Hasher>
 	{
 	public:
-		using base_type = unordered_set<pair<Key, Val>, Hasher>;
+		using Base_type = unordered_set<pair<Key, Val>, Hasher>;
 		using Self_Type = unordered_map<Key, Val, Hasher>;
 		using Bucket_Type = list<pair<Key, Val>>;
-		using itr_type = typename base_type::iterator;
+		using Itr_type = typename Base_type::iterator;
 
 		unordered_map();
 		unordered_map(const Self_Type& src);
 		unordered_map(Self_Type&& src) { this->move(src); }
-		~unordered_map() { base_type::clear(); }
+		~unordered_map() { Base_type::clear(); }
 
 		Self_Type& move(Self_Type& src);
 
 		void rehash();
 		bool contains(const Key& _k) const;
-		itr_type find(const Key& _k) const;
+		Itr_type find(const Key& _k) const;
 
 		Val& at(const Key& _k);
 		const Val& at(const Key& _k) const;
@@ -96,14 +96,14 @@ namespace nuts
 				        this->bucket.end(),
 				        res};
 		}
-		return base_type::npos;// if not found
+		return Base_type::npos;// if not found
 	}
 
 	template <class Key, class Val, class Hasher>
 	Val& unordered_map<Key, Val, Hasher>::at(const Key& _k)
 	{
 		auto it = this->find(_k);
-		assert(it != base_type::npos);
+		assert(it != Base_type::npos);
 		return it->second;
 	}
 
@@ -112,7 +112,7 @@ namespace nuts
 	        at(const Key& _k) const
 	{
 		auto it = this->find(_k);
-		assert(it != base_type::npos);
+		assert(it != Base_type::npos);
 		return it->second;
 	}
 
@@ -120,7 +120,7 @@ namespace nuts
 	Val& unordered_map<Key, Val, Hasher>::operator[](const Key& _k)
 	{
 		auto it = this->find(_k);
-		if (it != base_type::npos)
+		if (it != Base_type::npos)
 			return it->second;
 		else
 		{
@@ -138,7 +138,7 @@ namespace nuts
 	const Val& unordered_map<Key, Val, Hasher>::
 	operator[](const Key& _k) const
 	{
-		assert(this->find(_k) != base_type::npos);
+		assert(this->find(_k) != Base_type::npos);
 		return (*this)[_k];
 	}
 
@@ -162,7 +162,7 @@ namespace nuts
 	{
 		pair<Key, Val> tmp;
 		tmp.first = _k;
-		return base_type::erase(tmp);
+		return Base_type::erase(tmp);
 	}
 
 	template <class Key, class Val, class Hasher>

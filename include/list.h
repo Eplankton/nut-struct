@@ -40,7 +40,7 @@ namespace nuts
 	class list// Manager class
 	{
 	public:
-		using value_type = T;
+		using Value_type = T;
 		using node = ListNode<T>;
 		using node_ptr = node*;
 
@@ -97,7 +97,7 @@ namespace nuts
 		class iterator : public bidirectional_iterator
 		{
 		public:
-			using value_type = T;
+			using Value_type = T;
 
 		protected:
 			node_ptr _ptr = nullptr;

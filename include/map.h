@@ -26,10 +26,10 @@ namespace nuts
 	{
 	public:
 		using Val_type = Key;
-		using itr_type = typename AVL<pair<Key, Val>,
+		using Itr_type = typename AVL<pair<Key, Val>,
 		                              Compare>::iterator;
 
-		using base_type = set<pair<Key, Val>, Compare>;
+		using Base_type = set<pair<Key, Val>, Compare>;
 
 	public:
 		map() = default;
@@ -42,14 +42,14 @@ namespace nuts
 
 		map(map<Key, Val, Compare>&& src)
 		{
-			base_type::move(src);
+			Base_type::move(src);
 		}
 		~map() = default;
 
 		map<Key, Val, Compare>& operator=(const map<Key, Val, Compare>& src);
 		map<Key, Val, Compare>& operator=(map<Key, Val, Compare>&& src)
 		{
-			base_type::move(src);
+			Base_type::move(src);
 			return *this;
 		}
 
@@ -57,26 +57,26 @@ namespace nuts
 
 		bool insert(const Key& _k, const Val& _v)
 		{
-			return base_type::insert({_k, _v});
+			return Base_type::insert({_k, _v});
 		}
 
 		bool insert(const pair<Key, Val>& _p)
 		{
-			return base_type::insert(_p);
+			return Base_type::insert(_p);
 		}
 
 		bool erase(const Key& _k)
 		{
 			pair<Key, Val> tmp;
 			tmp.first = _k;
-			return base_type::erase(tmp);
+			return Base_type::erase(tmp);
 		}
 
-		itr_type find(const Key& _k) const
+		Itr_type find(const Key& _k) const
 		{
 			pair<Key, Val> tmp;
 			tmp.first = _k;
-			return base_type::find(tmp);
+			return Base_type::find(tmp);
 		}
 
 		bool contains(const Key& _k) const
@@ -87,29 +87,33 @@ namespace nuts
 		Val& at(const Key& _k)
 		{
 			auto loc = this->find(_k);
+			assert(loc != this->npos);
+			return loc->second;
+		}
+
+		const Val& at(const Key& _k) const
+		{
+			auto loc = this->find(_k);
+			assert(loc != this->npos);
+			return loc->second;
+		}
+
+
+		Val& operator[](const Key& _k)
+		{
+			auto loc = this->find(_k);
 			if (loc == this->npos)
 			{
 				pair<Key, Val> tmp;
 				tmp.first = _k;
-				auto at = base_type::insert_ret_pos(tmp);
+				auto at = Base_type::insert_ret_pos(tmp);
 				return at->second;
 			}
 			else
 				return loc->second;
 		}
 
-		Val& operator[](const Key& _k) { return this->at(_k); }
-
-		const Val& at(const Key& _k) const
-		{
-			auto loc = this->find(_k);
-			assert(loc != this->npos);
-			auto shit = loc.get();
-			return loc->second;
-		}
-
-		const Val& operator[](const Key& _k)
-		        const { return this->at(_k); }
+		const Val& operator[](const Key& _k) const { return at(_k); }
 	};
 
 	template <typename Key, typename Val, class Compare>
@@ -117,7 +121,7 @@ namespace nuts
 	{
 		auto pr = [this](const auto& x) {
 			std::cout << x;
-			if (x != this->max())
+			if (&x != &this->back())
 				printf(", ");
 		};
 
@@ -126,10 +130,12 @@ namespace nuts
 			for_each(this->begin(), this->end(), pr);
 		printf("}\n");
 	}
+
 	template <typename Key, typename Val, class Compare>
 	map<Key, Val, Compare>& map<Key, Val, Compare>::
 	operator=(const map<Key, Val, Compare>& src)
 	{
+		Base_type::clear();
 		for_each(this->begin(), this->end(),
 		         [this](const auto& x) { this->insert(x); });
 		return *this;

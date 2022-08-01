@@ -18,7 +18,7 @@ namespace nuts
 	class vector
 	{
 	public:
-		using value_type = T;
+		using Value_type = T;
 
 	protected:
 		T* data_ptr = nullptr;
@@ -64,7 +64,7 @@ namespace nuts
 		class iterator : public random_access_iterator
 		{
 		public:
-			using value_type = T;
+			using Value_type = T;
 
 		protected:
 			T* _ptr = nullptr;

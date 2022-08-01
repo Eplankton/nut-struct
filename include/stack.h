@@ -16,8 +16,8 @@ namespace nuts
 	class stack
 	{
 	public:
-		using value_type = T;
-		using itr_type = typename base::iterator;
+		using Value_type = T;
+		using Itr_type = typename base::iterator;
 
 	public:
 		stack() = default;
@@ -43,11 +43,11 @@ namespace nuts
 		stack<T, base>& operator=(stack<T, base>&& src) { return this->move(src); }
 		stack<T, base>& move(stack<T, base>& obj);
 
-		itr_type begin();
-		itr_type end();
+		Itr_type begin();
+		Itr_type end();
 
-		itr_type begin() const;
-		itr_type end() const;
+		Itr_type begin() const;
+		Itr_type end() const;
 
 		void print() const;
 

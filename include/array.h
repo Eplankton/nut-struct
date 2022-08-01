@@ -11,12 +11,12 @@ namespace nuts
 	class array
 	{
 	public:
-		using value_type = T;
+		using Value_type = T;
 		using pointer = T*;
 		using const_pointer = const T*;
 
 	protected:
-		value_type data_ptr[N];
+		Value_type data_ptr[N];
 
 	public:
 		array() = default;
@@ -42,7 +42,7 @@ namespace nuts
 		    : public random_access_iterator
 		{
 		public:
-			using value_type = T;
+			using Value_type = T;
 			using pointer = T*;
 			using const_pointer = const T*;
 

@@ -19,7 +19,7 @@ namespace nuts
 	class basic_string
 	{
 	public:
-		using value_type = T;
+		using Value_type = T;
 
 	protected:
 		T* data_ptr = nullptr;
@@ -35,16 +35,16 @@ namespace nuts
 		basic_string(const std::initializer_list<T>& ilist);        // Init by a {ilist}
 		~basic_string() { this->destroy(); }
 
-		size_t size() const { return this->v_size; }        // Return the number of elements
-		size_t capacity() const { return this->v_capacity; }// Return the current capacity
-		void clear();                                       // Clear all values, but don't destroy
-		bool empty() { return this->v_size == 0; }          // Check whether the string is empty
-		bool exist() { return this->data_ptr != nullptr; }  // Check whether the vector is existed
-		void destroy();                                     // Clear the contents and release memory, contain exist()
-		basic_string<T>& shrink_to_fit();                   // Reduce memory usage by freeing unused memory
-		basic_string<T>& resize(size_t N);                  // Reduce or expand capacity
-		basic_string<T>& push_back(const T& obj);           // Add an element to the end
-		basic_string<T>& pop_back();                        // Remove the last element
+		size_t size() const { return this->v_size; }            // Return the number of elements
+		size_t capacity() const { return this->v_capacity; }    // Return the current capacity
+		void clear();                                           // Clear all values, but don't destroy
+		bool empty() const { return this->v_size == 0; }        // Check whether the string is empty
+		bool exist() const { return this->data_ptr != nullptr; }// Check whether the vector is existed
+		void destroy();                                         // Clear the contents and release memory, contain exist()
+		basic_string<T>& shrink_to_fit();                       // Reduce memory usage by freeing unused memory
+		basic_string<T>& resize(size_t N);                      // Reduce or expand capacity
+		basic_string<T>& push_back(const T& obj);               // Add an element to the end
+		basic_string<T>& pop_back();                            // Remove the last element
 		basic_string<T>& move(basic_string<T>& src);
 
 		T* get() const { return data_ptr; }
@@ -53,9 +53,9 @@ namespace nuts
 		const T& front() const { return this->data_ptr[0]; }
 		const T& back() const { return this->data_ptr[this->size() - 1]; }
 
-		T& operator[](size_t N);// Access specified element in index
+		T& operator[](size_t N);
 		const T& operator[](size_t N) const;
-		basic_string<T>& operator=(const basic_string<T>& obj);           // Deep copy operator
+		basic_string<T>& operator=(const basic_string<T>& obj);// Deep copy operator
 		basic_string<T>& operator=(basic_string<T>&& src) { return this->move(src); }
 		basic_string<T>& operator=(const T* obj);                         // Covered by a cstring
 		basic_string<T>& operator=(const std::initializer_list<T>& ilist);// Covered by a {ilist}
@@ -109,7 +109,7 @@ namespace nuts
 		class iterator : public random_access_iterator
 		{
 		public:
-			using value_type = T;
+			using Value_type = T;
 
 		protected:
 			T* _ptr = nullptr;

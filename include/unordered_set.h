@@ -23,7 +23,7 @@ namespace nuts
 	{
 	public:
 		using prime_pointer = const u64*;
-		using value_type = Key;
+		using Value_type = Key;
 		using Self_Type = unordered_set<Key, Hasher>;
 		using Bucket_Type = list<Key>;
 
@@ -32,7 +32,7 @@ namespace nuts
 		    : public forward_iterator
 		{
 		public:
-			using value_type = Key;
+			using Value_type = Key;
 			using Outside = typename vector<Bucket_Type>::iterator;
 			using Inside = typename Bucket_Type::iterator;
 
@@ -166,7 +166,7 @@ namespace nuts
 		u64 _size = 0;
 		vector<Bucket_Type> bucket;
 		static const Hasher hash_fn;
-		static const iterator npos;// Null-pos
+		static const iterator npos; // Null-pos
 	};
 
 	template <class Key, class Hasher>

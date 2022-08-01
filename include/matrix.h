@@ -14,7 +14,7 @@ namespace nuts
 	class matrix
 	{
 	public:
-		using value_type = T;
+		using Value_type = T;
 		using Self_Type = matrix<T, Row, Col>;
 
 	protected:

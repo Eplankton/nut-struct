@@ -127,14 +127,14 @@ namespace nuts
 		while (st != ed && st != ed - 1)
 		{
 			itr_swap(st, ed);
-			st++;
-			ed--;
+			++st;
+			--ed;
 		}
 		if (st != ed)
 			itr_swap(st, ed);
 	}
 
-	template <typename Itr, class Comp = nuts::less<typename Itr::value_type>>
+	template <typename Itr, class Comp = nuts::less<typename Itr::Value_type>>
 	bool is_sorted(Itr st, Itr ed, Comp cmp = Comp())
 	{
 		for (auto it = st + 1; it != ed + 1; it++)

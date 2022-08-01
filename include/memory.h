@@ -21,7 +21,7 @@ namespace nuts
 	class unique_ptr
 	{
 	public:
-		using value_type = T;
+		using Value_type = T;
 		using pointer = T*;
 		using const_pointer = const T*;
 
@@ -153,7 +153,7 @@ namespace nuts
 	class shared_ptr
 	{
 	public:
-		using value_type = T;
+		using Value_type = T;
 		using pointer = T*;
 		using const_pointer = const T*;
 		using cntor = u64*;

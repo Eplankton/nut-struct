@@ -78,9 +78,9 @@ namespace nuts
 	template <typename Itr>
 	auto iterator_category(const Itr& x)
 	{
-		// itr_type is one of these 'tags'
-		using itr_type = typename Itr::Category;
-		return itr_type();
+		// Itr_type is one of these 'tags'
+		using Itr_type = typename Itr::Category;
+		return Itr_type();
 	}
 }
 
