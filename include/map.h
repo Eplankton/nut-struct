@@ -36,8 +36,7 @@ namespace nuts
 
 		map(const map<Key, Val, Compare>& src)
 		{
-			for_each(this->begin(), this->end(),
-			         [this](const auto& x) { this->insert(x); });
+			for_each(*this, [this](const auto& x) { this->insert(x); });
 		}
 
 		map(map<Key, Val, Compare>&& src)
@@ -127,7 +126,7 @@ namespace nuts
 
 		printf("\nmap @%#llx = {", (u64) this->root.get());
 		if (!this->empty())
-			for_each(this->begin(), this->end(), pr);
+			for_each(*this, pr);
 		printf("}\n");
 	}
 
@@ -136,8 +135,7 @@ namespace nuts
 	operator=(const map<Key, Val, Compare>& src)
 	{
 		Base_type::clear();
-		for_each(this->begin(), this->end(),
-		         [this](const auto& x) { this->insert(x); });
+		for_each(*this, [this](const auto& x) { this->insert(x); });
 		return *this;
 	}
 }

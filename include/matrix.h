@@ -14,7 +14,7 @@ namespace nuts
 	class matrix
 	{
 	public:
-		using Value_type = T;
+		using value_type = T;
 		using Self_Type = matrix<T, Row, Col>;
 
 	protected:
@@ -120,7 +120,7 @@ namespace nuts
 			};
 
 			printf("[");
-			nuts::for_each(r.begin(), r.end(), trav_in_col);
+			nuts::for_each(r, trav_in_col);
 			printf("]\n");
 		};
 

@@ -18,7 +18,7 @@ namespace nuts
 	class vector
 	{
 	public:
-		using Value_type = T;
+		using value_type = T;
 
 	protected:
 		T* data_ptr = nullptr;
@@ -52,6 +52,7 @@ namespace nuts
 		void print() const;
 
 		vector<T>& push_back(const T& obj);// Add an element to the end
+		vector<T>& emplace_back();         // Add an element to the end
 		vector<T>& pop_back();             // Remove the last element
 		vector<T>& move(vector<T>& after); // Deprive other's ownership
 
@@ -64,7 +65,7 @@ namespace nuts
 		class iterator : public random_access_iterator
 		{
 		public:
-			using Value_type = T;
+			using value_type = T;
 
 		protected:
 			T* _ptr = nullptr;
@@ -81,7 +82,7 @@ namespace nuts
 			const T& operator*() const { return *_ptr; }
 
 			T* operator->() { return _ptr; }
-			const T* operator->() const { return _ptr; }
+			T* operator->() const { return _ptr; }
 
 			iterator& operator=(T* obj)
 			{
@@ -133,39 +134,22 @@ namespace nuts
 				return res;
 			}
 
-			iterator operator+(i64 bias) const
-			{
-				return iterator(this->_ptr + bias);
-			}
+			iterator operator+(i64 bias)
+			        const { return iterator(this->_ptr + bias); }
 
-			void operator+=(i64 bias)
-			{
-				_ptr += bias;
-			}
+			void operator+=(i64 bias) { _ptr += bias; }
 
-			iterator operator-(i64 bias) const
-			{
-				return iterator(this->_ptr - bias);
-			}
+			iterator operator-(i64 bias)
+			        const { return iterator(this->_ptr - bias); }
 
-			void operator-=(i64 bias)
-			{
-				_ptr -= bias;
-			}
+			void operator-=(i64 bias) { _ptr -= bias; }
+
+			T& operator[](u64 _n) { return *((*this) + _n); }
+			const T& operator[](u64 _n) const { return *((*this) + _n); }
 
 			friend i64 operator-(const iterator& a,
 			                     const iterator& b) { return a.get() - b.get(); }
 		};
-
-		iterator begin()// Return iterator to the first element
-		{
-			return iterator(data());
-		}
-
-		iterator end()// Return iterator to the last element
-		{
-			return iterator(&this->data_ptr[this->size() - 1]);
-		}
 
 		iterator begin() const
 		{
@@ -238,7 +222,7 @@ namespace nuts
 	template <class T>
 	void vector<T>::clear()
 	{
-		if (this->exist())
+		if (!empty())
 		{
 			T INVALID;
 			std::fill_n(data_ptr, this->v_size, INVALID);
@@ -249,7 +233,7 @@ namespace nuts
 	template <class T>
 	void vector<T>::destroy()
 	{
-		if (this->exist())
+		if (!empty())
 		{
 			delete[] this->data_ptr;
 			this->data_ptr = nullptr;
@@ -375,7 +359,7 @@ namespace nuts
 
 		printf("\nvector @%#llx = [",
 		       (u64) (this->data_ptr));
-		for_each(begin(), end(), print);
+		for_each(*this, print);
 		printf("]\n");
 	}
 

@@ -82,6 +82,22 @@ namespace nuts
 		auto tmp = hr(some);
 		return {some, tmp.first, tmp.second};
 	}
+
+
+	// How-to-use?
+	// auto detect_scheme = [&m](const auto& it) {
+	// 				if (it == m.npos)
+	// 	        		return make_pair(Panic, (string)"Get npos iterator!");
+	// 	            else
+	// 					return make_pair(Success, (string)"Mooooo!"); };
+
+	// auto opt = make_option(m.find(555), detect_scheme);
+
+	// auto handle_scheme = [&opt, &m] {
+	// 				if (opt.elem == m.npos) m.insert(555, 0);
+	// 				else m[555] = 1;
+	// 					return opt; };
+	// opt.handle(handle_scheme);
 }
 
 #endif

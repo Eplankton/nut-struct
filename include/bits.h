@@ -8,6 +8,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 
+#include "type.h"
 #include "utility.h"
 #include "memory.h"
 #include "functional.h"
@@ -15,8 +16,8 @@ using std::endl;
 #include "iterator.h"
 #include "algorithm.h"
 #include "option.h"
-
-#include "type.h"
+#include "range.h"
+#include "concept.h"
 
 #include "array.h"
 #include "vector.h"
@@ -25,16 +26,14 @@ using std::endl;
 #include "stack.h"
 #include "queue.h"
 #include "basic_string.h"
+#include "matrix.h"
 
 #include "binary_tree.h"
 #include "set.h"
 #include "map.h"
-#include "matrix.h"
 
 #include "unordered_set.h"
 #include "unordered_map.h"
-
-
 
 //	string in = "pi";
 //	// std::cout << "\nPlease enter a name: ";

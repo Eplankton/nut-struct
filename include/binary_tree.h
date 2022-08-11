@@ -62,7 +62,7 @@ namespace nuts
 	class binary_tree
 	{
 	public:
-		using Value_type = T;
+		using value_type = T;
 		using tree_node = nuts::binary_tree_node<T>;
 		using node_ptr = nuts::unique_ptr<tree_node>;
 		using node_raw_ptr = binary_tree_node<T>*;
@@ -85,7 +85,7 @@ namespace nuts
 		    : public bidirectional_iterator
 		{
 		public:
-			using Value_type = T;
+			using value_type = T;
 			using tree_node = nuts::binary_tree_node<T>;
 			using node_ptr = nuts::unique_ptr<tree_node>;
 			using node_raw_ptr = binary_tree_node<T>*;
@@ -183,7 +183,7 @@ namespace nuts
 			node_raw_ptr get() const { return _ptr; }
 
 			T* operator->() { return &_ptr->data; }
-			const T* operator->() const { return &_ptr->data; }
+			T* operator->() const { return &_ptr->data; }
 
 			bool operator==(const iterator& other)
 			        const { return _ptr == other._ptr; }
@@ -199,23 +199,6 @@ namespace nuts
 		binary_tree(const binary_tree<T, Compare>& src);
 		binary_tree(binary_tree<T, Compare>&& src) { this->move(src); }
 		~binary_tree();
-
-		bool empty() const { return _size == 0 && root == nullptr; }
-		u64 size() const { return _size; }
-
-		iterator begin()
-		{
-			if (this->empty()) return npos;
-			else
-				return iterator {min(root)};
-		}
-
-		iterator end()
-		{
-			if (this->empty()) return npos;
-			else
-				return iterator {max(root)};
-		}
 
 		iterator begin() const
 		{
@@ -235,6 +218,9 @@ namespace nuts
 		T& back() { return *end(); }
 		const T& front() const { return *begin(); }
 		const T& back() const { return *end(); }
+
+		bool empty() const { return _size == 0 && root == nullptr; }
+		u64 size() const { return _size; }
 
 		bool insert(const T& _val);
 		auto insert_ret_pos(const T& _val) -> iterator;
@@ -272,16 +258,13 @@ namespace nuts
 	protected:
 		node_ptr root = nullptr;
 		u64 _size = 0;
-		static const Compare cmp;
+		constexpr static const Compare cmp;
 		static Itr_type npos;// NULL Position
 	};
 
 	template <typename T, class Compare>
 	typename binary_tree<T, Compare>::Itr_type
 	        binary_tree<T, Compare>::npos;
-
-	template <typename T, class Compare>
-	const Compare binary_tree<T, Compare>::cmp;
 
 	template <typename T, class Compare>
 	binary_tree_node<T>* binary_tree<T, Compare>::min(const node_ptr& st)

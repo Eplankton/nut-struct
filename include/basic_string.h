@@ -19,7 +19,7 @@ namespace nuts
 	class basic_string
 	{
 	public:
-		using Value_type = T;
+		using value_type = T;
 
 	protected:
 		T* data_ptr = nullptr;
@@ -109,7 +109,7 @@ namespace nuts
 		class iterator : public random_access_iterator
 		{
 		public:
-			using Value_type = T;
+			using value_type = T;
 
 		protected:
 			T* _ptr = nullptr;
@@ -180,49 +180,26 @@ namespace nuts
 				return res;
 			}
 
-			iterator operator+(i64 bias)
-			{
-				return iterator(this->_ptr + bias);
-			}
+			iterator operator+(i64 bias) { return iterator(this->_ptr + bias); }
 
-			void operator+=(i64 bias)
-			{
-				_ptr += bias;
-			}
+			void operator+=(i64 bias) { _ptr += bias; }
 
-			iterator operator-(i64 bias)
-			{
-				return iterator(this->_ptr - bias);
-			}
+			iterator operator-(i64 bias) { return iterator(this->_ptr - bias); }
 
-			void operator-=(i64 bias)
-			{
-				_ptr -= bias;
-			}
+			void operator-=(i64 bias) { _ptr -= bias; }
+
+			T& operator[](u64 _n) { return *((*this) + _n); }
+			const T& operator[](u64 _n) const { return *((*this) + _n); }
 
 			friend i64 operator-(const iterator& a,
 			                     const iterator& b) { return a.get() - b.get(); }
 		};
 
-		iterator begin()// Return iterator to the first element
-		{
-			return iterator(this->data_ptr);
-		}
+		iterator begin()
+		        const { return iterator(this->data_ptr); }
 
-		iterator end()// Return iterator to the last element
-		{
-			return iterator(&this->data_ptr[this->size() - 1]);
-		}
-
-		iterator begin() const
-		{
-			return iterator(this->data_ptr);
-		}
-
-		iterator end() const
-		{
-			return iterator(&this->data_ptr[this->size() - 1]);
-		}
+		iterator end()
+		        const { return iterator(&this->data_ptr[this->size() - 1]); }
 	};
 
 	using string = basic_string<char>;// Default in char_8bit type

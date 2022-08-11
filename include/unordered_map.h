@@ -129,7 +129,7 @@ namespace nuts
 			u64 index = this->hash_fn(_k) % *this->bucket_size;
 			this->bucket[index].push_back();
 			this->bucket[index].back().first = _k;
-			this->_size++;
+			++this->_size;
 			return this->bucket[index].back().second;
 		}
 	}

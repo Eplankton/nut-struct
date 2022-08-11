@@ -3,6 +3,7 @@
 
 #include "functional.h"
 #include "list.h"
+#include "range.h"
 #include "utility.h"
 #include "vector.h"
 
@@ -23,7 +24,7 @@ namespace nuts
 	{
 	public:
 		using prime_pointer = const u64*;
-		using Value_type = Key;
+		using value_type = Key;
 		using Self_Type = unordered_set<Key, Hasher>;
 		using Bucket_Type = list<Key>;
 
@@ -32,7 +33,7 @@ namespace nuts
 		    : public forward_iterator
 		{
 		public:
-			using Value_type = Key;
+			using value_type = Key;
 			using Outside = typename vector<Bucket_Type>::iterator;
 			using Inside = typename Bucket_Type::iterator;
 
@@ -91,6 +92,11 @@ namespace nuts
 				return res;
 			}
 
+			void operator+=(i64 bias)
+			{
+				while (bias--) ++(*this);
+			}
+
 			bool operator==(const iterator& x) const
 			{
 				return this->in_itr == x.in_itr;
@@ -101,29 +107,11 @@ namespace nuts
 				return this->in_itr != x.in_itr;
 			}
 		};
-
-		iterator begin()
-		{
-			auto ed = bucket.end() + 1;
-			for (auto o = bucket.begin(); o != ed; ++o)
-				if (!o->empty())
-					return {o, bucket.end(), o->begin()};
-			return npos;
-		}
-
+		
 		iterator begin() const
 		{
 			auto ed = bucket.end() + 1;
 			for (auto o = bucket.begin(); o != ed; ++o)
-				if (!o->empty())
-					return {o, bucket.end(), o->begin()};
-			return npos;
-		}
-
-		iterator end()
-		{
-			auto ed = bucket.begin() - 1;
-			for (auto o = bucket.end(); o != ed; --o)
 				if (!o->empty())
 					return {o, bucket.end(), o->begin()};
 			return npos;
@@ -143,6 +131,11 @@ namespace nuts
 		unordered_set(Self_Type&& src) { this->move(src); }
 		unordered_set(const std::initializer_list<Key>& ilist);
 		~unordered_set() { this->clear(); }
+
+		Key& front() { return *begin(); }
+		const Key& front() const { return *begin(); }
+		Key& back() { return *end(); }
+		const Key& back() const { return *end(); }
 
 		u64 size() const { return _size; }
 		bool empty() const { return _size == 0; }
@@ -165,16 +158,9 @@ namespace nuts
 		prime_pointer bucket_size = PRIME_LIST;
 		u64 _size = 0;
 		vector<Bucket_Type> bucket;
-		static const Hasher hash_fn;
-		static const iterator npos; // Null-pos
+		constexpr static const Hasher hash_fn{};
+		constexpr static const iterator npos{};// Null-pos
 	};
-
-	template <class Key, class Hasher>
-	const typename unordered_set<Key, Hasher>::iterator
-	        unordered_set<Key, Hasher>::npos;
-
-	template <class Key, class Hasher>
-	const Hasher unordered_set<Key, Hasher>::hash_fn;
 
 	template <class Key, class Hasher>
 	unordered_set<Key, Hasher>::unordered_set()
@@ -259,7 +245,7 @@ namespace nuts
 			u64 index = hash_fn(_k) % *bucket_size;
 			bucket[index].push_back();
 			bucket[index].back() = _k;
-			_size++;
+			++_size;
 		}
 		// else do nothing.
 	}
@@ -319,7 +305,7 @@ namespace nuts
 		};
 
 		printf("\nhash_table @%#llx = {", (u64) bucket.data());
-		for_each(begin(), end(), pr);
+		for_each(*this, pr);
 		printf("}\n");
 	}
 
@@ -334,7 +320,7 @@ namespace nuts
 			{
 				collison += bucket[n].size() - 1;
 				printf("#%lld: ", n);
-				for_each(bucket[n].begin(), bucket[n].end(),
+				for_each(bucket[n],
 				         [](const auto& x) { std::cout << x << " ~ "; });
 				printf("\n");
 			}

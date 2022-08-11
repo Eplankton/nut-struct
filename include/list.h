@@ -19,7 +19,8 @@ namespace nuts
 		ListNode<T>* next = nullptr;
 
 		ListNode() = default;
-		explicit ListNode(const T& userInputData) : data(userInputData), prev(nullptr), next(nullptr) {}
+		explicit ListNode(const T& userInputData)
+		    : data(userInputData), prev(nullptr), next(nullptr) {}
 		~ListNode()
 		{
 			prev = nullptr;
@@ -40,14 +41,9 @@ namespace nuts
 	class list// Manager class
 	{
 	public:
-		using Value_type = T;
+		using value_type = T;
 		using node = ListNode<T>;
 		using node_ptr = node*;
-
-	protected:
-		node_ptr head = nullptr;
-		node_ptr tail = nullptr;
-		u64 length = 0;
 
 	private:
 		list<T>& erase(node_ptr start_node, u64 N_far = 0);// Remove a node that N blocks from the start_node(reference argument)
@@ -57,13 +53,13 @@ namespace nuts
 		list() = default;                                              // Void constructor
 		explicit list(u64 userInputlength);                            // Init by several empty nodes
 		explicit list(const T& userInputData, u64 userInputlength = 1);// Init by several valued nodes
-		
-		list(const list<T>& obj);                                      // Init by another list(deep copy)
+
+		list(const list<T>& obj);// Init by another list(deep copy)
 		list(list<T>&& src) { this->move(src); }
-		
+
 		list(const std::initializer_list<T>& ilist);// Init by a {ilist}
-		
-		~list() { this->clear(); }                  // Clear and gain back memory
+
+		~list() { this->clear(); }// Clear and gain back memory
 
 		bool empty() const// Whether the list is empty
 		{
@@ -73,14 +69,14 @@ namespace nuts
 		}
 
 		node_ptr data() const { return const_cast<node_ptr>(head); }
+
 		bool exist() const { return this->empty(); }// Whether the list exists
 		u64 size() const { return length; }         // Get the length of the whole list
 		void print() const;                         // Print a list in console
+		list<T>& clear();                           // Clear the whole list, release all nodes
 
 		list<T>& operator=(const list<T>& obj);// Copy
 		list<T>& operator=(list<T>&& src) { return this->move(src); }
-
-		list<T>& clear();// Clear the whole list, release all nodes
 
 		list<T>& push_back();                         // Add back an empty node
 		list<T>& push_back(const T& obj, u64 num = 1);// Add back several nodes(add by init calue)
@@ -92,12 +88,12 @@ namespace nuts
 		list<T>& pop_front();// Remove first element
 
 		list<T>& merge(list<T>& after);// Merge lists together, the latter lost ownership
-		list<T>& move(list<T>& src); // A void manager can deprive other's ownership
+		list<T>& move(list<T>& src);   // A void manager can deprive other's ownership
 
 		class iterator : public bidirectional_iterator
 		{
 		public:
-			using Value_type = T;
+			using value_type = T;
 
 		protected:
 			node_ptr _ptr = nullptr;
@@ -164,10 +160,7 @@ namespace nuts
 				return advance(res, bias);
 			}
 
-			void operator+=(i64 bias)
-			{
-				return advance(*this, bias);
-			}
+			void operator+=(i64 bias) { advance(*this, bias); }
 
 			iterator operator-(i64 bias) const
 			{
@@ -175,17 +168,12 @@ namespace nuts
 				return advance(res, -bias);
 			}
 
-			void operator-=(i64 bias)
-			{
-				return advance(*this, -bias);
-			}
+			void operator-=(i64 bias) { advance(*this, -bias); }
 
 			T* operator->() { return &_ptr->data; }
-			const T* operator->() const { return &_ptr->data; }
+			T* operator->() const { return &_ptr->data; }
 		};
 
-		iterator begin() { return iterator(this->head); }
-		iterator end() { return iterator(this->tail); }
 		iterator begin() const { return {const_cast<node_ptr>(this->head)}; }
 		iterator end() const { return {const_cast<node_ptr>(this->tail)}; }
 
@@ -197,6 +185,7 @@ namespace nuts
 
 		list<T>& insert(const iterator& pos,
 		                const T& obj, u64 num = 1);// Insert several node at position
+
 		list<T>& erase(iterator pos, u64 num = 0);
 
 		template <typename Itr>
@@ -210,6 +199,11 @@ namespace nuts
 
 		template <typename Itr>
 		list(Itr st, Itr ed);
+
+	protected:
+		node_ptr head = nullptr;
+		node_ptr tail = nullptr;
+		u64 length = 0;
 	};
 
 	template <class T>
@@ -561,14 +555,9 @@ namespace nuts
 				}
 				p->next = temp;
 				if (temp != nullptr)
-				{
 					temp->prev = p;
-				}
 				if (position == this->tail)
-				{
 					this->tail = p;
-				}
-				return *this;
 			}
 		}
 		return *this;
@@ -623,7 +612,6 @@ namespace nuts
 			for_each(begin(), end(), print);
 		printf("]\n");
 	}
-
-}// namespace nuts
+}
 
 #endif

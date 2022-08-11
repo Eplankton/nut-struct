@@ -2,6 +2,7 @@
 #define _NUTS_SET_ 1
 
 #include "binary_tree.h"
+#include "concept.h"
 #include "functional.h"
 #include "type.h"
 
@@ -11,8 +12,9 @@ namespace nuts
 	class set : public AVL<T, Compare>
 	{
 	public:
-		using Value_type = T;
+		using value_type = T;
 		using Base_type = AVL<T, Compare>;
+
 
 	public:
 		set() { this->root = nullptr, this->_size = 0; }
@@ -41,16 +43,14 @@ namespace nuts
 	template <typename T, class Compare>
 	set<T, Compare>::set(const set<T, Compare>& src)
 	{
-		for_each(src.begin(), src.end() - 1,
-		         [this](const T& x) { Base_type::insert(x); });
+		for_each(src, [this](const T& x) { Base_type::insert(x); });
 	}
 
 	template <typename T, class Compare>
 	set<T, Compare>& set<T, Compare>::operator=(const set<T, Compare>& src)
 	{
 		Base_type::clear();
-		for_each(src.begin(), src.end() - 1,
-		         [this](const T& x) { Base_type::insert(x); });
+		for_each(src, [this](const T& x) { Base_type::insert(x); });
 		return *this;
 	}
 
@@ -65,7 +65,7 @@ namespace nuts
 
 		printf("\nset @%#llx = {", (u64) this->root.get());
 		if (!this->empty())
-			for_each(this->begin(), this->end(), pr);
+			for_each(*this, pr);
 		printf("}\n");
 	}
 }

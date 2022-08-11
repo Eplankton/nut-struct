@@ -11,12 +11,12 @@ namespace nuts
 	class array
 	{
 	public:
-		using Value_type = T;
+		using value_type = T;
 		using pointer = T*;
 		using const_pointer = const T*;
 
 	protected:
-		Value_type data_ptr[N];
+		value_type data_ptr[N];
 
 	public:
 		array() = default;
@@ -42,7 +42,7 @@ namespace nuts
 		    : public random_access_iterator
 		{
 		public:
-			using Value_type = T;
+			using value_type = T;
 			using pointer = T*;
 			using const_pointer = const T*;
 
@@ -116,15 +116,12 @@ namespace nuts
 			friend i64 operator-(const iterator& a,
 			                     const iterator& b) { return a.get() - b.get(); }
 
+			T& operator[](u64 _n) { return *((*this) + _n); }
+			const T& operator[](u64 _n) const { return *((*this) + _n); }
+
 			pointer operator->() { return _ptr; }
 			const_pointer operator->() const { return _ptr; }
 		};
-
-		iterator begin() { return {data()}; }
-		// Return iterator to the first element
-
-		iterator end() { return {&data_ptr[size() - 1]}; }
-		// Return iterator to the last element
 
 		iterator begin()
 		        const { return {const_cast<pointer>(data())}; }

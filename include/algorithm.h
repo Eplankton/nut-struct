@@ -1,9 +1,12 @@
 #ifndef _NUTS_ALG_
 #define _NUTS_ALG_ 1
 
+#include "concept.h"
 #include "functional.h"
 #include "iterator.h"
+#include "range.h"
 #include "type.h"
+
 #include <cassert>
 
 namespace nuts
@@ -11,26 +14,25 @@ namespace nuts
 	template <typename Itr, class Func>
 	Func for_each(Itr st, Itr ed, Func fn)
 	{
-		for (; st != ed + 1; ++st)
-		{
-			fn(*st);
-		}
+		ed += 1;
+		for (; st != ed; ++st) fn(*st);
 		return fn;
 	}
 
-	template <typename Itr>
-	i64 distance(Itr st, Itr ed)
+	template <typename T, class Func>
+	Func for_each(const T& x, Func fn)
 	{
-		return distance(st, ed, iterator_category(st));
+		for (auto& i: range(x)) fn(i);
+		return fn;
 	}
 
-	template <typename Bid_Itr>
-	i64 distance(Bid_Itr st, Bid_Itr ed,
-	             bidirectional_iterator_tag)
+	template <Bidirectional_Itr Itr>
+	i64 distance(Itr st, Itr ed)
 	{
 		if (st == ed) return 0;
 		i64 n = 0;
-		while (st != ed + 1)
+		ed += 1;
+		while (st != ed)
 		{
 			++st;
 			++n;
@@ -38,45 +40,36 @@ namespace nuts
 		return n;
 	}
 
-	template <typename Random_Itr>
-	i64 distance(Random_Itr st, Random_Itr ed,
-	             random_access_iterator_tag)
+	template <Random_Itr Itr>
+	i64 distance(Itr st, Itr ed)
 	{
 		return (st == ed) ? 0 : ed - st + 1;
 	}
 
-	template <typename Itr>
+	template <Bidirectional_Itr Itr>
 	Itr advance(Itr it, i64 n)
 	{
-		return advance(it, n, iterator_category(it));
-	}
-
-	template <typename Itr>
-	Itr advance(Itr it, i64 n, bidirectional_iterator_tag)
-	{
 		if (n >= 0)
-			while (n--)
-				++it;
+			while (n--) ++it;
 		else
-			while (n++)
-				--it;
+			while (n++) --it;
 		return it;
 	}
 
-	template <typename Itr>
-	Itr advance(Itr it, i64 n, random_access_iterator_tag)
+	template <Random_Itr Itr>
+	Itr advance(Itr it, i64 n)
 	{
 		return it + n;
 	}
 
 	template <typename T>
-	T min(const T& a, const T& b)// Return the minimum
+	const T& min(const T& a, const T& b)// Return the minimum
 	{
 		return (a < b) ? a : b;
 	}
 
 	template <typename T>
-	T max(const T& a, const T& b)// Return the maximum
+	const T& max(const T& a, const T& b)// Return the maximum
 	{
 		return (a > b) ? a : b;
 	}
@@ -85,11 +78,9 @@ namespace nuts
 	Itr min_in(Itr st, Itr ed)// Give range by itr: st && ed -> O(N)
 	{
 		Itr tmp = st;
-		for (auto i = st; i != ed + 1; i++)
-		{
-			if (*i < *tmp)
-				tmp = i;
-		}
+		ed += 1;
+		for (auto i = st; i != ed; i++)
+			if (*i < *tmp) tmp = i;
 		return tmp;
 	}
 
@@ -97,11 +88,9 @@ namespace nuts
 	Itr max_in(Itr st, Itr ed)// Give range by itr: st && ed -> O(N)
 	{
 		Itr tmp = st;
-		for (auto i = st; i != ed + 1; i++)
-		{
-			if (*i > *tmp)
-				tmp = i;
-		}
+		ed += 1;
+		for (auto i = st; i != ed; i++)
+			if (*i > *tmp) tmp = i;
 		return tmp;
 	}
 
@@ -119,9 +108,7 @@ namespace nuts
 		swap(*a_itr, *b_itr);
 	}
 
-	template <typename Itr, typename =
-	                                std::enable_if<
-	                                        is_bidirectional_iterator<typename Itr::Category>::value>>
+	template <Bidirectional_Itr Itr>
 	void reverse(Itr st, Itr ed)// Give range by itr: st && ed -> O(N)
 	{
 		while (st != ed && st != ed - 1)
@@ -134,10 +121,11 @@ namespace nuts
 			itr_swap(st, ed);
 	}
 
-	template <typename Itr, class Comp = nuts::less<typename Itr::Value_type>>
+	template <typename Itr, class Comp = nuts::less<typename Itr::value_type>>
 	bool is_sorted(Itr st, Itr ed, Comp cmp = Comp())
 	{
-		for (auto it = st + 1; it != ed + 1; it++)
+		ed += 1;
+		for (auto it = st + 1; it != ed; it++)
 		{
 			if (cmp(*it, *(it - 1)))
 				return false;
@@ -145,7 +133,7 @@ namespace nuts
 		return true;
 	}
 
-	template <typename T, typename Container, class Comp = nuts::less<T>>
+	template <typename Container, class Comp = nuts::less<typename Container::value_type>>
 	bool is_sorted(const Container& x, Comp cmp())
 	{
 		auto ed = x.end() + 1;
@@ -153,14 +141,15 @@ namespace nuts
 		{
 			if (cmp(*it, *(it - 1)))
 				return false;
-		}
+		}	
 		return true;
 	}
 
 	template <typename Itr, class Func>
 	Itr find_if(Itr st, Itr ed, Func fn)// Basic linear version -> O(N)
 	{
-		while (st != ed + 1)
+		ed += 1;
+		while (st != ed)
 		{
 			if (fn(*st))
 				return st;

@@ -82,6 +82,27 @@ namespace nuts
 		using Itr_type = typename Itr::Category;
 		return Itr_type();
 	}
+
+	template <typename Itr>
+	concept Forward_Itr = requires(Itr it)
+	{
+		*it;
+		++it;
+	};
+
+	template <typename Itr>
+	concept Bidirectional_Itr =
+	        Forward_Itr<Itr> && requires(Itr it)
+	{
+		--it;
+	};
+
+	template <typename Itr>
+	concept Random_Itr =
+	        Bidirectional_Itr<Itr> && requires(Itr it, u64 n)
+	{
+		it[n];
+	};
 }
 
 #endif

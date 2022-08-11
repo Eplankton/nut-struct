@@ -1,6 +1,7 @@
 #ifndef _NUTS_STACK_
 #define _NUTS_STACK_ 1
 
+#include "concept.h"
 #include "deque.h"
 #include "type.h"
 #include "vector.h"
@@ -12,18 +13,26 @@
 
 namespace nuts
 {
-	template <class T, class base = vector<T>>
+	template <typename T>
+	concept Stack_Base = Container<T> &&
+	        requires(T x, typename T::value_type val)
+	{
+		x.push_back(val);
+		x.pop_back();
+	};
+
+	template <class T, Stack_Base base = vector<T>>
 	class stack
 	{
 	public:
-		using Value_type = T;
+		using value_type = T;
 		using Itr_type = typename base::iterator;
 
 	public:
 		stack() = default;
 		stack(const std::initializer_list<T>& ilist);
 		stack(stack<T, base>&& src) { this->move(src); }
-		stack(const stack<T, base>& src) { container = src.container; }
+		stack(const stack<T, base>& src) { _Base = src._Base; }
 		~stack() = default;
 
 		stack<T, base>& push(const T& obj);
@@ -33,18 +42,15 @@ namespace nuts
 		T& top();
 		const T& top() const;
 
-		bool empty() const { return container.empty(); }
-		u64 size() const { return container.size(); }
-		T& front() { return container.front(); }
-		T& back() { return container.back(); }
-		const T& front() const { return container.front(); }
-		const T& back() const { return container.back(); }
+		bool empty() const { return _Base.empty(); }
+		u64 size() const { return _Base.size(); }
+		T& front() { return _Base.front(); }
+		T& back() { return _Base.back(); }
+		const T& front() const { return _Base.front(); }
+		const T& back() const { return _Base.back(); }
 		stack<T, base>& operator=(const stack<T, base>& obj);
 		stack<T, base>& operator=(stack<T, base>&& src) { return this->move(src); }
 		stack<T, base>& move(stack<T, base>& obj);
-
-		Itr_type begin();
-		Itr_type end();
 
 		Itr_type begin() const;
 		Itr_type end() const;
@@ -52,94 +58,82 @@ namespace nuts
 		void print() const;
 
 	protected:
-		base container;
+		base _Base;
 	};
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	stack<T, base>::stack(const std::initializer_list<T>& ilist)
 	{
 		base copy(ilist);
-		this->container.move(copy);
+		this->_Base.move(copy);
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	stack<T, base>& stack<T, base>::operator=(const stack<T, base>& obj)
 	{
 		this->clear();
-		container = obj.container;
+		_Base = obj._Base;
 		return *this;
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	stack<T, base>& stack<T, base>::move(stack<T, base>& obj)
 	{
 		this->clear();
-		container.move(obj.container);
+		_Base.move(obj._Base);
 		return *this;
 	}
 
-	template <class T, class base>
-	typename base::iterator stack<T, base>::begin()
-	{
-		return container.begin();
-	}
-
-	template <class T, class base>
-	typename base::iterator stack<T, base>::end()
-	{
-		return container.end();
-	}
-
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	typename base::iterator
 	stack<T, base>::begin() const
 	{
-		return container.begin();
+		return _Base.begin();
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	typename base::iterator
 	stack<T, base>::end() const
 	{
-		return container.end();
+		return _Base.end();
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	stack<T, base>& stack<T, base>::push(const T& obj)
 	{
-		container.push_back(obj);
+		_Base.push_back(obj);
 		return *this;
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	stack<T, base>& stack<T, base>::pop()
 	{
-		container.pop_back();
+		_Base.pop_back();
 		return *this;
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	stack<T, base>& stack<T, base>::clear()
 	{
-		container.clear();
+		_Base.clear();
 		return *this;
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	T& stack<T, base>::top()
 	{
-		assert(!container.empty());
-		return container.back();
+		assert(!_Base.empty());
+		return _Base.back();
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	const T& stack<T, base>::top() const
 	{
-		assert(!container.empty());
-		return container.back();
+		assert(!_Base.empty());
+		return _Base.back();
 	}
 
-	template <class T, class base>
+	template <class T, Stack_Base base>
 	void stack<T, base>::print() const
 	{
 		auto print = [this](const auto& x) {
@@ -148,9 +142,9 @@ namespace nuts
 				printf(", ");
 		};
 
-		printf("\nstack @%#llx = [", (u64) container.data());
+		printf("\nstack @%#llx = [", (u64) _Base.data());
 		if (!empty())
-			for_each(begin(), end(), print);
+			for_each(_Base, print);
 		printf("]\n");
 	}
 }
