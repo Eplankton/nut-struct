@@ -26,7 +26,7 @@ namespace nuts
 	{
 	public:
 		using Val_type = Key;
-		using Itr_type = typename AVL<pair<Key, Val>,
+		using itr_type = typename AVL<pair<Key, Val>,
 		                              Compare>::iterator;
 
 		using Base_type = set<pair<Key, Val>, Compare>;
@@ -71,7 +71,7 @@ namespace nuts
 			return Base_type::erase(tmp);
 		}
 
-		Itr_type find(const Key& _k) const
+		itr_type find(const Key& _k) const
 		{
 			pair<Key, Val> tmp;
 			tmp.first = _k;

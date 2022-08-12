@@ -26,7 +26,7 @@ namespace nuts
 	{
 	public:
 		using value_type = T;
-		using Itr_type = typename base::iterator;
+		using itr_type = typename base::iterator;
 
 	public:
 		stack() = default;
@@ -52,8 +52,8 @@ namespace nuts
 		stack<T, base>& operator=(stack<T, base>&& src) { return this->move(src); }
 		stack<T, base>& move(stack<T, base>& obj);
 
-		Itr_type begin() const;
-		Itr_type end() const;
+		itr_type begin() const;
+		itr_type end() const;
 
 		void print() const;
 
@@ -64,7 +64,7 @@ namespace nuts
 	template <class T, Stack_Base base>
 	stack<T, base>::stack(const std::initializer_list<T>& ilist)
 	{
-		base copy(ilist);
+		base copy{ilist};
 		this->_Base.move(copy);
 	}
 

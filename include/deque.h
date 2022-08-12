@@ -53,12 +53,10 @@ namespace nuts
 			      ed(src.ed), itr(src.itr) {}
 
 			pointer get() const { return cur; }
+			pointer operator->() const { return cur; }
 
 			T& operator*() { return *cur; }
 			const T& operator*() const { return *cur; }
-
-			pointer operator->() { return cur; }
-			pointer operator->() const { return cur; }
 
 			iterator& operator++()
 			{
@@ -126,25 +124,17 @@ namespace nuts
 
 			void operator-=(i64 bias) { advance(*this, -bias); }
 
-			bool operator==(const iterator& obj) const
-			{
-				return this->cur == obj.cur;
-			}
+			bool operator==(const iterator& obj)
+			        const { return this->cur == obj.cur; }
 
-			bool operator!=(const iterator& obj) const
-			{
-				return this->cur != obj.cur;
-			}
+			bool operator!=(const iterator& obj)
+			        const { return this->cur != obj.cur; }
 
-			bool operator==(pointer obj) const
-			{
-				return this->cur == obj;
-			}
+			bool operator==(pointer obj)
+			        const { return this->cur == obj; }
 
-			bool operator!=(pointer obj) const
-			{
-				return this->cur != obj;
-			}
+			bool operator!=(pointer obj)
+			        const { return this->cur != obj; }
 
 			iterator& operator=(const iterator& src)
 			{
@@ -234,9 +224,7 @@ namespace nuts
 	template <class T, u64 Buf>
 	deque<T, Buf>::deque(const std::initializer_list<T>& ilist)
 	{
-		auto ed = ilist.end();
-		for (auto p = ilist.begin(); p != ed; ++p)
-			this->push_back(*p);
+		for (const auto& x: ilist) this->push_back(x);
 	}
 
 	template <class T, u64 Buf>
@@ -274,7 +262,7 @@ namespace nuts
 	{
 		if (empty())
 		{
-			map.push_back();
+			map.emplace_back();
 			first = &map.back()[0];
 			last = first;
 			*last = _val;
@@ -283,7 +271,7 @@ namespace nuts
 		{
 			if (is_back_full())
 			{
-				map.push_back();
+				map.emplace_back();
 				last = &map.back()[0];
 				*last = _val;
 			}
@@ -298,7 +286,7 @@ namespace nuts
 	{
 		if (empty())
 		{
-			map.push_front();
+			map.emplace_front();
 			last = &map.front()[Buf - 1];
 			first = last;
 			*first = _val;
@@ -307,7 +295,7 @@ namespace nuts
 		{
 			if (is_front_full())
 			{
-				map.push_front();
+				map.emplace_front();
 				first = &map.front()[Buf - 1];
 				*first = _val;
 			}
@@ -322,7 +310,7 @@ namespace nuts
 	{
 		if (empty())
 		{
-			map.push_back();
+			map.emplace_back();
 			first = &map.back()[0];
 			last = first;
 		}
@@ -330,7 +318,7 @@ namespace nuts
 		{
 			if (is_back_full())
 			{
-				map.push_back();
+				map.emplace_back();
 				last = &map.back()[0];
 			}
 			else
@@ -344,7 +332,7 @@ namespace nuts
 	{
 		if (empty())
 		{
-			map.push_front();
+			map.emplace_front();
 			last = &map.front()[Buf - 1];
 			first = last;
 		}
@@ -352,7 +340,7 @@ namespace nuts
 		{
 			if (is_front_full())
 			{
-				map.push_front();
+				map.emplace_front();
 				first = &map.front()[Buf - 1];
 			}
 			else

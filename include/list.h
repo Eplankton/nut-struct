@@ -78,10 +78,10 @@ namespace nuts
 		list<T>& operator=(const list<T>& obj);// Copy
 		list<T>& operator=(list<T>&& src) { return this->move(src); }
 
-		list<T>& push_back();                         // Add back an empty node
+		list<T>& emplace_back();                         // Add back an empty node
 		list<T>& push_back(const T& obj, u64 num = 1);// Add back several nodes(add by init calue)
 
-		list<T>& push_front();                         // Add front an empty node
+		list<T>& emplace_front();                         // Add front an empty node
 		list<T>& push_front(const T& obj, u64 num = 1);// Add frontseveral nodes(add by init value)
 
 		list<T>& pop_back(); // Remove last element
@@ -170,7 +170,6 @@ namespace nuts
 
 			void operator-=(i64 bias) { advance(*this, -bias); }
 
-			T* operator->() { return &_ptr->data; }
 			T* operator->() const { return &_ptr->data; }
 		};
 
@@ -248,8 +247,7 @@ namespace nuts
 	template <class T>
 	list<T>::list(const std::initializer_list<T>& ilist)
 	{
-		for (auto p = ilist.begin(); p != ilist.end(); ++p)
-			this->push_back(*p);
+		for (const auto& x: ilist) this->push_back(x);
 	}
 
 	template <class T>
@@ -352,7 +350,7 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T>& list<T>::push_back()
+	list<T>& list<T>::emplace_back()
 	{
 		if (!this->empty())
 		{
@@ -413,7 +411,7 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T>& list<T>::push_front()
+	list<T>& list<T>::emplace_front()
 	{
 		if (!this->empty())
 		{
@@ -595,7 +593,7 @@ namespace nuts
 	void list<T>::assign(Itr st, Itr ed)
 	{
 		for_each(st, ed,
-		         [=](const auto& x) { this->push_back(x); });
+		         [this](const auto& x) { this->push_back(x); });
 	}
 
 	template <class T>

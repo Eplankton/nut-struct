@@ -19,9 +19,10 @@ namespace nuts
 	{
 	public:
 		using value_type = T;
+		using pointer = T*;
 
 	protected:
-		T* data_ptr = nullptr;
+		pointer data_ptr = nullptr;
 		u64 v_size = 0, v_capacity = 0;
 
 	public:
@@ -76,13 +77,12 @@ namespace nuts
 			iterator(std::nullptr_t obj) : _ptr(obj) {}
 			iterator(const iterator& obj) : _ptr(obj._ptr) {}
 
-			T* get() const { return _ptr; }
+			pointer get() const { return _ptr; }
 
 			T& operator*() { return *_ptr; }
 			const T& operator*() const { return *_ptr; }
 
-			T* operator->() { return _ptr; }
-			T* operator->() const { return _ptr; }
+			pointer operator->() const { return _ptr; }
 
 			iterator& operator=(T* obj)
 			{

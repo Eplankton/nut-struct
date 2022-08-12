@@ -11,21 +11,21 @@ namespace nuts
 	    : public unordered_set<pair<Key, Val>, Hasher>
 	{
 	public:
-		using Base_type = unordered_set<pair<Key, Val>, Hasher>;
-		using Self_Type = unordered_map<Key, Val, Hasher>;
-		using Bucket_Type = list<pair<Key, Val>>;
-		using Itr_type = typename Base_type::iterator;
+		using base_type = unordered_set<pair<Key, Val>, Hasher>;
+		using self_type = unordered_map<Key, Val, Hasher>;
+		using bucket_type = list<pair<Key, Val>>;
+		using itr_type = typename base_type::iterator;
 
 		unordered_map();
-		unordered_map(const Self_Type& src);
-		unordered_map(Self_Type&& src) { this->move(src); }
-		~unordered_map() { Base_type::clear(); }
+		unordered_map(const self_type& src);
+		unordered_map(self_type&& src) { this->move(src); }
+		~unordered_map() { base_type::clear(); }
 
-		Self_Type& move(Self_Type& src);
+		self_type& move(self_type& src);
 
 		void rehash();
 		bool contains(const Key& _k) const;
-		Itr_type find(const Key& _k) const;
+		itr_type find(const Key& _k) const;
 
 		Val& at(const Key& _k);
 		const Val& at(const Key& _k) const;
@@ -37,20 +37,20 @@ namespace nuts
 		void insert(const pair<Key, Val>& _p);
 		bool erase(const Key& _k);
 
-		Self_Type& operator=(const Self_Type& src);
-		Self_Type& operator=(Self_Type&& src) { return this->move(src); }
+		self_type& operator=(const self_type& src);
+		self_type& operator=(self_type&& src) { return this->move(src); }
 	};
 
 	template <class Key, class Val, class Hasher>
 	unordered_map<Key, Val, Hasher>::unordered_map()
 	{
-		vector<Bucket_Type> tmp(*this->bucket_size);
+		vector<bucket_type> tmp(*this->bucket_size);
 		this->bucket.move(tmp);
 	}
 
 	template <class Key, class Val, class Hasher>
 	unordered_map<Key, Val, Hasher>::
-	        unordered_map(const Self_Type& src)
+	        unordered_map(const self_type& src)
 	{
 		this->bucket_size = src.bucket_size;
 		this->bucket(src.bucket);
@@ -59,7 +59,7 @@ namespace nuts
 
 	template <class Key, class Val, class Hasher>
 	unordered_map<Key, Val, Hasher>&
-	unordered_map<Key, Val, Hasher>::move(Self_Type& src)
+	unordered_map<Key, Val, Hasher>::move(self_type& src)
 	{
 		this->bucket_size = src.bucket_size;
 		this->bucket.move(src.bucket);
@@ -96,14 +96,14 @@ namespace nuts
 				        this->bucket.end(),
 				        res};
 		}
-		return Base_type::npos;// if not found
+		return base_type::npos;// if not found
 	}
 
 	template <class Key, class Val, class Hasher>
 	Val& unordered_map<Key, Val, Hasher>::at(const Key& _k)
 	{
 		auto it = this->find(_k);
-		assert(it != Base_type::npos);
+		assert(it != base_type::npos);
 		return it->second;
 	}
 
@@ -112,7 +112,7 @@ namespace nuts
 	        at(const Key& _k) const
 	{
 		auto it = this->find(_k);
-		assert(it != Base_type::npos);
+		assert(it != base_type::npos);
 		return it->second;
 	}
 
@@ -120,14 +120,14 @@ namespace nuts
 	Val& unordered_map<Key, Val, Hasher>::operator[](const Key& _k)
 	{
 		auto it = this->find(_k);
-		if (it != Base_type::npos)
+		if (it != base_type::npos)
 			return it->second;
 		else
 		{
 			if (this->_size == *this->bucket_size)
 				this->rehash();
 			u64 index = this->hash_fn(_k) % *this->bucket_size;
-			this->bucket[index].push_back();
+			this->bucket[index].emplace_back();
 			this->bucket[index].back().first = _k;
 			++this->_size;
 			return this->bucket[index].back().second;
@@ -138,7 +138,7 @@ namespace nuts
 	const Val& unordered_map<Key, Val, Hasher>::
 	operator[](const Key& _k) const
 	{
-		assert(this->find(_k) != Base_type::npos);
+		assert(this->find(_k) != base_type::npos);
 		return (*this)[_k];
 	}
 
@@ -162,19 +162,20 @@ namespace nuts
 	{
 		pair<Key, Val> tmp;
 		tmp.first = _k;
-		return Base_type::erase(tmp);
+		return base_type::erase(tmp);
 	}
 
 	template <class Key, class Val, class Hasher>
 	void unordered_map<Key, Val, Hasher>::rehash()
 	{
 		this->bucket_size++;
-		vector<Bucket_Type> tmp(*this->bucket_size);
+		vector<bucket_type> tmp(*this->bucket_size);
 		tmp.shrink_to_fit();
 
-		auto fv = [this, &tmp](const pair<Key, Val>& x) {
+		auto fv = [this, &tmp](pair<Key, Val>& x) {
 			u64 index = this->hash_fn(x.first) % (*this->bucket_size);
-			tmp[index].push_back(x);
+			tmp[index].emplace_back();
+			tmp[index].back() = std::move(x);
 		};
 
 		for_each(this->begin(), this->end(), fv);
@@ -183,10 +184,10 @@ namespace nuts
 
 	template <class Key, class Val, class Hasher>
 	unordered_map<Key, Val, Hasher>& unordered_map<Key, Val, Hasher>::
-	operator=(const Self_Type& src)
+	operator=(const self_type& src)
 	{
 		this->bucket_size = src.bucket_size;
-		this->bucket = src.bucket;
+		this->bucket = src.bucket;// Copy
 		this->_size = src._size;
 	}
 }

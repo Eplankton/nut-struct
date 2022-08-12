@@ -139,9 +139,8 @@ namespace nuts
 		auto ed = x.end() + 1;
 		for (auto it = x.begin() + 1; it != ed; it++)
 		{
-			if (cmp(*it, *(it - 1)))
-				return false;
-		}	
+			if (cmp(*it, *(it - 1))) return false;
+		}
 		return true;
 	}
 

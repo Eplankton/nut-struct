@@ -2,6 +2,7 @@
 #define _NUTS_MATRIX_ 1
 
 #include "array.h"
+#include "concept.h"
 #include "type.h"
 
 namespace nuts
@@ -15,7 +16,7 @@ namespace nuts
 	{
 	public:
 		using value_type = T;
-		using Self_Type = matrix<T, Row, Col>;
+		using self_type = matrix<T, Row, Col>;
 
 	protected:
 		array<array<T, Col>, Row> m;
@@ -23,7 +24,7 @@ namespace nuts
 	public:
 		matrix() = default;
 		matrix(const T& _val);
-		matrix(const Self_Type& src);
+		matrix(const self_type& src);
 		matrix(const std::initializer_list<array<T, Col>>& ilist);
 		matrix(const std::initializer_list<T>& ilist);
 		~matrix() = default;
@@ -59,7 +60,7 @@ namespace nuts
 		friend matrix<Ty, R1, C2> operator*(const matrix<Ty, R1, C1>& A,
 		                                    const matrix<Ty, C1, C2>& B);
 
-		Self_Type& operator=(const Self_Type& src);
+		self_type& operator=(const self_type& src);
 	};
 
 	template <typename T, u64 Row, u64 Col>
@@ -91,7 +92,7 @@ namespace nuts
 	}
 
 	template <typename T, u64 Row, u64 Col>
-	matrix<T, Row, Col>::matrix(const Self_Type& src)
+	matrix<T, Row, Col>::matrix(const self_type& src)
 	{
 		for (u64 i = 0; i < row(); ++i)
 			for (u64 j = 0; j < col(); ++j)
@@ -99,8 +100,7 @@ namespace nuts
 	}
 
 	template <typename T, u64 Row, u64 Col>
-	matrix<T, Row, Col>&
-	matrix<T, Row, Col>::operator=(const Self_Type& src)
+	matrix<T, Row, Col>& matrix<T, Row, Col>::operator=(const self_type& src)
 	{
 		for (u64 i = 0; i < row(); ++i)
 			for (u64 j = 0; j < col(); ++j)
@@ -108,30 +108,9 @@ namespace nuts
 		return *this;
 	}
 
-	template <typename T, u64 Row, u64 Col>
-	void matrix<T, Row, Col>::print() const
-	{
-		printf("\n");
-		auto row_array_print = [](const auto& r) {
-			auto trav_in_col = [&r](const auto& c) {
-				std::cout << (T) c;
-				if (&c != &r.back())
-					printf(", ");
-			};
-
-			printf("[");
-			nuts::for_each(r, trav_in_col);
-			printf("]\n");
-		};
-
-		for (u64 i = 0; i < row(); ++i)
-		{
-			row_array_print(m[i]);
-		}
-	}
-
 	template <typename T, u64 R, u64 C>
-	matrix<T, R, C> operator+(const matrix<T, R, C>& A, const matrix<T, R, C>& B)
+	matrix<T, R, C>
+	operator+(const matrix<T, R, C>& A, const matrix<T, R, C>& B)
 	{
 		matrix<T, R, C> res;
 		for (u64 i = 0; i < res.row(); ++i)
@@ -141,7 +120,8 @@ namespace nuts
 	}
 
 	template <typename T, u64 R, u64 C>
-	matrix<T, R, C> operator-(const matrix<T, R, C>& A, const matrix<T, R, C>& B)
+	matrix<T, R, C>
+	operator-(const matrix<T, R, C>& A, const matrix<T, R, C>& B)
 	{
 		matrix<T, R, C> res;
 		for (u64 i = 0; i < res.row(); ++i)
@@ -161,6 +141,27 @@ namespace nuts
 				for (u64 c = 0; c < A.col(); ++c)
 					res[i][j] += A[i][c] * B[c][j];
 		return res;
+	}
+
+	template <typename T, u64 Row, u64 Col>
+	void matrix<T, Row, Col>::print() const
+	{
+		printf("\n");
+		auto row_array_print = [](const auto& r) {
+			auto trav_in_col = [&r](const auto& c) {
+				std::cout << c;
+				if (&c != &r.back())
+					printf(", ");
+			};
+			printf("[");
+			nuts::for_each(r, trav_in_col);
+			printf("]\n");
+		};
+
+		for (u64 i = 0; i < row(); ++i)
+		{
+			row_array_print(m[i]);
+		}
 	}
 }
 

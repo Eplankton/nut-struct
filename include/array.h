@@ -56,6 +56,7 @@ namespace nuts
 			iterator(const iterator& obj) { this->_ptr = obj._ptr; }
 
 			pointer get() const { return const_cast<pointer>(_ptr); }
+			pointer operator->() const { return const_cast<pointer>(_ptr); }
 			T& operator*() { return *_ptr; }
 			const T& operator*() const { return *_ptr; }
 
@@ -118,9 +119,6 @@ namespace nuts
 
 			T& operator[](u64 _n) { return *((*this) + _n); }
 			const T& operator[](u64 _n) const { return *((*this) + _n); }
-
-			pointer operator->() { return _ptr; }
-			const_pointer operator->() const { return _ptr; }
 		};
 
 		iterator begin()

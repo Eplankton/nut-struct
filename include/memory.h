@@ -189,12 +189,6 @@ namespace nuts
 			return *_ptr;
 		}
 
-		T* operator->()
-		{
-			assert(_ptr != nullptr);
-			return _ptr;
-		}
-
 		T* operator->() const
 		{
 			assert(_ptr != nullptr);
@@ -311,12 +305,6 @@ namespace nuts
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
-		}
-
-		pointer operator->()
-		{
-			assert(_ptr != nullptr);
-			return _ptr;
 		}
 
 		const_pointer operator->() const

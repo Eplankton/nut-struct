@@ -7,8 +7,8 @@ int main()
 {
 	// set<i32> A {7, 8, 0, 4, 2, 6, 9, 3, 5, 1};
 	set<i32> A;
-	unordered_set<i32> B = {1, 4, 7, 10, 13, 16, 19, 22, 25, 28};
-	for (auto i: range(0, 25))
+	unordered_set<i32> B {1, 4, 7, 10, 13, 16, 19, 22, 25, 28};
+	for (auto i: range(0, 100))
 		A.insert(i);
 	// A.print_as_tree();
 	// B.print();
@@ -19,13 +19,13 @@ int main()
 
 	unordered_map<i32, bool> hmap;
 	for_each(m, [&hmap](const auto& x) { hmap.insert(x); });
-	// hmap.print_as_table();
+	hmap.print_as_table();
 
 	deque<string> s {"human", "dog", "cat", "cow",
 	                 "sheep", "monkey", "turtle",
 	                 "elephant"};
 	reverse(s.begin(), s.end());
-	s.print();
+	// s.print();
 
 	return 0;
 }

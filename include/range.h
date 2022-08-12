@@ -1,7 +1,6 @@
 #ifndef _NUTS_RANGE_
 #define _NUTS_RANGE_ 1
 
-#include "concept.h"
 #include "type.h"
 
 namespace nuts
@@ -10,21 +9,21 @@ namespace nuts
 	class Range
 	{
 	public:
-		using Itr_type = typename C::iterator;
+		using itr_type = typename C::iterator;
 
 	public:
 		Range() = default;
 		Range(const C& x) : st(x.begin()), ed(x.end() + 1) {}
 		~Range() = default;
 
-		Itr_type& begin() { return st; }
-		Itr_type& end() { return ed; }
+		itr_type& begin() { return st; }
+		itr_type& end() { return ed; }
 
-		const Itr_type& begin() const { return st; }
-		const Itr_type& end() const { return ed; }
+		const itr_type& begin() const { return st; }
+		const itr_type& end() const { return ed; }
 
 	protected:
-		Itr_type st, ed;
+		itr_type st, ed;
 	};
 
 	template <typename T>
