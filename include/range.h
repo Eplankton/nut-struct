@@ -33,7 +33,7 @@ namespace nuts
 	}
 
 	template <>
-	class Range<u64>
+	class Range<i64>
 	{
 	public:
 		class iterator
@@ -42,19 +42,25 @@ namespace nuts
 
 		public:
 			iterator() = default;
-			iterator(u64 x, u64 s = 1) : curr(x), step(s) {}
+			iterator(i64 x, i64 s = 1) : curr(x), step(s) {}
 			~iterator() = default;
 
-			u64 operator*() { return curr; }
-			u64 operator*() const { return curr; }
+			i64 operator*() { return curr; }
+			i64 operator*() const { return curr; }
 
-			bool operator==(const iterator& obj) const { return this->curr == obj.curr; }
-			bool operator!=(const iterator& obj) const { return this->curr <= obj.curr &&
-				                                                this->curr != obj.curr; }
+			bool operator==(const iterator& obj) const { return curr == obj.curr; }
+			bool operator!=(const iterator& obj)
+			        const
+			{
+				return step > 0 ? (curr <= obj.curr &&
+				                   curr != obj.curr)
+				                : (curr >= obj.curr &&
+				                   curr != obj.curr);
+			}
 
 			iterator& operator++()
 			{
-				this->curr += step;
+				curr += step;
 				return *this;
 			}
 
@@ -67,7 +73,7 @@ namespace nuts
 
 			iterator& operator--()
 			{
-				this->curr -= step;
+				curr -= step;
 				return *this;
 			}
 
@@ -79,23 +85,23 @@ namespace nuts
 			}
 
 		protected:
-			u64 curr, step;
+			i64 curr, step;
 		};
 
 		Range() = default;
-		Range(u64 st, u64 ed, u64 step = 1) : lb(st), ub(ed), s(step) {}
+		Range(i64 st, i64 ed, i64 step = 1) : lb(st), ub(ed), s(step) {}
 		~Range() = default;
 
 		iterator begin() const { return {lb, s}; }
 		iterator end() const { return {ub, s}; }
 
 	protected:
-		u64 lb, ub, s;
+		i64 lb, ub, s;
 	};
 
-	Range<u64> range(u64 lb, u64 ub, u64 s = 1)
+	Range<i64> range(i64 lb, i64 ub, i64 s = 1)
 	{
-		return Range<u64>(lb, ub, s);
+		return Range<i64>(lb, ub, s);
 	}
 }
 

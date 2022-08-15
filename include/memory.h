@@ -211,8 +211,7 @@ namespace nuts
 
 		shared_ptr<T, Dx>& operator=(shared_ptr<T, Dx>& src)
 		{
-			if (_ptr != nullptr)
-				*(_cnt) -= 1;
+			if (_ptr != nullptr) *(_cnt) -= 1;
 			_ptr = src._ptr, _cnt = src._cnt;
 			*(_cnt) += 1;
 			return *this;

@@ -24,7 +24,7 @@ namespace nuts
 		array(const std::initializer_list<T>& ilist);
 		~array() = default;
 
-		array<T, N>& fill(const T& _val);
+		void fill(const T& _val);
 		pointer data() const { return const_cast<pointer>(data_ptr); }
 		u64 size() const { return N; }
 		u64 empty() const { return size() == 0; }
@@ -51,9 +51,9 @@ namespace nuts
 
 		public:
 			iterator() = default;
-			iterator(const_pointer obj) { this->_ptr = const_cast<pointer>(obj); }
-			iterator(pointer obj) { this->_ptr = obj; }
-			iterator(const iterator& obj) { this->_ptr = obj._ptr; }
+			iterator(const_pointer obj) { _ptr = const_cast<pointer>(obj); }
+			iterator(pointer obj) { _ptr = obj; }
+			iterator(const iterator& obj) { _ptr = obj._ptr; }
 
 			pointer get() const { return const_cast<pointer>(_ptr); }
 			pointer operator->() const { return const_cast<pointer>(_ptr); }
@@ -62,25 +62,25 @@ namespace nuts
 
 			iterator& operator=(pointer obj)
 			{
-				this->_ptr = obj;
+				_ptr = obj;
 				return *this;
 			}
 
 			iterator& operator=(const iterator& obj)
 			{
-				this->_ptr = obj._ptr;
+				_ptr = obj._ptr;
 				return *this;
 			}
 
-			bool operator==(pointer obj) const { return this->_ptr == obj; }
-			bool operator!=(pointer obj) const { return this->_ptr != obj; }
+			bool operator==(pointer obj) const { return _ptr == obj; }
+			bool operator!=(pointer obj) const { return _ptr != obj; }
 
-			bool operator==(const iterator& obj) const { return this->_ptr == obj._ptr; }
-			bool operator!=(const iterator& obj) const { return this->_ptr != obj._ptr; }
+			bool operator==(const iterator& obj) const { return _ptr == obj._ptr; }
+			bool operator!=(const iterator& obj) const { return _ptr != obj._ptr; }
 
 			iterator& operator++()
 			{
-				this->_ptr++;
+				_ptr++;
 				return *this;
 			}
 
@@ -93,7 +93,7 @@ namespace nuts
 
 			iterator& operator--()
 			{
-				this->_ptr--;
+				_ptr--;
 				return *this;
 			}
 
@@ -105,12 +105,12 @@ namespace nuts
 			}
 
 			iterator operator+(i64 bias)
-			        const { return iterator(this->_ptr + bias); }
+			        const { return iterator(_ptr + bias); }
 
 			void operator+=(i64 bias) { _ptr += bias; }
 
 			iterator operator-(i64 bias)
-			        const { return iterator(this->_ptr - bias); }
+			        const { return iterator(_ptr - bias); }
 
 			void operator-=(i64 bias) { _ptr -= bias; }
 
@@ -121,42 +121,45 @@ namespace nuts
 			const T& operator[](u64 _n) const { return *((*this) + _n); }
 		};
 
-		iterator begin()
-		        const { return {const_cast<pointer>(data())}; }
-
-		iterator end()
-		        const { return {const_cast<pointer>(&data_ptr[size() - 1])}; }
+		iterator begin() const { return {data()}; }
+		iterator end() const { return {&data_ptr[size() - 1]}; }
 	};
 
-	template <typename T, nuts::u64 N>
+	template <typename T, u64 N>
 	array<T, N>::array(const T& val)
 	{
 		std::fill_n(data_ptr, size(), val);
 	}
 
-	template <typename T, nuts::u64 N>
+	template <typename T, u64 N>
 	array<T, N>::array(const std::initializer_list<T>& ilist)
 	{
 		auto st = ilist.begin();
-		for (u64 i = 0; i < size(); ++i)
+		for (u64 i: range(0, size()))
 			data_ptr[i] = *(st++);
 	}
 
-	template <typename T, nuts::u64 N>
+	template <typename T, u64 N>
 	T& array<T, N>::at(u64 _n)
 	{
 		assert(_n < size() && "Index_Bound");
 		return data_ptr[_n];
 	}
 
-	template <typename T, nuts::u64 N>
+	template <typename T, u64 N>
 	const T& array<T, N>::at(u64 _n) const
 	{
 		assert(_n < size() && "Index_Bound");
 		return data_ptr[_n];
 	}
 
-	template <typename T, nuts::u64 N>
+	template <typename T, u64 N>
+	void array<T, N>::fill(const T& _val)
+	{
+		return std::fill_n(data_ptr, N, _val);
+	}
+
+	template <typename T, u64 N>
 	void array<T, N>::print() const
 	{
 		auto print = [this](const auto& x) {
@@ -168,12 +171,6 @@ namespace nuts
 		if (!empty())
 			for_each(begin(), end(), print);
 		printf("]\n");
-	}
-
-	template <typename T, u64 N>
-	array<T, N>& array<T, N>::fill(const T& _val)
-	{
-		return std::fill_n(data_ptr, N, _val);
 	}
 }
 

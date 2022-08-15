@@ -25,30 +25,26 @@ namespace nuts
 	class map : public set<pair<Key, Val>, Compare>
 	{
 	public:
-		using Val_type = Key;
+		using value_type = Key;
 		using itr_type = typename AVL<pair<Key, Val>,
 		                              Compare>::iterator;
 
-		using Base_type = set<pair<Key, Val>, Compare>;
+		using base_type = set<pair<Key, Val>, Compare>;
 
 	public:
 		map() = default;
-
 		map(const map<Key, Val, Compare>& src)
 		{
-			for_each(*this, [this](const auto& x) { this->insert(x); });
+			for_each(*this,    [this](const auto& x) { this->insert(x); });
 		}
 
-		map(map<Key, Val, Compare>&& src)
-		{
-			Base_type::move(src);
-		}
+		map(map<Key, Val, Compare>&& src) { base_type::move(src); }
 		~map() = default;
 
 		map<Key, Val, Compare>& operator=(const map<Key, Val, Compare>& src);
 		map<Key, Val, Compare>& operator=(map<Key, Val, Compare>&& src)
 		{
-			Base_type::move(src);
+			base_type::move(src);
 			return *this;
 		}
 
@@ -56,26 +52,26 @@ namespace nuts
 
 		bool insert(const Key& _k, const Val& _v)
 		{
-			return Base_type::insert({_k, _v});
+			return base_type::insert({_k, _v});
 		}
 
 		bool insert(const pair<Key, Val>& _p)
 		{
-			return Base_type::insert(_p);
+			return base_type::insert(_p);
 		}
 
 		bool erase(const Key& _k)
 		{
 			pair<Key, Val> tmp;
 			tmp.first = _k;
-			return Base_type::erase(tmp);
+			return base_type::erase(tmp);
 		}
 
 		itr_type find(const Key& _k) const
 		{
 			pair<Key, Val> tmp;
 			tmp.first = _k;
-			return Base_type::find(tmp);
+			return base_type::find(tmp);
 		}
 
 		bool contains(const Key& _k) const
@@ -105,7 +101,7 @@ namespace nuts
 			{
 				pair<Key, Val> tmp;
 				tmp.first = _k;
-				auto at = Base_type::insert_ret_pos(tmp);
+				auto at = base_type::insert_ret_pos(tmp);
 				return at->second;
 			}
 			else
@@ -134,7 +130,7 @@ namespace nuts
 	map<Key, Val, Compare>& map<Key, Val, Compare>::
 	operator=(const map<Key, Val, Compare>& src)
 	{
-		Base_type::clear();
+		base_type::clear();
 		for_each(*this, [this](const auto& x) { this->insert(x); });
 		return *this;
 	}

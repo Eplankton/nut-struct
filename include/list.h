@@ -55,33 +55,33 @@ namespace nuts
 		explicit list(const T& userInputData, u64 userInputlength = 1);// Init by several valued nodes
 
 		list(const list<T>& obj);// Init by another list(deep copy)
-		list(list<T>&& src) { this->move(src); }
+		list(list<T>&& src) { move(src); }
 
 		list(const std::initializer_list<T>& ilist);// Init by a {ilist}
 
-		~list() { this->clear(); }// Clear and gain back memory
+		~list() { clear(); }// Clear and gain back memory
 
 		bool empty() const// Whether the list is empty
 		{
-			return this->size() == 0 &&
+			return size() == 0 &&
 			       head == nullptr &&
 			       tail == nullptr;
 		}
 
 		node_ptr data() const { return const_cast<node_ptr>(head); }
 
-		bool exist() const { return this->empty(); }// Whether the list exists
-		u64 size() const { return length; }         // Get the length of the whole list
-		void print() const;                         // Print a list in console
-		list<T>& clear();                           // Clear the whole list, release all nodes
+		bool exist() const { return empty(); }// Whether the list exists
+		u64 size() const { return length; }   // Get the length of the whole list
+		void print() const;                   // Print a list in console
+		list<T>& clear();                     // Clear the whole list, release all nodes
 
 		list<T>& operator=(const list<T>& obj);// Copy
-		list<T>& operator=(list<T>&& src) { return this->move(src); }
+		list<T>& operator=(list<T>&& src) { return move(src); }
 
-		list<T>& emplace_back();                         // Add back an empty node
+		list<T>& emplace_back();                      // Add back an empty node
 		list<T>& push_back(const T& obj, u64 num = 1);// Add back several nodes(add by init calue)
 
-		list<T>& emplace_front();                         // Add front an empty node
+		list<T>& emplace_front();                      // Add front an empty node
 		list<T>& push_front(const T& obj, u64 num = 1);// Add frontseveral nodes(add by init value)
 
 		list<T>& pop_back(); // Remove last element
@@ -90,7 +90,8 @@ namespace nuts
 		list<T>& merge(list<T>& after);// Merge lists together, the latter lost ownership
 		list<T>& move(list<T>& src);   // A void manager can deprive other's ownership
 
-		class iterator : public bidirectional_iterator
+		class iterator
+		    : public bidirectional_iterator
 		{
 		public:
 			using value_type = T;
@@ -128,8 +129,10 @@ namespace nuts
 
 			iterator& operator++()
 			{
-				if (this->_ptr != nullptr)
-					this->_ptr = this->_ptr->next;
+				if (_ptr != nullptr)
+					_ptr = _ptr->next;
+				else
+					_ptr = nullptr;
 				return *this;
 			}
 
@@ -144,6 +147,8 @@ namespace nuts
 			{
 				if (_ptr != nullptr)
 					_ptr = _ptr->prev;
+				else
+					_ptr = nullptr;
 				return *this;
 			}
 
@@ -160,7 +165,7 @@ namespace nuts
 				return advance(res, bias);
 			}
 
-			void operator+=(i64 bias) { advance(*this, bias); }
+			void operator+=(i64 bias) { *this = advance(*this, bias); }
 
 			iterator operator-(i64 bias) const
 			{
@@ -168,19 +173,19 @@ namespace nuts
 				return advance(res, -bias);
 			}
 
-			void operator-=(i64 bias) { advance(*this, -bias); }
+			void operator-=(i64 bias) { *this = advance(*this, -bias); }
 
-			T* operator->() const { return &_ptr->data; }
+			T* operator->() const { return (T*) &_ptr->data; }
 		};
 
-		iterator begin() const { return {const_cast<node_ptr>(this->head)}; }
-		iterator end() const { return {const_cast<node_ptr>(this->tail)}; }
+		iterator begin() const { return {const_cast<node_ptr>(head)}; }
+		iterator end() const { return {const_cast<node_ptr>(tail)}; }
 
-		T& front() { return this->head->data; }
-		T& back() { return this->tail->data; }
+		T& front() { return head->data; }
+		T& back() { return tail->data; }
 
-		const T& front() const { return this->head->data; }
-		const T& back() const { return this->tail->data; }
+		const T& front() const { return head->data; }
+		const T& back() const { return tail->data; }
 
 		list<T>& insert(const iterator& pos,
 		                const T& obj, u64 num = 1);// Insert several node at position
@@ -210,17 +215,17 @@ namespace nuts
 	{
 		if (userInputlength >= 1)
 		{
-			this->length = userInputlength;
-			this->head = new ListNode<T>;// Save the head node address.
+			length = userInputlength;
+			head = new ListNode<T>;// Save the head node address.
 			auto p = head;
-			for (int i = 1; i < userInputlength; i++)
+			for (i64 i: range(1, userInputlength))
 			{
 				p->next = new ListNode<T>;
 				p->next->prev = p;
 				p = p->next;
 				p->next = nullptr;
 			}
-			this->tail = p;// Save the last node address.
+			tail = p;// Save the last node address.
 		}
 	}
 
@@ -263,53 +268,53 @@ namespace nuts
 	list<T>& list<T>::erase(ListNode<T>* start_node, u64 N_far)
 	{
 		assert(N_far < this->size() && !this->empty());
-		int i = 0;
+		i64 i = 0;
 		for (auto p = start_node; p != nullptr; p = p->next)
 		{
 			if (i == N_far)
 			{
-				if (p == this->head)
+				if (p == head)
 				{
 					if (p->next != nullptr)
 					{
 						p->next->prev = nullptr;
-						this->head = p->next;
+						head = p->next;
 						delete p;
-						this->length--;
+						length--;
 						return *this;
 					}
 					else
 					{
 						delete p;
-						this->head = nullptr;
-						this->tail = nullptr;
-						this->length--;
+						head = nullptr;
+						tail = nullptr;
+						length--;
 						return *this;
 					}
 				}
-				if (p == this->tail)
+				if (p == tail)
 				{
 					if (p->prev != nullptr)
 					{
 						p->prev->next = nullptr;
-						this->tail = p->prev;
+						tail = p->prev;
 						delete p;
-						this->length--;
+						length--;
 						return *this;
 					}
 					else
 					{
 						delete p;
-						this->head = nullptr;
-						this->tail = nullptr;
-						this->length--;
+						head = nullptr;
+						tail = nullptr;
+						length--;
 						return *this;
 					}
 				}
 				p->next->prev = p->prev;
 				p->prev->next = p->next;
 				delete p;
-				this->length--;
+				length--;
 				return *this;
 			}
 			i++;
@@ -341,9 +346,8 @@ namespace nuts
 	{
 		if (!this->empty())
 		{
-			for (i64 i = static_cast<i64>(this->size() - 1);
-			     i >= 0; i--)
-				this->erase(this->head, i);
+			for (i64 i: range(size() - 1, -1, -1))
+				erase(head, i);
 			head = nullptr, tail = nullptr;
 		}
 		return *this;
@@ -354,13 +358,13 @@ namespace nuts
 	{
 		if (!this->empty())
 		{
-			auto p = this->tail;
+			auto p = tail;
 			p->next = new ListNode<T>;
 			p->next->prev = p;
 			p = p->next;
 			p->next = nullptr;
-			this->tail = p;
-			this->length++;
+			tail = p;
+			length++;
 			return *this;
 		}
 		else// If it's an empty list,add a node.
@@ -368,9 +372,9 @@ namespace nuts
 			auto p = new ListNode<T>;
 			p->prev = nullptr;
 			p->next = nullptr;
-			this->head = p;
-			this->tail = p;
-			this->length++;
+			head = p;
+			tail = p;
+			length++;
 			return *this;
 		}
 	}
@@ -380,32 +384,32 @@ namespace nuts
 	{
 		if (!this->empty())
 		{
-			auto p = this->tail;
+			auto p = tail;
 			for (int i = 0; i < num; i++)
 			{
 				p->next = new ListNode<T>(obj);
 				p->next->prev = p;
 				p = p->next;
 				p->next = nullptr;
-				this->length++;
+				length++;
 			}
-			this->tail = p;
+			tail = p;
 			return *this;
 		}
 		else// If it's an empty list,add several node.
 		{
 			auto p = new ListNode<T>(obj);
-			this->head = p;
-			this->length++;
-			for (int i = 1; i < num; i++)
+			head = p;
+			length++;
+			for (i64 i: range(1, num))
 			{
 				p->next = new ListNode<T>(obj);
 				p->next->prev = p;
 				p = p->next;
 				p->next = nullptr;
-				this->length++;
+				length++;
 			}
-			this->tail = p;
+			tail = p;
 			return *this;
 		}
 	}
@@ -415,18 +419,18 @@ namespace nuts
 	{
 		if (!this->empty())
 		{
-			auto tmp = this->head;
-			this->head = new ListNode<T>;
-			this->head->next = tmp;
-			tmp->prev = this->head;
-			this->length++;
+			auto tmp = head;
+			head = new ListNode<T>;
+			head->next = tmp;
+			tmp->prev = head;
+			length++;
 			return *this;
 		}
 		else
 		{
-			this->head = new ListNode<T>;
-			this->tail = this->head;
-			this->length++;
+			head = new ListNode<T>;
+			tail = head;
+			length++;
 			return *this;
 		}
 	}
@@ -436,17 +440,17 @@ namespace nuts
 	{
 		if (!this->empty())
 		{
-			auto tmp = this->head;
-			this->head = new ListNode<T>(obj);
-			this->length++;
-			auto p = this->head;
-			for (int i = 1; i < num; i++)
+			auto tmp = head;
+			head = new ListNode<T>(obj);
+			length++;
+			auto p = head;
+			for (i64 i: range(1, num))
 			{
 				p->next = new ListNode<T>(obj);
 				p->next->prev = p;
 				p = p->next;
 				p->next = nullptr;
-				this->length++;
+				length++;
 			}
 			p->next = tmp;
 			tmp->prev = p;
@@ -455,17 +459,17 @@ namespace nuts
 		else// If it's an empty list,add several node.
 		{
 			auto* p = new ListNode<T>(obj);
-			this->head = p;
-			this->length++;
-			for (int i = 1; i < num; i++)
+			head = p;
+			length++;
+			for (i64 i: range(1, num))
 			{
 				p->next = new ListNode<T>(obj);
 				p->next->prev = p;
 				p = p->next;
 				p->next = nullptr;
-				this->length++;
+				length++;
 			}
-			this->tail = p;
+			tail = p;
 			return *this;
 		}
 	}
@@ -473,14 +477,14 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::pop_back()
 	{
-		this->erase(this->tail);
+		this->erase(tail);
 		return *this;
 	}
 
 	template <class T>
 	list<T>& list<T>::pop_front()
 	{
-		this->erase(this->head);
+		this->erase(head);
 		return *this;
 	}
 
@@ -492,10 +496,10 @@ namespace nuts
 			if (!this->empty())
 			{
 				// Pass ownership.
-				this->length = this->size() + after.size();
-				this->tail->next = after.head;
-				after.head->prev = this->tail;
-				this->tail = after.tail;
+				length = this->size() + after.size();
+				tail->next = after.head;
+				after.head->prev = tail;
+				tail = after.tail;
 				// Release the ownership of after.
 				after.head = nullptr;
 				after.tail = nullptr;
@@ -504,9 +508,9 @@ namespace nuts
 			}
 			else
 			{
-				this->length = after.size();// Pass ownership.
-				this->head = after.head;
-				this->tail = after.tail;
+				length = after.size();// Pass ownership.
+				head = after.head;
+				tail = after.tail;
 				after.head = nullptr;// Release the ownership of after.
 				after.tail = nullptr;
 				after.length = 0;
@@ -525,9 +529,9 @@ namespace nuts
 		if (!this->empty())// Pass ownership.
 			this->clear();
 
-		this->length = src.length;// Release the ownership of after.
-		this->head = src.head;
-		this->tail = src.tail;
+		length = src.length;// Release the ownership of after.
+		head = src.head;
+		tail = src.tail;
 
 		src.head = nullptr;
 		src.tail = nullptr;
@@ -538,7 +542,7 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::insert(ListNode<T>* position, const T& obj, u64 num)
 	{
-		for (auto p = this->head; p != nullptr; p = p->next)
+		for (auto p = head; p != nullptr; p = p->next)
 		{
 			if (p == position)
 			{
@@ -549,13 +553,13 @@ namespace nuts
 					p->next->prev = p;
 					p = p->next;
 					p->next = nullptr;
-					this->length++;
+					length++;
 				}
 				p->next = temp;
 				if (temp != nullptr)
 					temp->prev = p;
-				if (position == this->tail)
-					this->tail = p;
+				if (position == tail)
+					tail = p;
 			}
 		}
 		return *this;
@@ -605,7 +609,7 @@ namespace nuts
 				printf(", ");
 		};
 
-		printf("\nlist @%#llx = [", (u64) this->head);
+		printf("\nlist @%#llx = [", (u64) head);
 		if (!empty())
 			for_each(begin(), end(), print);
 		printf("]\n");

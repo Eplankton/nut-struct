@@ -31,7 +31,7 @@ namespace nuts
 	public:
 		stack() = default;
 		stack(const std::initializer_list<T>& ilist);
-		stack(stack<T, base>&& src) { this->move(src); }
+		stack(stack<T, base>&& src) { move(src); }
 		stack(const stack<T, base>& src) { _Base = src._Base; }
 		~stack() = default;
 
@@ -49,7 +49,7 @@ namespace nuts
 		const T& front() const { return _Base.front(); }
 		const T& back() const { return _Base.back(); }
 		stack<T, base>& operator=(const stack<T, base>& obj);
-		stack<T, base>& operator=(stack<T, base>&& src) { return this->move(src); }
+		stack<T, base>& operator=(stack<T, base>&& src) { return move(src); }
 		stack<T, base>& move(stack<T, base>& obj);
 
 		itr_type begin() const;

@@ -63,8 +63,8 @@ namespace nuts
 				auto tmp = itr;
 				if (cur == ed && ++tmp == nullptr)
 				{
-					cur = nullptr, st = nullptr,
-					ed = nullptr, itr = nullptr;
+					cur = st = ed = nullptr;
+					itr = nullptr;
 					return *this;
 				}
 				if (cur == ed)
@@ -91,8 +91,8 @@ namespace nuts
 				auto tmp = itr;
 				if (cur == st && --tmp == nullptr)
 				{
-					cur = nullptr, st = nullptr,
-					ed = nullptr, itr = nullptr;
+					cur = st = ed = nullptr;
+					itr = nullptr;
 					return *this;
 				}
 				if (cur == st)
@@ -117,12 +117,12 @@ namespace nuts
 			iterator operator+(i64 bias)
 			        const { return advance(*this, bias); }
 
-			void operator+=(i64 bias) { advance(*this, bias); }
+			void operator+=(i64 bias) { *this = advance(*this, bias); }
 
 			iterator operator-(i64 bias)
 			        const { return advance(*this, -bias); }
 
-			void operator-=(i64 bias) { advance(*this, -bias); }
+			void operator-=(i64 bias) { *this = advance(*this, -bias); }
 
 			bool operator==(const iterator& obj)
 			        const { return this->cur == obj.cur; }
@@ -146,17 +146,17 @@ namespace nuts
 
 		iterator begin() const
 		{
-			const_pointer st = &map.front()[0];
-			const_pointer ed = &map.front()[Buf - 1];
-			const_pointer cur = first;
+			const_pointer st = &map.front()[0],
+			              ed = &map.front()[Buf - 1],
+			              cur = first;
 			return {cur, st, ed, map.begin()};
 		}
 
 		iterator end() const
 		{
-			const_pointer st = &map.back()[0];
-			const_pointer ed = &map.back()[Buf - 1];
-			const_pointer cur = last;
+			const_pointer st = &map.back()[0],
+			              ed = &map.back()[Buf - 1],
+			              cur = last;
 			return {cur, st, ed, map.end()};
 		}
 
@@ -170,11 +170,11 @@ namespace nuts
 
 		deque<T, Buf>& move(deque<T, Buf>& src)
 		{
-			this->map.move(src.map);
-			this->_size = src.size();
-			this->first = src.first, this->last = src.last;
+			map.move(src.map);
+			_size = src.size();
+			first = src.first, last = src.last;
 			src._size = 0;
-			src.first = nullptr, src.last = nullptr;
+			src.first = src.last = nullptr;
 			return *this;
 		}
 
@@ -186,7 +186,7 @@ namespace nuts
 			if (!empty())
 			{
 				map.clear();
-				first = nullptr, last = nullptr, _size = 0;
+				first = last = nullptr, _size = 0;
 			}
 		}
 
@@ -382,9 +382,9 @@ namespace nuts
 	template <typename T, u64 Buf>
 	T& deque<T, Buf>::operator[](u64 _n)
 	{
-		u64 head_len = (&map.front().back() - begin().get()) + 1,
-		    tail_len = (end().get() - &map.back().front()) + 1,
-		    mid_len = (map.size() < 2) ? 0 : Buf * (map.size() - 2);
+		u64 head_len = (&map.front().back() - first) + 1,
+		    tail_len = (last - &map.back().front()) + 1,
+		    mid_len = (map.size() <= 2) ? 0 : Buf * (map.size() - 2);
 		if (_n < head_len)
 		{
 			return map.front()[_n + Buf - head_len];
@@ -402,15 +402,15 @@ namespace nuts
 			return map.back()[_n - (head_len + mid_len)];
 		}
 		// undefined
-		return *(end() + 1);
+		return *(last + 1);
 	}
 
 	template <typename T, u64 Buf>
 	const T& deque<T, Buf>::operator[](u64 _n) const
 	{
-		u64 head_len = &map.front().back() - begin().get() + 1,
-		    tail_len = end().get() - &map.back().front() + 1,
-		    mid_len = (map.size() < 2) ? 0 : Buf * (map.size() - 2);
+		u64 head_len = &map.front().back() - first + 1,
+		    tail_len = last - &map.back().front() + 1,
+		    mid_len = (map.size() <= 2) ? 0 : Buf * (map.size() - 2);
 		if (_n < head_len)
 		{
 			return map.front()[_n + Buf - head_len];
@@ -428,16 +428,16 @@ namespace nuts
 			return map.back()[_n - (head_len + mid_len)];
 		}
 		// undefined
-		return *(end() + 1);
+		return *(last + 1);
 	}
 
 	template <typename T, u64 Buf>
 	T& deque<T, Buf>::at(u64 _n)
 	{
 		assert(_n > size());
-		u64 head_len = &map.front().back() - begin().get() + 1,
-		    tail_len = end().get() - &map.back().front() + 1,
-		    mid_len = (map.size() < 2) ? 0 : Buf * (map.size() - 2);
+		u64 head_len = &map.front().back() - first + 1,
+		    tail_len = last - &map.back().front() + 1,
+		    mid_len = (map.size() <= 2) ? 0 : Buf * (map.size() - 2);
 		if (_n < head_len)
 		{
 			return map.front()[_n + Buf - head_len];
@@ -455,16 +455,16 @@ namespace nuts
 			return map.back()[_n - (head_len + mid_len)];
 		}
 		// undefined
-		return *(end() + 1);
+		return *(last + 1);
 	}
 
 	template <typename T, u64 Buf>
 	const T& deque<T, Buf>::at(u64 _n) const
 	{
 		assert(_n < size());
-		u64 head_len = &map.front().back() - begin().get() + 1,
-		    tail_len = end().get() - &map.back().front() + 1,
-		    mid_len = (map.size() < 2) ? 0 : Buf * (map.size() - 2);
+		u64 head_len = &map.front().back() - first + 1,
+		    tail_len = last - &map.back().front() + 1,
+		    mid_len = (map.size() <= 2) ? 0 : Buf * (map.size() - 2);
 		if (_n < head_len)
 		{
 			return map.front()[_n + Buf - head_len];
@@ -482,7 +482,7 @@ namespace nuts
 			return map.back()[_n - (head_len + mid_len)];
 		}
 		// undefined
-		return *(end() + 1);
+		return *(last + 1);
 	}
 
 	template <typename T, u64 Buf>
@@ -490,13 +490,11 @@ namespace nuts
 	{
 		auto print = [this](const auto& x) {
 			std::cout << x;
-			if (&x != &this->back())
-				printf(", ");
+			if (&x != &this->back()) printf(", ");
 		};
 
 		printf("\ndeque @%#llx = [", (u64) map.data());
-		if (!empty())
-			for_each(*this, print);
+		if (!empty()) for_each(*this, print);
 		printf("]\n");
 	}
 
@@ -505,19 +503,19 @@ namespace nuts
 	{
 		auto array_print = [this](const buf_type& arr) {
 			printf("[");
-			nuts::for_each(arr.begin(), arr.end(),
-			               [&arr, this](const T& x) { 
-							   	if (&x == this->begin().get() ||
-									&x == this->end().get())
-                                    printf("*");
+			for_each(arr.begin(), arr.end(),
+			         [&arr, this](const T& x) { 
+						if (&x == this->begin().get() ||
+							&x == this->end().get())
+							 printf("*");
 								std::cout << x; 
-                                if (&x != &arr.back()) printf(", "); });
+                        if (&x != &arr.back()) printf(", "); });
 			printf("]\n");
 		};
 
 		printf("\ndeque @%#llx: \n", (u64) map.data());
 		if (!empty())
-			nuts::for_each(map, array_print);
+			for_each(map, array_print);
 	}
 }
 

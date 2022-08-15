@@ -207,9 +207,7 @@ namespace nuts
 		v_size = ilist.size();
 		v_capacity = v_size + STD_CAPACITY;
 		data_ptr = new T[v_size + STD_CAPACITY];
-		T* q = data_ptr;
-		for (auto p = ilist.begin(); p != ilist.end(); ++p, ++q)
-			*q = *p;
+		for (const T& x: ilist) push_back(x);
 	}
 
 	template <class T>

@@ -74,11 +74,9 @@ namespace nuts
 		static const bool value = true;
 	};
 
-	// Get traits
 	template <typename Itr>
 	auto iterator_category(const Itr& x)
 	{
-		// itr_type is one of these 'tags'
 		using itr_type = typename Itr::Category;
 		return itr_type();
 	}

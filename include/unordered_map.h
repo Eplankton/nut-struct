@@ -73,10 +73,10 @@ namespace nuts
 	{
 		u64 index = hash_fn(_k) % *this->bucket_size;
 		auto ed = this->bucket[index].end() + 1;
-		for (auto res = this->bucket[index].begin();
-		     res != ed; res++)
+		for (auto it = this->bucket[index].begin();
+		     it != ed; ++it)
 		{
-			if (res->first == _k)
+			if (it->first == _k)
 				return true;
 		}
 		return false;
@@ -88,13 +88,12 @@ namespace nuts
 	{
 		u64 index = this->hash_fn(_k) % *this->bucket_size;
 		auto ed = this->bucket[index].end() + 1;
-		for (auto res = this->bucket[index].begin();
-		     res != nullptr && res != ed; res++)
+		for (auto it = this->bucket[index].begin();
+		     it != nullptr && it != ed; ++it)
 		{
-			if (res->first == _k)
+			if (it->first == _k)
 				return {this->bucket.begin() + index,
-				        this->bucket.end(),
-				        res};
+				        this->bucket.end(), it};
 		}
 		return base_type::npos;// if not found
 	}
@@ -172,13 +171,13 @@ namespace nuts
 		vector<bucket_type> tmp(*this->bucket_size);
 		tmp.shrink_to_fit();
 
-		auto fv = [this, &tmp](pair<Key, Val>& x) {
+		auto opr = [this, &tmp](pair<Key, Val>& x) {
 			u64 index = this->hash_fn(x.first) % (*this->bucket_size);
 			tmp[index].emplace_back();
 			tmp[index].back() = std::move(x);
 		};
 
-		for_each(this->begin(), this->end(), fv);
+		for_each(*this, opr);
 		this->bucket.move(tmp);
 	}
 

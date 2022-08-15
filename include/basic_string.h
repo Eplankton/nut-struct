@@ -255,12 +255,7 @@ namespace nuts
 		this->v_size = ilist.size();
 		this->v_capacity = this->v_size + STD_EXPAN;
 		this->data_ptr = new T[v_size + STD_EXPAN];
-		T* q = this->data_ptr;
-		for (auto p = ilist.begin(); p != ilist.end(); ++p)
-		{
-			*q = *p;
-			q++;
-		}
+		for (const T& x: ilist) push_back(x);
 		_POP_EXC_0();
 	}
 
@@ -430,12 +425,7 @@ namespace nuts
 		this->v_size = ilist.size();
 		this->v_capacity = this->v_size + STD_EXPAN;
 		this->data_ptr = new T[v_size + STD_EXPAN];
-		T* p = this->data_ptr;
-		for (auto q = ilist.begin(); q != ilist.end(); ++q)
-		{
-			*p = *q;
-			p++;
-		}
+		for (const T& x: ilist) push_back(x);
 		return *this;
 	}
 
