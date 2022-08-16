@@ -1,3 +1,4 @@
+#include "array.h"
 #include "bits.h"
 #include "timer.h"
 
@@ -24,8 +25,12 @@ int main()
 	deque<string> s {"human", "dog", "cat", "cow",
 	                 "sheep", "monkey", "turtle",
 	                 "elephant"};
-	// reverse(s.begin(), s.end());
+	
+    // reverse(s.begin(), s.end());
 	// s.print_detail();
 	
+    array<i32, 5> v {1, 2, 3, 4, 5};
+    v.print();
+
 	return 0;
 }

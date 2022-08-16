@@ -158,7 +158,7 @@ namespace nuts
 		deque(const std::initializer_list<T>& ilist);
 
 		deque(const deque<T, Buf>& src);
-		deque(deque<T, Buf>&& src) { this->move(src); }
+		deque(deque<T, Buf>&& src) { move(src); }
 
 		~deque() { clear(); }
 
@@ -218,14 +218,13 @@ namespace nuts
 	template <class T, u64 Buf>
 	deque<T, Buf>::deque(const std::initializer_list<T>& ilist)
 	{
-		for (const auto& x: ilist) this->push_back(x);
+		for (const auto& x: ilist) push_back(x);
 	}
 
 	template <class T, u64 Buf>
 	deque<T, Buf>::deque(const deque<T, Buf>& src)
 	{
-		for_each(src.begin(), src.end(),
-		         [this](const auto& x) { this->push_back(x); });
+		for_each(src, [this](const auto& x) { this->push_back(x); });
 	}
 
 	template <typename T, u64 Buf>
@@ -245,9 +244,8 @@ namespace nuts
 	template <class T, u64 Buf>
 	deque<T, Buf>& deque<T, Buf>::operator=(const deque<T, Buf>& src)
 	{
-		this->clear();
-		for_each(src.begin(), src.end(),
-		         [this](const auto& x) { this->push_back(x); });
+		clear();
+		for_each(src, [this](const auto& x) { this->push_back(x); });
 		return *this;
 	}
 

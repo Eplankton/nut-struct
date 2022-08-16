@@ -8,26 +8,35 @@
 namespace nuts
 {
 	template <typename T>
-	concept Container = requires(T x)
+	concept Iterable = requires(T x)
 	{
 		typename T::value_type;
-
-		x.size();
-
-		x.front();
-		x.back();
-
+		typename T::iterator;
 		x.begin();
 		x.end();
+	};
 
+	template <typename T>
+	concept Container = Iterable<T> &&
+	        requires(T x)
+	{
+		x.size();
 		x.clear();
 		x.empty();
+		x.front();
+		x.back();
 	};
 
 	template <typename T>
 	concept Display = requires(T x)
 	{
-		std::cout << x;
+		requires requires
+		{
+			std::cout << x;
+		} || requires
+		{
+			x.print();
+		};
 	};
 
 	template <typename T>
@@ -49,13 +58,13 @@ namespace nuts
 	};
 
 	template <typename T>
-	concept Divide = requires(T a, T b)
+	concept Div = requires(T a, T b)
 	{
 		a / b;
 	};
 
 	template <typename T>
-	concept Arithmetic = Add<T> && Minus<T> && Multi<T> && Divide<T>;
+	concept Arithmetic = Add<T> && Minus<T> && Multi<T> && Div<T>;
 }
 
 #endif

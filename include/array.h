@@ -3,6 +3,7 @@
 
 #include "iterator.h"
 #include "type.h"
+#include "range.h"
 #include <iostream>
 #include <cassert>
 #include <initializer_list>
@@ -29,8 +30,8 @@ namespace nuts
 
 		void fill(const T& _val);
 		pointer data() const { return const_cast<pointer>(data_ptr); }
-		u64 size() const { return N; }
-		u64 empty() const { return size() == 0; }
+		constexpr u64 size() const { return N; }
+		constexpr bool empty() const { return size() == 0; }
 		
 		T& front() { return data_ptr[0]; }
 		T& back() { return data_ptr[this->size() - 1]; }

@@ -2,8 +2,8 @@
 #define _NUTS_MATRIX_ 1
 
 #include "array.h"
+#include "algorithm.h"
 #include "concept.h"
-#include "type.h"
 
 namespace nuts
 {
@@ -16,10 +16,11 @@ namespace nuts
 	{
 	public:
 		using value_type = T;
-		using self_type = matrix<T, Row, Col>;
+        using self_type = matrix<T, Row, Col>;
+        using base_type = array<array<T, Col>, Row>;
 
 	protected:
-		array<array<T, Col>, Row> m;
+		base_type m;
 
 	public:
 		matrix() = default;
@@ -29,8 +30,8 @@ namespace nuts
 		matrix(const std::initializer_list<T>& ilist);
 		~matrix() = default;
 
-		u64 row() const { return Row; }
-		u64 col() const { return Col; }
+		constexpr u64 row() const { return Row; }
+		constexpr u64 col() const { return Col; }
 		void print() const;
 
 		array<T, Col>& operator[](u64 _r) { return m[_r]; }
@@ -150,11 +151,11 @@ namespace nuts
 		auto row_array_print = [](const auto& r) {
 			auto trav_in_col = [&r](const auto& c) {
 				std::cout << c;
-				if (&c != &r.back())
+		    	if (&c != &r.back())
 					printf(", ");
 			};
 			printf("[");
-			nuts::for_each(r, trav_in_col);
+			for_each(r, trav_in_col);
 			printf("]\n");
 		};
 

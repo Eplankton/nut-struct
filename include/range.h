@@ -2,6 +2,7 @@
 #define _NUTS_RANGE_ 1
 
 #include "type.h"
+#include "iterator.h"
 
 namespace nuts
 {
