@@ -3,7 +3,10 @@
 
 #include "iterator.h"
 #include "type.h"
+#include <iostream>
 #include <cassert>
+#include <initializer_list>
+#include <algorithm>
 
 namespace nuts
 {
@@ -28,14 +31,18 @@ namespace nuts
 		pointer data() const { return const_cast<pointer>(data_ptr); }
 		u64 size() const { return N; }
 		u64 empty() const { return size() == 0; }
+		
 		T& front() { return data_ptr[0]; }
 		T& back() { return data_ptr[this->size() - 1]; }
+		
 		const T& front() const { return data_ptr[0]; }
 		const T& back() const { return data_ptr[this->size() - 1]; }
+		
 		T& operator[](u64 _n) { return data_ptr[_n]; }
 		const T& operator[](u64 _n) const { return data_ptr[_n]; }
 		T& at(u64 _n);
 		const T& at(u64 _n) const;
+		
 		void print() const;
 
 		class iterator
@@ -135,8 +142,7 @@ namespace nuts
 	array<T, N>::array(const std::initializer_list<T>& ilist)
 	{
 		auto st = ilist.begin();
-		for (u64 i: range(0, size()))
-			data_ptr[i] = *(st++);
+		for (u64 i: range(0, size())) data_ptr[i] = *(st++);
 	}
 
 	template <typename T, u64 N>
@@ -167,7 +173,7 @@ namespace nuts
 			if (&x != &this->back())
 				printf(", ");
 		};
-		printf("\narray @%#llx = [", (u64) this->data());
+		printf("\narray @%#llx = [", (u64) data());
 		if (!empty())
 			for_each(begin(), end(), print);
 		printf("]\n");

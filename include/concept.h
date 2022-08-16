@@ -3,6 +3,8 @@
 
 // Only for version after C++20
 
+#include <iostream>
+
 namespace nuts
 {
 	template <typename T>
@@ -17,7 +19,7 @@ namespace nuts
 
 		x.begin();
 		x.end();
-		
+
 		x.clear();
 		x.empty();
 	};

@@ -1,9 +1,8 @@
 #ifndef _NUTS_MAP_
 #define _NUTS_MAP_ 1
 
-#include "functional.h"
-#include "set.h"
 #include "type.h"
+#include "set.h"
 #include "utility.h"
 #include <cassert>
 
@@ -26,16 +25,14 @@ namespace nuts
 	{
 	public:
 		using value_type = Key;
-		using itr_type = typename AVL<pair<Key, Val>,
-		                              Compare>::iterator;
-
+		using itr_type = typename AVL<pair<Key, Val>, Compare>::iterator;
 		using base_type = set<pair<Key, Val>, Compare>;
 
 	public:
 		map() = default;
 		map(const map<Key, Val, Compare>& src)
 		{
-			for_each(*this,    [this](const auto& x) { this->insert(x); });
+			for_each(*this, [this](const auto& x) { this->insert(x); });
 		}
 
 		map(map<Key, Val, Compare>&& src) { base_type::move(src); }
@@ -74,10 +71,8 @@ namespace nuts
 			return base_type::find(tmp);
 		}
 
-		bool contains(const Key& _k) const
-		{
-			return this->find(_k) != this->npos;
-		}
+		bool contains(const Key& _k)
+		        const { return this->find(_k) != this->npos; }
 
 		Val& at(const Key& _k)
 		{
@@ -92,7 +87,6 @@ namespace nuts
 			assert(loc != this->npos);
 			return loc->second;
 		}
-
 
 		Val& operator[](const Key& _k)
 		{

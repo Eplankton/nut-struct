@@ -3,8 +3,8 @@
 
 #include "concept.h"
 #include "deque.h"
-#include "type.h"
 #include "vector.h"
+
 
 /** @file stack
      * push() vector as same as deque 
@@ -64,14 +64,14 @@ namespace nuts
 	template <class T, Stack_Base base>
 	stack<T, base>::stack(const std::initializer_list<T>& ilist)
 	{
-		base copy{ilist};
-		this->_Base.move(copy);
+		base copy {ilist};
+		_Base.move(copy);
 	}
 
 	template <class T, Stack_Base base>
 	stack<T, base>& stack<T, base>::operator=(const stack<T, base>& obj)
 	{
-		this->clear();
+		clear();
 		_Base = obj._Base;
 		return *this;
 	}
@@ -79,7 +79,7 @@ namespace nuts
 	template <class T, Stack_Base base>
 	stack<T, base>& stack<T, base>::move(stack<T, base>& obj)
 	{
-		this->clear();
+		clear();
 		_Base.move(obj._Base);
 		return *this;
 	}

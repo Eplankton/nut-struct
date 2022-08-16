@@ -4,10 +4,6 @@
 #include <iostream>
 #include <cmath>
 
-using std::cin;
-using std::cout;
-using std::endl;
-
 #include "type.h"
 #include "utility.h"
 #include "memory.h"

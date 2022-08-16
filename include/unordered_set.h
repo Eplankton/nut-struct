@@ -127,9 +127,9 @@ namespace nuts
 
 		unordered_set();
 		unordered_set(const self_type& src);
-		unordered_set(self_type&& src) { this->move(src); }
+		unordered_set(self_type&& src) { move(src); }
 		unordered_set(const std::initializer_list<Key>& ilist);
-		~unordered_set() { this->clear(); }
+		~unordered_set() { clear(); }
 
 		Key& front() { return *begin(); }
 		Key& back() { return *end(); }
@@ -137,18 +137,18 @@ namespace nuts
 		const Key& back() const { return *end(); }
 
 		u64 size() const { return _size; }
-		bool empty() const { return _size == 0; }
-		void rehash();
+		bool empty() const { return _size == 0; };
 		self_type& move(self_type& src);
 
 		iterator find(const Key& _k) const;
 		bool contains(const Key& _k) const;
 		void insert(const Key& _k);
 		bool erase(const Key& _k);
+		void rehash();
 		void clear();
 
 		self_type& operator=(const self_type& src);
-		self_type& operator=(self_type&& src) { return this->move(src); }
+		self_type& operator=(self_type&& src) { return move(src); }
 
 		void print() const;
 		void print_as_table() const;
@@ -165,16 +165,16 @@ namespace nuts
 	unordered_set<Key, Hasher>::unordered_set()
 	{
 		vector<bucket_type> tmp(*bucket_size);
-		this->bucket.move(tmp);
+		bucket.move(tmp);
 	}
 
 	template <class Key, class Hasher>
 	unordered_set<Key, Hasher>::
 	        unordered_set(const self_type& src)
 	{
-		this->bucket_size = src.bucket_size;
-		this->bucket = src.bucket;
-		this->_size = src._size;
+		bucket_size = src.bucket_size;
+		bucket = src.bucket;
+		_size = src._size;
 	}
 
 	template <class Key, class Hasher>
@@ -185,8 +185,8 @@ namespace nuts
 			bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
 		tmp.shrink_to_fit();
-		this->bucket.move(tmp);
-		for (const auto& x: ilist) this->insert(x);
+		bucket.move(tmp);
+		for (const auto& x: ilist) insert(x);
 	}
 
 	template <class Key, class Hasher>
@@ -267,7 +267,7 @@ namespace nuts
 	template <class Key, class Hasher>
 	void unordered_set<Key, Hasher>::clear()
 	{
-		if (!this->empty())
+		if (!empty())
 		{
 			for_each(bucket, [](bucket_type& x) { x.clear(); });
 			_size = 0;

@@ -5,6 +5,7 @@
 #include "functional.h"
 #include "iterator.h"
 #include "memory.h"
+#include "queue.h"
 #include "type.h"
 #include <cassert>
 
@@ -86,8 +87,8 @@ namespace nuts
 		{
 		public:
 			using value_type = T;
-			using tree_node = nuts::binary_tree_node<T>;
-			using node_ptr = nuts::unique_ptr<tree_node>;
+			using tree_node = binary_tree_node<T>;
+			using node_ptr = unique_ptr<tree_node>;
 			using node_raw_ptr = binary_tree_node<T>*;
 
 		protected:
@@ -186,7 +187,7 @@ namespace nuts
 			        const { return _ptr == other._ptr; }
 
 			bool operator!=(const iterator& other)
-			        const { return this->_ptr != other._ptr; }
+			        const { return _ptr != other._ptr; }
 		};
 
 		using itr_type = typename binary_tree<T, Compare>::iterator;
@@ -194,19 +195,19 @@ namespace nuts
 		binary_tree() : root(nullptr), _size(0) {}
 		binary_tree(const std::initializer_list<T>& ilist);
 		binary_tree(const binary_tree<T, Compare>& src);
-		binary_tree(binary_tree<T, Compare>&& src) { this->move(src); }
+		binary_tree(binary_tree<T, Compare>&& src) { move(src); }
 		~binary_tree();
 
 		iterator begin() const
 		{
-			if (this->empty()) return npos;
+			if (empty()) return npos;
 			else
 				return iterator {min(root)};
 		}
 
 		iterator end() const
 		{
-			if (this->empty()) return npos;
+			if (empty()) return npos;
 			else
 				return iterator {max(root)};
 		}
@@ -226,13 +227,13 @@ namespace nuts
 		auto erase_ret_pos(const T& _val) -> iterator;
 
 		auto find(const T& _val) const -> iterator;
-		bool contains(const T& _val) const { return find(_val) != this->npos; };
+		bool contains(const T& _val) const { return find(_val) != npos; };
 		auto lower_bound(const T& _val) const -> iterator;
 		auto upper_bound(const T& _val) const -> iterator;
 
 		binary_tree<T, Compare>& move(binary_tree<T, Compare>& src);
 		binary_tree<T, Compare>& operator=(const binary_tree<T, Compare>& src);
-		binary_tree<T, Compare>& operator=(binary_tree<T, Compare>&& src) { return this->move(src); }
+		binary_tree<T, Compare>& operator=(binary_tree<T, Compare>&& src) { return move(src); }
 
 		void print_as_tree() const;
 		void clear();
@@ -283,16 +284,16 @@ namespace nuts
 	binary_tree<T, Compare>::binary_tree(const binary_tree<T, Compare>& src)
 	{
 		for_each(src.begin(), src.end(),
-		         [this](const auto& x) { this->insert(x); });
+		         [this](const auto& x) { insert(x); });
 	}
 
 	template <typename T, class Compare>
 	binary_tree<T, Compare>&
 	binary_tree<T, Compare>::move(binary_tree<T, Compare>& src)
 	{
-		this->clear();
-		this->root = src.root;
-		this->_size = src._size;
+		clear();
+		root = src.root;
+		_size = src._size;
 		src.root = nullptr;
 		src._size = 0;
 		return *this;
@@ -302,9 +303,9 @@ namespace nuts
 	binary_tree<T, Compare>&
 	binary_tree<T, Compare>::operator=(const binary_tree<T, Compare>& src)
 	{
-		this->clear();
+		clear();
 		binary_tree<T, Compare> copy = src;
-		this->move(copy);
+		move(copy);
 		return *this;
 	}
 
@@ -323,13 +324,13 @@ namespace nuts
 	template <typename T, class Compare>
 	binary_tree<T, Compare>::binary_tree(const std::initializer_list<T>& ilist)
 	{
-		for (const auto& x: ilist) this->insert(x);
+		for (const auto& x: ilist) insert(x);
 	}
 
 	template <typename T, class Compare>
 	inline binary_tree<T, Compare>::~binary_tree()
 	{
-		this->clear();
+		clear();
 	}
 
 	template <typename T, class Compare>
@@ -513,7 +514,7 @@ namespace nuts
 			else if (cmp(child->data, _val))
 				child = child->rc.get();
 			else// if value already exist, then just return
-				return this->npos;
+				return npos;
 		}
 
 		if (cmp(_val, parent->data))
@@ -545,7 +546,7 @@ namespace nuts
 	        -> itr_type
 	{
 		auto tmp = find(_val);
-		if (tmp == this->npos) return npos;
+		if (tmp == npos) return npos;
 		iterator res {tmp.get()->prev.get()};
 		node_raw_ptr target = tmp.get();
 		if (target->lc == nullptr && target->rc == nullptr)
@@ -566,8 +567,8 @@ namespace nuts
 			}
 			else
 			{
-				Delete_X.move(this->root);
-				this->root = nullptr;
+				Delete_X.move(root);
+				root = nullptr;
 			}
 			--_size;
 			return res;
@@ -658,7 +659,6 @@ namespace nuts
 		void single_rotate_right(node_ptr& ptr);
 		void double_rotate_left(node_ptr& ptr);
 		void double_rotate_right(node_ptr& ptr);
-		// void update_all();
 		void update_upon(const node_ptr& ptr);
 		void balance(node_ptr& ptr);
 
@@ -902,7 +902,7 @@ namespace nuts
 		if (st != nullptr)
 		{
 			std::cout << prefix;
-			if (st == this->root.get())
+			if (st == root.get())
 				printf("\n└── ");
 			else
 				printf("%s", (isLeft ? "├── " : "└── "));
@@ -918,8 +918,8 @@ namespace nuts
 	void binary_tree<T, Compare>::print_as_tree() const
 	{
 		printf("\nbinary_tree @%#llx:", (u64) this->root.get());
-		if (this->root != nullptr)
-			printBT("", this->root, false);
+		if (root != nullptr)
+			printBT("", root, false);
 		else
 			printf("\n└── ∧\n");
 	}
@@ -930,9 +930,9 @@ namespace nuts
 		if (st != npos)
 		{
 			std::cout << std::endl;
-			node_ptr k = st.get();
-			printBT("", k, false);
-			k = nullptr;
+			node_ptr tmp = st.get();
+			printBT("", tmp, false);
+			tmp = nullptr;
 		}
 		else
 			printf("\n└── ∧\n");

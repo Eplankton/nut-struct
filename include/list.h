@@ -232,42 +232,40 @@ namespace nuts
 	template <class T>
 	list<T>::list(const T& userInputData, u64 userInputlength)
 	{
-		this->push_back(userInputData, userInputlength);// better way
+		push_back(userInputData, userInputlength);// better way
 	}
 
 	template <class T>
 	template <typename Itr>
 	list<T>::list(Itr st, Itr ed)
 	{
-		this->assign(st, ed);
+		assign(st, ed);
 	}
 
 	template <class T>
 	list<T>::list(const list<T>& obj)
 	{
-		if (!this->empty())
-			this->operator=(obj);
+		if (!empty()) this->operator=(obj);
 	}
 
 	template <class T>
 	list<T>::list(const std::initializer_list<T>& ilist)
 	{
-		for (const auto& x: ilist) this->push_back(x);
+		for (const auto& x: ilist) push_back(x);
 	}
 
 	template <class T>
 	list<T>& list<T>::operator=(const list<T>& obj)
 	{
-		if (!this->empty())
-			this->clear();
-		this->assign(obj.begin(), obj.end());
+		if (!empty()) clear();
+		assign(obj.begin(), obj.end());
 		return *this;
 	}
 
 	template <class T>
 	list<T>& list<T>::erase(ListNode<T>* start_node, u64 N_far)
 	{
-		assert(N_far < this->size() && !this->empty());
+		assert(N_far < size() && !empty());
 		i64 i = 0;
 		for (auto p = start_node; p != nullptr; p = p->next)
 		{
@@ -333,7 +331,7 @@ namespace nuts
 			safe = p + 1;
 			if (fn(*p))
 			{
-				this->erase(p);
+				erase(p);
 				p = safe;
 			}
 			else
@@ -344,11 +342,11 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::clear()
 	{
-		if (!this->empty())
+		if (!empty())
 		{
 			for (i64 i: range(size() - 1, -1, -1))
 				erase(head, i);
-			head = nullptr, tail = nullptr;
+			head = tail = nullptr;
 		}
 		return *this;
 	}
@@ -356,7 +354,7 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::emplace_back()
 	{
-		if (!this->empty())
+		if (!empty())
 		{
 			auto p = tail;
 			p->next = new ListNode<T>;
@@ -382,7 +380,7 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::push_back(const T& obj, u64 num)
 	{
-		if (!this->empty())
+		if (!empty())
 		{
 			auto p = tail;
 			for (int i = 0; i < num; i++)
@@ -417,7 +415,7 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::emplace_front()
 	{
-		if (!this->empty())
+		if (!empty())
 		{
 			auto tmp = head;
 			head = new ListNode<T>;
@@ -438,7 +436,7 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::push_front(const T& obj, u64 num)
 	{
-		if (!this->empty())
+		if (!empty())
 		{
 			auto tmp = head;
 			head = new ListNode<T>(obj);
@@ -477,14 +475,14 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::pop_back()
 	{
-		this->erase(tail);
+		erase(tail);
 		return *this;
 	}
 
 	template <class T>
 	list<T>& list<T>::pop_front()
 	{
-		this->erase(head);
+		erase(head);
 		return *this;
 	}
 
@@ -493,10 +491,10 @@ namespace nuts
 	{
 		if (!after.empty())
 		{
-			if (!this->empty())
+			if (!empty())
 			{
 				// Pass ownership.
-				length = this->size() + after.size();
+				length = size() + after.size();
 				tail->next = after.head;
 				after.head->prev = tail;
 				tail = after.tail;
@@ -526,10 +524,9 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::move(list<T>& src)
 	{
-		if (!this->empty())// Pass ownership.
-			this->clear();
+		if (!empty()) clear();
 
-		length = src.length;// Release the ownership of after.
+		length = src.length;
 		head = src.head;
 		tail = src.tail;
 
@@ -568,7 +565,7 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::insert(const iterator& pos, const T& obj, u64 num)
 	{
-		this->insert(pos.get(), obj, num);
+		insert(pos.get(), obj, num);
 		return *this;
 	}
 

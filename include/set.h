@@ -2,9 +2,6 @@
 #define _NUTS_SET_ 1
 
 #include "binary_tree.h"
-#include "concept.h"
-#include "functional.h"
-#include "type.h"
 
 namespace nuts
 {

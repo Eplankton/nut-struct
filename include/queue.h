@@ -4,7 +4,6 @@
 #include "concept.h"
 #include "deque.h"
 #include "list.h"
-#include "type.h"
 
 /** @file queue
      * push() list as same as deque 
@@ -32,7 +31,7 @@ namespace nuts
 		queue() = default;
 		queue(const std::initializer_list<T>& ilist);
 		queue(const queue<T, base>& src) { _Base = src._Base; }
-		queue(queue<T, base>&& src) { this->move(src); }
+		queue(queue<T, base>&& src) { move(src); }
 		~queue() = default;
 
 		queue<T, base>& push(const T& obj);
@@ -46,7 +45,7 @@ namespace nuts
 		const T& front() const { return _Base.front(); }
 		const T& back() const { return _Base.back(); }
 		queue<T, base>& operator=(const queue<T, base>& obj);
-		queue<T, base>& operator=(queue<T, base>&& src) { return this->move(src); }
+		queue<T, base>& operator=(queue<T, base>&& src) { return move(src); }
 		queue<T, base>& move(queue<T, base>& src);
 
 		itr_type begin() const;
@@ -62,7 +61,7 @@ namespace nuts
 	queue<T, base>::queue(const std::initializer_list<T>& ilist)
 	{
 		base copy{ilist};
-		this->_Base.move(copy);
+		_Base.move(copy);
 	}
 
 	template <class T, Queue_Base base>
@@ -102,7 +101,7 @@ namespace nuts
 	template <class T, Queue_Base base>
 	queue<T, base>& queue<T, base>::operator=(const queue<T, base>& obj)
 	{
-		this->clear();
+		clear();
 		_Base = obj._Base;
 		return *this;
 	}
@@ -110,7 +109,7 @@ namespace nuts
 	template <class T, Queue_Base base>
 	queue<T, base>& queue<T, base>::move(queue<T, base>& src)
 	{
-		this->clear();
+		clear();
 		_Base.move(src._Base);
 		return *this;
 	}

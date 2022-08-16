@@ -61,8 +61,8 @@ namespace nuts
 			}
 		}
 
-		template <class Helper>
-		auto handle(Helper fn)
+		template <class Func>
+		auto handle(Func fn)
 		{
 			return fn();
 		}
@@ -82,7 +82,6 @@ namespace nuts
 		auto tmp = hr(some);
 		return {some, tmp.first, tmp.second};
 	}
-
 
 	// How-to-use?
 	// auto detect_scheme = [&m](const auto& it) {

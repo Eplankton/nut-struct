@@ -1,6 +1,8 @@
 #ifndef _NUTS_ITER_
 #define _NUTS_ITER_ 1
 
+#include "type.h"
+
 namespace nuts
 {
 	struct forward_iterator_tag

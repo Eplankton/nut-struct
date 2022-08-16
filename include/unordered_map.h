@@ -38,7 +38,7 @@ namespace nuts
 		bool erase(const Key& _k);
 
 		self_type& operator=(const self_type& src);
-		self_type& operator=(self_type&& src) { return this->move(src); }
+		self_type& operator=(self_type&& src) { return move(src); }
 	};
 
 	template <class Key, class Val, class Hasher>

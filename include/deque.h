@@ -6,7 +6,7 @@
 #include "list.h"
 #include "type.h"
 
-#define DEQUE_BUF_SIZE 16
+#define DEQUE_BUF_SIZE 8
 
 namespace nuts
 {
@@ -30,6 +30,7 @@ namespace nuts
 		{
 		public:
 			using value_type = T;
+			using pointer = T*;
 			using out_itr = typename map_type::iterator;
 
 		protected:
@@ -43,14 +44,9 @@ namespace nuts
 			         const_pointer& e, const out_itr& i)
 			    : cur(const_cast<pointer>(c)), st(const_cast<pointer>(s)),
 			      ed(const_cast<pointer>(e)), itr(i) {}
-			iterator(pointer& c, pointer& s,
-			         pointer& e, const out_itr& i)
-			    : cur(c), st(s),
-			      ed(e), itr(i) {}
 
 			iterator(const iterator& src)
-			    : cur(src.cur), st(src.st),
-			      ed(src.ed), itr(src.itr) {}
+			    : cur(src.cur), st(src.st), ed(src.ed), itr(src.itr) {}
 
 			pointer get() const { return cur; }
 			pointer operator->() const { return cur; }
@@ -70,8 +66,7 @@ namespace nuts
 				if (cur == ed)
 				{
 					++itr;
-					st = &itr->front();
-					ed = &itr->back();
+					st = &itr->front(), ed = &itr->back();
 					cur = st;
 					return *this;
 				}
@@ -98,8 +93,7 @@ namespace nuts
 				if (cur == st)
 				{
 					--itr;
-					st = &itr->front();
-					ed = &itr->back();
+					st = &itr->front(), ed = &itr->back();
 					cur = ed;
 					return *this;
 				}
@@ -507,8 +501,7 @@ namespace nuts
 			         [&arr, this](const T& x) { 
 						if (&x == this->begin().get() ||
 							&x == this->end().get())
-							 printf("*");
-								std::cout << x; 
+							 printf("*"); std::cout << x; 
                         if (&x != &arr.back()) printf(", "); });
 			printf("]\n");
 		};
