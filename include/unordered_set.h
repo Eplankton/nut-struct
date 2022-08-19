@@ -158,6 +158,8 @@ namespace nuts
 		u64 _size = 0;
 		vector<bucket_type> bucket;
 		constexpr static const Hasher hash_fn {};
+
+	public:
 		constexpr static const iterator npos {};
 	};
 

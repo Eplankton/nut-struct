@@ -1,13 +1,14 @@
 #ifndef _NUTS_ARRAY_
 #define _NUTS_ARRAY_ 1
 
-#include "iterator.h"
-#include "type.h"
-#include "range.h"
-#include <iostream>
 #include <cassert>
 #include <initializer_list>
-#include <algorithm>
+#include <iostream>
+
+#include "algorithm.h"
+#include "iterator.h"
+#include "range.h"
+#include "type.h"
 
 namespace nuts
 {
@@ -32,18 +33,18 @@ namespace nuts
 		pointer data() const { return const_cast<pointer>(data_ptr); }
 		constexpr u64 size() const { return N; }
 		constexpr bool empty() const { return size() == 0; }
-		
+
 		T& front() { return data_ptr[0]; }
 		T& back() { return data_ptr[this->size() - 1]; }
-		
+
 		const T& front() const { return data_ptr[0]; }
 		const T& back() const { return data_ptr[this->size() - 1]; }
-		
+
 		T& operator[](u64 _n) { return data_ptr[_n]; }
 		const T& operator[](u64 _n) const { return data_ptr[_n]; }
 		T& at(u64 _n);
 		const T& at(u64 _n) const;
-		
+
 		void print() const;
 
 		class iterator
@@ -136,7 +137,7 @@ namespace nuts
 	template <typename T, u64 N>
 	array<T, N>::array(const T& val)
 	{
-		std::fill_n(data_ptr, size(), val);
+		nuts::fill_n(data_ptr, N, val);
 	}
 
 	template <typename T, u64 N>
@@ -163,7 +164,7 @@ namespace nuts
 	template <typename T, u64 N>
 	void array<T, N>::fill(const T& _val)
 	{
-		return std::fill_n(data_ptr, N, _val);
+		nuts::fill_n(data_ptr, N, _val);
 	}
 
 	template <typename T, u64 N>
@@ -174,9 +175,9 @@ namespace nuts
 			if (&x != &this->back())
 				printf(", ");
 		};
+
 		printf("\narray @%#llx = [", (u64) data());
-		if (!empty())
-			for_each(begin(), end(), print);
+		if (!empty()) for_each(begin(), end(), print);
 		printf("]\n");
 	}
 }

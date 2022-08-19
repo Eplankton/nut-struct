@@ -29,7 +29,6 @@ namespace nuts
 
 	struct bidirectional_iterator
 	    : public forward_iterator
-
 	{
 		using Category = bidirectional_iterator_tag;
 	};
@@ -83,9 +82,22 @@ namespace nuts
 		return itr_type();
 	}
 
+	// template <typename Itr>
+	// concept OutputItr = requires(Itr it)
+	// {
+	// 	typename Itr::value_type;
+	// };
+	
+	// template <typename Itr>
+	// concept InputItr = requires(Itr it)
+	// {
+	// 	typename Itr::value_type;
+	// };
+
 	template <typename Itr>
 	concept Forward_Itr = requires(Itr it)
 	{
+		typename Itr::value_type;
 		*it;
 		++it;
 	};
@@ -102,6 +114,18 @@ namespace nuts
 	        Bidirectional_Itr<Itr> && requires(Itr it, u64 n)
 	{
 		it[n];
+	};
+
+	template <typename P>
+	concept NonVoidPointer = requires(P x, P y, i64 n)
+	{
+		requires requires { !Forward_Itr<P>; };
+		++x;
+		--x;
+		x + n;
+		x - n;
+		x - y;
+		*x;
 	};
 }
 

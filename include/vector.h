@@ -179,7 +179,7 @@ namespace nuts
 	vector<T>::vector(u64 userInputSize, const T& userInputData)
 	{
 		data_ptr = new T[userInputSize + STD_CAPACITY];
-		std::fill_n(data_ptr, userInputSize, userInputData);
+		nuts::fill_n(data_ptr, userInputSize, userInputData);
 		v_size = userInputSize;
 		v_capacity = v_size + STD_CAPACITY;
 	}

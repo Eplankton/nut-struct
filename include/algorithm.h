@@ -201,6 +201,30 @@ namespace nuts
 		return binary_search(arr.begin(), arr.end(), val);
 	}
 
+	template <typename Itr>
+	Itr fill_n(Itr st, u64 n, const typename Itr::value_type& val)
+	{
+		auto res = st;
+		while (n--)
+		{
+			*st = val;
+			++st;
+		}
+		return res;
+	}
+
+	template <typename T>
+	T* fill_n(T* st, u64 n, const T& val)
+	{
+		auto res = st;
+		while (n--)
+		{
+			*st = val;
+			++st;
+		}
+		return res;
+	}
+
 	// template <typename Itr>
 	// // General itr version -> O(N^2)
 	// void insertion_sort(Itr st, Itr ed)

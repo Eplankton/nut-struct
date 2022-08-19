@@ -255,6 +255,8 @@ namespace nuts
 		node_ptr root = nullptr;
 		u64 _size = 0;
 		constexpr static const Compare cmp {};
+
+	public:
 		static itr_type npos;
 	};
 
@@ -265,9 +267,9 @@ namespace nuts
 	template <typename T, class Compare>
 	binary_tree_node<T>* binary_tree<T, Compare>::min(const node_ptr& st)
 	{
-		auto res = st.get();
+		auto res = get_raw(st);
 		while (res != nullptr && res->lc != nullptr)
-			res = (res->lc).get();
+			res = get_raw(res->lc);
 		return res;
 	}
 
@@ -283,8 +285,7 @@ namespace nuts
 	template <typename T, class Compare>
 	binary_tree<T, Compare>::binary_tree(const binary_tree<T, Compare>& src)
 	{
-		for_each(src.begin(), src.end(),
-		         [this](const auto& x) { insert(x); });
+		for_each(src, [this](const auto& x) { insert(x); });
 	}
 
 	template <typename T, class Compare>
@@ -552,7 +553,7 @@ namespace nuts
 		if (target->lc == nullptr && target->rc == nullptr)
 		{
 			node_ptr Delete_X;
-			if (target->prev.get() != nullptr)
+			if (target->prev != nullptr)
 			{
 				if (target == target->prev->lc.get())
 				{
@@ -575,7 +576,7 @@ namespace nuts
 		}
 		if (target->lc != nullptr && target->rc == nullptr)
 		{
-			target->lc.get()->prev = target;
+			target->lc->prev = target;
 			node_raw_ptr L_MAX = max(target->lc);
 			node_ptr rec;
 			rec.move(L_MAX->lc);
@@ -589,7 +590,7 @@ namespace nuts
 			if (rec != nullptr)
 			{
 				target->lc.move(rec);
-				target->lc.get()->prev = target;
+				target->lc->prev = target;
 			}
 			rec = nullptr;
 			--_size;
@@ -597,7 +598,7 @@ namespace nuts
 		}
 		if (target->lc == nullptr && target->rc != nullptr)
 		{
-			target->rc.get()->prev = target;
+			target->rc->prev = target;
 			node_raw_ptr R_MIN = min(target->rc);
 			node_ptr rec;
 			rec.move(R_MIN->rc);
@@ -611,7 +612,7 @@ namespace nuts
 			if (rec != nullptr)
 			{
 				target->rc.move(rec);
-				target->rc.get()->prev = target;
+				target->rc->prev = target;
 			}
 			rec = nullptr;
 			--_size;
@@ -619,8 +620,8 @@ namespace nuts
 		}
 		if (target->lc != nullptr && target->rc != nullptr)
 		{
-			target->lc.get()->prev = target;
-			target->rc.get()->prev = target;
+			target->lc->prev = target;
+			target->rc->prev = target;
 			node_raw_ptr L_MAX = max(target->lc);
 			node_ptr rec;
 			rec.move(L_MAX->lc);
@@ -634,7 +635,7 @@ namespace nuts
 			if (rec != nullptr)
 			{
 				target->lc.move(rec);
-				target->lc.get()->prev = target;
+				target->lc->prev = target;
 			}
 			rec = nullptr;
 			--_size;
@@ -664,12 +665,9 @@ namespace nuts
 
 	public:
 		AVL() { this->root = nullptr, this->_size = 0; }
-
 		AVL(const std::initializer_list<T>& ilist);
-
 		AVL(const AVL<T, Compare>& src);
 		AVL(AVL<T, Compare>&& src) { BST<T, Compare>::move(src); }
-
 		~AVL() { this->_size = 0; }
 
 		bool insert(const T& _val);
@@ -684,21 +682,20 @@ namespace nuts
 	template <typename T, class Compare>
 	AVL<T, Compare>::AVL(const AVL<T, Compare>& src)
 	{
-		for_each(src.begin(), src.end(),
-		         [this](const T& x) { this->insert(x); });
+		for_each(src, [this](const T& x) { this->insert(x); });
 	}
 
 	template <typename T, class Compare>
 	AVL<T, Compare>::AVL(const std::initializer_list<T>& ilist)
 	{
-		for (const auto& x: ilist) AVL<T>::insert(x);
+		for (const auto& x: ilist) insert(x);
 	}
 
 	template <typename T, class Compare>
 	AVL<T, Compare>& AVL<T, Compare>::operator=(const AVL<T, Compare>& src)
 	{
 		AVL<T, Compare> copy(src);
-		this->move(copy);
+		BST<T, Compare>::move(copy);
 		return *this;
 	}
 
@@ -729,8 +726,8 @@ namespace nuts
 		node_ptr left;
 		left.move(ptr->lc);
 		ptr->lc.move(left->rc);
-		ptr->bf = get_bf(ptr.get());
-		left->bf = get_bf(left.get());
+		ptr->bf = get_bf(ptr);
+		left->bf = get_bf(left);
 		left->rc.move(ptr);
 
 		if (left->rc->prev != nullptr)
@@ -767,8 +764,8 @@ namespace nuts
 		node_ptr right;
 		right.move(ptr->rc);
 		ptr->rc.move(right->lc);
-		ptr->bf = get_bf(ptr.get());
-		right->bf = get_bf(right.get());
+		ptr->bf = get_bf(ptr);
+		right->bf = get_bf(right);
 		right->lc.move(ptr);
 
 		if (right->lc->prev != nullptr)
@@ -816,14 +813,14 @@ namespace nuts
 	void AVL<T, Compare>::balance(node_ptr& ptr)
 	{
 		if (ptr == nullptr) return;
-		if (get_w(ptr->rc) < get_w(ptr->lc))// if (get_w(ptr->lc) >= get_w(ptr->rc) + 1)
+		if (get_w(ptr->rc) < get_w(ptr->lc))
 		{
 			if (get_w(ptr->lc->lc) >= get_w(ptr->lc->rc))
 				single_rotate_left(ptr);
 			else
 				double_rotate_left(ptr);
 		}
-		else if (get_w(ptr->lc) < get_w(ptr->rc))// else if (get_w(ptr->rc) >= get_w(ptr->lc) + 1)
+		else if (get_w(ptr->lc) < get_w(ptr->rc))
 		{
 			if (get_w(ptr->rc->rc) >= get_w(ptr->rc->lc))
 				single_rotate_right(ptr);

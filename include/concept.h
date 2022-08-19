@@ -14,6 +14,8 @@ namespace nuts
 		typename T::iterator;
 		x.begin();
 		x.end();
+		x.front();
+		x.back();
 	};
 
 	template <typename T>
@@ -23,8 +25,6 @@ namespace nuts
 		x.size();
 		x.clear();
 		x.empty();
-		x.front();
-		x.back();
 	};
 
 	template <typename T>
@@ -64,7 +64,8 @@ namespace nuts
 	};
 
 	template <typename T>
-	concept Arithmetic = Add<T> && Minus<T> && Multi<T> && Div<T>;
+	concept Arithmetic = Add<T> &&
+	        Minus<T> && Multi<T> && Div<T>;
 }
 
 #endif
