@@ -32,7 +32,7 @@ namespace nuts
 		map() = default;
 		map(const map<Key, Val, Compare>& src)
 		{
-			for_each(*this, [this](const auto& x) { this->insert(x); });
+			for_each(*this, [this](const auto& x) { insert(x); });
 		}
 
 		map(map<Key, Val, Compare>&& src) { base_type::move(src); }
@@ -125,7 +125,7 @@ namespace nuts
 	operator=(const map<Key, Val, Compare>& src)
 	{
 		base_type::clear();
-		for_each(*this, [this](const auto& x) { this->insert(x); });
+		for_each(*this, [this](const auto& x) { insert(x); });
 		return *this;
 	}
 }

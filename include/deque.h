@@ -18,7 +18,7 @@ namespace nuts
 		using pointer = T*;
 		using const_pointer = const T*;
 		using buf_type = array<T, Buf>;
-		using map_type = list<array<T, Buf>>;
+		using map_type = list<buf_type>;
 
 	private:
 		bool is_back_full() const;
@@ -156,10 +156,8 @@ namespace nuts
 
 		deque() = default;
 		deque(const std::initializer_list<T>& ilist);
-
 		deque(const deque<T, Buf>& src);
 		deque(deque<T, Buf>&& src) { move(src); }
-
 		~deque() { clear(); }
 
 		deque<T, Buf>& move(deque<T, Buf>& src)
@@ -497,8 +495,7 @@ namespace nuts
 			printf("[");
 			for_each(arr.begin(), arr.end(),
 			         [&arr, this](const T& x) { 
-						if (&x == this->begin().get() ||
-							&x == this->end().get())
+						if (&x == first || &x == last)
 							 printf("*"); std::cout << x; 
                         if (&x != &arr.back()) printf(", "); });
 			printf("]\n");

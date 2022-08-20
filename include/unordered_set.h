@@ -183,8 +183,7 @@ namespace nuts
 	unordered_set<Key, Hasher>::
 	        unordered_set(const std::initializer_list<Key>& ilist)
 	{
-		while (ilist.size() > *bucket_size)
-			bucket_size++;
+		while (ilist.size() > *bucket_size) bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
 		tmp.shrink_to_fit();
 		bucket.move(tmp);
@@ -214,6 +213,7 @@ namespace nuts
 		bucket_size = src.bucket_size;
 		_size = src._size;
 		bucket.move(src.bucket);
+		bucket_size = PRIME_LIST;
 		src._size = 0;
 		return *this;
 	}
@@ -272,6 +272,7 @@ namespace nuts
 		if (!empty())
 		{
 			for_each(bucket, [](bucket_type& x) { x.clear(); });
+			bucket_size = PRIME_LIST;
 			_size = 0;
 		}
 	}
@@ -298,8 +299,7 @@ namespace nuts
 	{
 		auto pr = [this](const auto& x) {
 			std::cout << x;
-			if (x != *this->end())
-				printf(", ");
+			if (x != *end()) printf(", ");
 		};
 
 		printf("\nhash_table @%#llx = {", (u64) bucket.data());
@@ -319,7 +319,7 @@ namespace nuts
 				collison += bucket[n].size() - 1;
 				printf("#%lld: ", n);
 				for_each(bucket[n],
-				         [](const auto& x) { std::cout << x << " ~ "; });
+				         [](const auto& x) { std::cout << x << " -> "; });
 				printf("\n");
 			}
 		}
