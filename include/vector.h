@@ -26,42 +26,6 @@ namespace nuts
 		u64 v_size = 0, v_capacity = 0;
 
 	public:
-		vector() = default;// Void constructor
-
-		explicit vector(u64 userInputSize);                        // Init by size
-		explicit vector(u64 userInputSize, const T& userInputData);// Init by size and value
-
-		vector(const vector<T>& obj);         // Copy constructor
-		vector(vector<T>&& src) { move(src); }// Move constructor
-
-		vector(const std::initializer_list<T>& ilist);// Init by a {ilist}
-
-		~vector() { destroy(); }
-
-		T* data() const { return const_cast<T*>(data_ptr); }
-		u64 size() const { return v_size; }               // Return the number of elements
-		u64 capacity() const { return v_capacity; }       // Return the current capacity
-		bool empty() const { return v_size == 0; }        // Check whether the vector is empty
-		bool exist() const { return data_ptr != nullptr; }// Check whether the vector is existed
-
-		vector<T>& shrink_to_fit();// Reduce memory usage by freeing unused memory
-		vector<T>& resize(u64 N);  // Reduce or expand capacity
-
-		void clear();  // Clear all values, but don't destroy
-		void destroy();// Clear the contents and release memory, contain exist()
-		void print() const;
-
-		vector<T>& push_back(const T& obj);// Add an element to the end
-		vector<T>& emplace_back();         // Add an element to the end
-		vector<T>& pop_back();             // Remove the last element
-		vector<T>& move(vector<T>& after); // Deprive other's ownership
-
-		T& operator[](u64 N);// Access specified element
-		const T& operator[](u64 N) const;
-
-		vector<T>& operator=(const vector<T>& obj);// Deep copy operator
-		vector<T>& operator=(vector<T>&& src) { return move(src); }
-
 		class iterator
 		    : public random_access_iterator
 		{
@@ -150,6 +114,40 @@ namespace nuts
 			friend i64
 			operator-(const iterator& a, const iterator& b) { return a.get() - b.get(); }
 		};
+
+		vector() = default;                                        // Void constructor
+		explicit vector(u64 userInputSize);                        // Init by size
+		explicit vector(u64 userInputSize, const T& userInputData);// Init by size and value
+		vector(const vector<T>& obj);                              // Copy constructor
+		vector(vector<T>&& src) { move(src); }                     // Move constructor
+		vector(const std::initializer_list<T>& ilist);             // Init by a {ilist}
+		~vector() { destroy(); }
+
+		T* data() const { return const_cast<T*>(data_ptr); }
+		u64 size() const { return v_size; }               // Return the number of elements
+		u64 capacity() const { return v_capacity; }       // Return the current capacity
+		bool empty() const { return v_size == 0; }        // Check whether the vector is empty
+		bool exist() const { return data_ptr != nullptr; }// Check whether the vector is existed
+
+		vector<T>& shrink_to_fit();// Reduce memory usage by freeing unused memory
+		vector<T>& resize(u64 N);  // Reduce or expand size
+		vector<T>& reserve(u64 N) { return (N <= v_capacity) ? *this : resize(N); }
+
+		void clear();  // Clear all values, but don't destroy
+		void destroy();// Clear the contents and release memory, contain exist()
+		void print() const;
+
+		vector<T>& push_back(const T& obj);// Add an element to the end
+		vector<T>& push_back(T&& src);
+		vector<T>& emplace_back();        // Add an element to the end
+		vector<T>& pop_back();            // Remove the last element
+		vector<T>& move(vector<T>& after);// Deprive other's ownership
+
+		T& operator[](u64 N);// Access specified element
+		const T& operator[](u64 N) const;
+
+		vector<T>& operator=(const vector<T>& obj);// Deep copy operator
+		vector<T>& operator=(vector<T>&& src) { return move(src); }
 
 		iterator begin() const { return {const_cast<T*>(data())}; }
 		iterator end() const { return {const_cast<T*>(&data_ptr[size() - 1])}; }
@@ -264,30 +262,40 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T>& vector<T>::push_back(const T& obj)
+	vector<T>& vector<T>::emplace_back()
 	{
 		if (v_capacity - v_size == 0)
 		{
 			if (v_size != 0)
-				resize(v_size * EXPAN_COEF);
+				reserve(v_size * EXPAN_COEF);
 			else
-				resize(STD_CAPACITY);
+				reserve(STD_CAPACITY);
 		}
-		data_ptr[v_size] = obj;
-		v_size++;
+		++v_size;
+		return *this;
+	}
+
+	template <class T>
+	vector<T>& vector<T>::push_back(const T& obj)
+	{
+		emplace_back();
+		data_ptr[v_size - 1] = obj;
+		return *this;
+	}
+
+	template <class T>
+	vector<T>& vector<T>::push_back(T&& src)
+	{
+		emplace_back();
+		data_ptr[v_size - 1] = static_cast<T&&>(src);
 		return *this;
 	}
 
 	template <class T>
 	vector<T>& vector<T>::pop_back()
 	{
-		if (!empty())
-		{
-			--v_size;
-			return *this;
-		}
-		else
-			return *this;
+		if (!empty()) --v_size;
+		return *this;
 	}
 
 	template <class T>

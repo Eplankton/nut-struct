@@ -35,6 +35,7 @@ namespace nuts
 		~queue() = default;
 
 		queue<T, base>& push(const T& obj);
+		queue<T, base>& push(T&& obj);
 		queue<T, base>& pop();
 		queue<T, base>& clear();
 		bool empty() const { return _Base.empty(); }
@@ -60,7 +61,7 @@ namespace nuts
 	template <class T, Queue_Base base>
 	queue<T, base>::queue(const std::initializer_list<T>& ilist)
 	{
-		base copy{ilist};
+		base copy {ilist};
 		_Base.move(copy);
 	}
 
@@ -80,6 +81,13 @@ namespace nuts
 	queue<T, base>& queue<T, base>::push(const T& obj)
 	{
 		_Base.push_back(obj);
+		return *this;
+	}
+
+	template <class T, Queue_Base base>
+	queue<T, base>& queue<T, base>::push(T&& obj)
+	{
+		_Base.push_back(static_cast<T&&>(obj));
 		return *this;
 	}
 

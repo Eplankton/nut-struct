@@ -1,8 +1,8 @@
 #ifndef _NUTS_MAP_
 #define _NUTS_MAP_ 1
 
-#include "type.h"
 #include "set.h"
+#include "type.h"
 #include "utility.h"
 #include <cassert>
 
@@ -55,6 +55,11 @@ namespace nuts
 		bool insert(const pair<Key, Val>& _p)
 		{
 			return base_type::insert(_p);
+		}
+
+		bool insert(pair<Key, Val>&& _p)
+		{
+			return base_type::insert(static_cast<pair<Key, Val>&&>(_p));
 		}
 
 		bool erase(const Key& _k)

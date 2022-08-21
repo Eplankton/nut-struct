@@ -21,10 +21,11 @@ namespace nuts
 		ListNode() = default;
 		explicit ListNode(const T& userInputData)
 		    : data(userInputData), prev(nullptr), next(nullptr) {}
+		explicit ListNode(T&& userInputData)
+		    : data(userInputData), prev(nullptr), next(nullptr) {}
 		~ListNode()
 		{
-			prev = nullptr;
-			next = nullptr;
+			prev = next = nullptr;
 
 			/* Don't have to delete anything here */
 			/* Because the variable 'data' will call its own deconstructor  */
@@ -80,9 +81,11 @@ namespace nuts
 
 		list<T>& emplace_back();                      // Add back an empty node
 		list<T>& push_back(const T& obj, u64 num = 1);// Add back several nodes(add by init calue)
+		list<T>& push_back(T&& obj);
 
 		list<T>& emplace_front();                      // Add front an empty node
 		list<T>& push_front(const T& obj, u64 num = 1);// Add frontseveral nodes(add by init value)
+		list<T>& push_front(T&& obj);
 
 		list<T>& pop_back(); // Remove last element
 		list<T>& pop_front();// Remove first element
@@ -284,8 +287,7 @@ namespace nuts
 					else
 					{
 						delete p;
-						head = nullptr;
-						tail = nullptr;
+						head = tail = nullptr;
 						length--;
 						return *this;
 					}
@@ -303,8 +305,7 @@ namespace nuts
 					else
 					{
 						delete p;
-						head = nullptr;
-						tail = nullptr;
+						head = tail = nullptr;
 						length--;
 						return *this;
 					}
@@ -368,8 +369,7 @@ namespace nuts
 		else// If it's an empty list,add a node.
 		{
 			auto p = new ListNode<T>;
-			p->prev = nullptr;
-			p->next = nullptr;
+			p->prev = p->next = nullptr;
 			head = p;
 			tail = p;
 			length++;
@@ -383,7 +383,7 @@ namespace nuts
 		if (!empty())
 		{
 			auto p = tail;
-			for (int i = 0; i < num; i++)
+			for (i64 i: range(0, num))
 			{
 				p->next = new ListNode<T>(obj);
 				p->next->prev = p;
@@ -410,6 +410,14 @@ namespace nuts
 			tail = p;
 			return *this;
 		}
+	}
+
+	template <class T>
+	list<T>& list<T>::push_back(T&& obj)
+	{
+		emplace_back();
+		back() = static_cast<T&&>(obj);
+		return *this;
 	}
 
 	template <class T>
@@ -473,6 +481,14 @@ namespace nuts
 	}
 
 	template <class T>
+	list<T>& list<T>::push_front(T&& obj)
+	{
+		emplace_front();
+		back() = static_cast<T&&>(obj);
+		return *this;
+	}
+
+	template <class T>
 	list<T>& list<T>::pop_back()
 	{
 		erase(tail);
@@ -498,9 +514,7 @@ namespace nuts
 				tail->next = after.head;
 				after.head->prev = tail;
 				tail = after.tail;
-				// Release the ownership of after.
-				after.head = nullptr;
-				after.tail = nullptr;
+				after.head = after.tail = nullptr;
 				after.length = 0;
 				return *this;
 			}
@@ -509,8 +523,7 @@ namespace nuts
 				length = after.size();// Pass ownership.
 				head = after.head;
 				tail = after.tail;
-				after.head = nullptr;// Release the ownership of after.
-				after.tail = nullptr;
+				after.head = after.tail = nullptr;
 				after.length = 0;
 				return *this;
 			}
@@ -530,8 +543,7 @@ namespace nuts
 		head = src.head;
 		tail = src.tail;
 
-		src.head = nullptr;
-		src.tail = nullptr;
+		src.head = src.tail = nullptr;
 		src.length = 0;
 		return *this;
 	}
@@ -582,10 +594,7 @@ namespace nuts
 	{
 		auto ed = end() + 1;
 		for (auto p = begin(); p != ed; ++p)
-		{
-			if (fn(*p))
-				return p;
-		}
+			if (fn(*p)) return p;
 		return iterator {nullptr};
 	}
 
@@ -593,8 +602,7 @@ namespace nuts
 	template <typename Itr>
 	void list<T>::assign(Itr st, Itr ed)
 	{
-		for_each(st, ed,
-		         [this](const auto& x) { this->push_back(x); });
+		for_each(st, ed, [this](const auto& x) { push_back(x); });
 	}
 
 	template <class T>
@@ -607,8 +615,7 @@ namespace nuts
 		};
 
 		printf("\nlist @%#llx = [", (u64) head);
-		if (!empty())
-			for_each(begin(), end(), print);
+		if (!empty()) for_each(*this, print);
 		printf("]\n");
 	}
 }

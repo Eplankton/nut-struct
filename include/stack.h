@@ -36,6 +36,7 @@ namespace nuts
 		~stack() = default;
 
 		stack<T, base>& push(const T& obj);
+		stack<T, base>& push(T&& obj);
 		stack<T, base>& pop();
 		stack<T, base>& clear();
 
@@ -102,6 +103,13 @@ namespace nuts
 	stack<T, base>& stack<T, base>::push(const T& obj)
 	{
 		_Base.push_back(obj);
+		return *this;
+	}
+
+	template <class T, Stack_Base base>
+	stack<T, base>& stack<T, base>::push(T&& obj)
+	{
+		_Base.push_back(static_cast<T&&>(obj));
 		return *this;
 	}
 

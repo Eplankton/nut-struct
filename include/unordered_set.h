@@ -143,6 +143,7 @@ namespace nuts
 		iterator find(const Key& _k) const;
 		bool contains(const Key& _k) const;
 		void insert(const Key& _k);
+		void insert(Key&& _k);
 		bool erase(const Key& _k);
 		void rehash();
 		void clear();
@@ -244,6 +245,19 @@ namespace nuts
 			if (_size == *bucket_size - 1) rehash();
 			u64 index = hash_fn(_k) % *bucket_size;
 			bucket[index].push_back(_k);
+			++_size;
+		}
+	}
+
+	template <class Key, class Hasher>
+	void unordered_set<Key, Hasher>::insert(Key&& _k)
+	{
+		auto it = find(_k);
+		if (it == npos)
+		{
+			if (_size == *bucket_size - 1) rehash();
+			u64 index = hash_fn(_k) % *bucket_size;
+			bucket[index].push_back(static_cast<Key&&>(_k));
 			++_size;
 		}
 	}

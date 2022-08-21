@@ -80,8 +80,7 @@ namespace nuts
 
 		void _POP_EXC_0()
 		{
-			while (size() >= 2 && data_ptr[size() - 2] == '\0')
-				pop_back();
+			while (size() >= 2 && data_ptr[size() - 2] == '\0') pop_back();
 		}
 
 		template <class Type>

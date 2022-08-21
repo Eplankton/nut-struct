@@ -201,6 +201,10 @@ namespace nuts
 
 		void push_back(const T& _val);
 		void push_front(const T& _val);
+
+		void push_back(T&& _val);
+		void push_front(T&& _val);
+
 		void pop_back();
 		void pop_front();
 
@@ -243,56 +247,36 @@ namespace nuts
 	deque<T, Buf>& deque<T, Buf>::operator=(const deque<T, Buf>& src)
 	{
 		clear();
-		for_each(src, [this](const auto& x) { this->push_back(x); });
+		for_each(src, [this](const auto& x) { push_back(x); });
 		return *this;
 	}
 
 	template <typename T, u64 Buf>
 	void deque<T, Buf>::push_back(const T& _val)
 	{
-		if (empty())
-		{
-			map.emplace_back();
-			first = &map.back()[0];
-			last = first;
-			*last = _val;
-		}
-		else
-		{
-			if (is_back_full())
-			{
-				map.emplace_back();
-				last = &map.back()[0];
-				*last = _val;
-			}
-			else
-				*(++last) = _val;
-		}
-		++_size;
+		emplace_back();
+		back() = _val;
 	}
 
 	template <typename T, u64 Buf>
 	void deque<T, Buf>::push_front(const T& _val)
 	{
-		if (empty())
-		{
-			map.emplace_front();
-			last = &map.front()[Buf - 1];
-			first = last;
-			*first = _val;
-		}
-		else
-		{
-			if (is_front_full())
-			{
-				map.emplace_front();
-				first = &map.front()[Buf - 1];
-				*first = _val;
-			}
-			else
-				*(--first) = _val;
-		}
-		++_size;
+		emplace_front();
+		front() = _val;
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::push_back(T&& _val)
+	{
+		emplace_back();
+		back() = static_cast<T&&>(_val);
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::push_front(T&& _val)
+	{
+		emplace_front();
+		front() = static_cast<T&&>(_val);
 	}
 
 	template <typename T, u64 Buf>
