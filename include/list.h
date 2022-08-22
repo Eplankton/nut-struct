@@ -120,7 +120,7 @@ namespace nuts
 
 			iterator& operator=(const iterator& obj)
 			{
-				this->_ptr = obj._ptr;
+				_ptr = obj._ptr;
 				return *this;
 			}
 
@@ -610,8 +610,7 @@ namespace nuts
 	{
 		auto print = [this](const auto& x) {
 			std::cout << x;
-			if (&x != &this->back())
-				printf(", ");
+			if (&x != &back()) printf(", ");
 		};
 
 		printf("\nlist @%#llx = [", (u64) head);

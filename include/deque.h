@@ -21,8 +21,12 @@ namespace nuts
 		using map_type = list<buf_type>;
 
 	private:
-		bool is_back_full() const;
 		bool is_front_full() const;
+		bool is_back_full() const;
+		void allocate_front();
+		void allocate_back();
+		void free_front();
+		void free_back();
 
 	public:
 		class iterator
@@ -119,16 +123,16 @@ namespace nuts
 			void operator-=(i64 bias) { *this = advance(*this, -bias); }
 
 			bool operator==(const iterator& obj)
-			        const { return this->cur == obj.cur; }
+			        const { return cur == obj.cur; }
 
 			bool operator!=(const iterator& obj)
-			        const { return this->cur != obj.cur; }
+			        const { return cur != obj.cur; }
 
 			bool operator==(pointer obj)
-			        const { return this->cur == obj; }
+			        const { return cur == obj; }
 
 			bool operator!=(pointer obj)
-			        const { return this->cur != obj; }
+			        const { return cur != obj; }
 
 			iterator& operator=(const iterator& src)
 			{
@@ -160,27 +164,10 @@ namespace nuts
 		deque(deque<T, Buf>&& src) { move(src); }
 		~deque() { clear(); }
 
-		deque<T, Buf>& move(deque<T, Buf>& src)
-		{
-			map.move(src.map);
-			_size = src.size();
-			first = src.first, last = src.last;
-			src._size = 0;
-			src.first = src.last = nullptr;
-			return *this;
-		}
-
 		T* data() const { return (pointer) map.data(); }
 		u64 size() const { return _size; }
 		bool empty() const { return size() == 0; }
-		void clear()
-		{
-			if (!empty())
-			{
-				map.clear();
-				first = last = nullptr, _size = 0;
-			}
-		}
+		void clear();
 
 		T& front() { return *begin(); }
 		T& back() { return *end(); }
@@ -194,7 +181,8 @@ namespace nuts
 		const T& at(u64 _n) const;
 
 		deque<T, Buf>& operator=(const deque<T, Buf>& src);
-		deque<T, Buf>& operator=(deque<T, Buf>&& src) { return this->move(src); }
+		deque<T, Buf>& operator=(deque<T, Buf>&& src) { return move(src); }
+		deque<T, Buf>& move(deque<T, Buf>& src);
 
 		void emplace_back();
 		void emplace_front();
@@ -217,16 +205,37 @@ namespace nuts
 		pointer first = nullptr, last = nullptr;
 	};
 
-	template <class T, u64 Buf>
+	template <typename T, u64 Buf>
 	deque<T, Buf>::deque(const std::initializer_list<T>& ilist)
 	{
 		for (const auto& x: ilist) push_back(x);
 	}
 
-	template <class T, u64 Buf>
+	template <typename T, u64 Buf>
 	deque<T, Buf>::deque(const deque<T, Buf>& src)
 	{
-		for_each(src, [this](const auto& x) { this->push_back(x); });
+		for_each(src, [this](const auto& x) { push_back(x); });
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::clear()
+	{
+		if (!empty())
+		{
+			map.clear();
+			first = last = nullptr, _size = 0;
+		}
+	}
+
+	template <typename T, u64 Buf>
+	deque<T, Buf>& deque<T, Buf>::move(deque<T, Buf>& src)
+	{
+		map.move(src.map);
+		_size = src.size();
+		first = src.first, last = src.last;
+		src._size = 0;
+		src.first = src.last = nullptr;
+		return *this;
 	}
 
 	template <typename T, u64 Buf>
@@ -241,6 +250,34 @@ namespace nuts
 	{
 		auto tmp = (&map.front()[Buf - 1]) + 1;
 		return first == &map.front()[0] || first == tmp;
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::allocate_back()
+	{
+		map.emplace_back();
+		last = &map.back()[0];
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::allocate_front()
+	{
+		map.emplace_front();
+		first = &map.front()[Buf - 1];
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::free_front()
+	{
+		map.pop_front();
+		first = &map.front()[0];
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::free_back()
+	{
+		map.pop_back();
+		last = &map.back()[Buf - 1];
 	}
 
 	template <class T, u64 Buf>
@@ -284,17 +321,12 @@ namespace nuts
 	{
 		if (empty())
 		{
-			map.emplace_back();
-			first = &map.back()[0];
-			last = first;
+			allocate_back();
+			first = last;
 		}
 		else
 		{
-			if (is_back_full())
-			{
-				map.emplace_back();
-				last = &map.back()[0];
-			}
+			if (is_back_full()) allocate_back();
 			else
 				++last;
 		}
@@ -306,17 +338,12 @@ namespace nuts
 	{
 		if (empty())
 		{
-			map.emplace_front();
-			last = &map.front()[Buf - 1];
-			first = last;
+			allocate_front();
+			last = first;
 		}
 		else
 		{
-			if (is_front_full())
-			{
-				map.emplace_front();
-				first = &map.front()[Buf - 1];
-			}
+			if (is_front_full()) allocate_front();
 			else
 				--first;
 		}
@@ -330,10 +357,7 @@ namespace nuts
 		{
 			last--;
 			if (last == &map.back()[0] - 1)
-			{
-				map.pop_back();
-				last = &map.back()[Buf - 1];
-			}
+				free_back();
 			--_size;
 		}
 	}
@@ -345,10 +369,7 @@ namespace nuts
 		{
 			first++;
 			if (first == &map.front()[Buf - 1] + 1)
-			{
-				map.pop_front();
-				first = &map.front()[0];
-			}
+				free_front();
 			--_size;
 		}
 	}
@@ -464,7 +485,7 @@ namespace nuts
 	{
 		auto print = [this](const auto& x) {
 			std::cout << x;
-			if (&x != &this->back()) printf(", ");
+			if (&x != last) printf(", ");
 		};
 
 		printf("\ndeque @%#llx = [", (u64) map.data());

@@ -127,8 +127,7 @@ namespace nuts
 	{
 		auto print = [this](const auto& x) {
 			std::cout << x;
-			if (&x != &this->back())
-				printf(", ");
+			if (&x != &back()) printf(", ");
 		};
 
 		printf("\nqueue @%#llx = [", (u64) _Base.data());

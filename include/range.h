@@ -100,7 +100,7 @@ namespace nuts
 		i64 lb, ub, s;
 	};
 
-	Range<i64> range(i64 lb, i64 ub, i64 s = 1)
+	inline Range<i64> range(i64 lb, i64 ub, i64 s = 1)
 	{
 		return {lb, ub, s};
 	}

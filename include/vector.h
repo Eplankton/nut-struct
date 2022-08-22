@@ -9,8 +9,8 @@
 #include "iterator.h"
 #include "type.h"
 
-#define STD_CAPACITY 5
-#define EXPAN_COEF 2
+#define STD_CAPACITY 5U
+#define EXPAN_COEF 2U
 
 namespace nuts
 {
@@ -345,7 +345,7 @@ namespace nuts
 	{
 		auto print = [this](const auto& x) {
 			std::cout << x;
-			if (&x != &this->back()) printf(", ");
+			if (&x != &back()) printf(", ");
 		};
 
 		printf("\nvector @%#llx = [", (u64) data());

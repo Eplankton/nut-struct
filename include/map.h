@@ -8,19 +8,19 @@
 
 namespace nuts
 {
-	template <typename Pair>
+	template <typename K, typename V>
 	struct default_key_compare
 	{
 		default_key_compare() = default;
-		bool operator()(const Pair& a,
-		                const Pair& b) const
+		bool operator()(const pair<K, V>& a,
+		                const pair<K, V>& b) const
 		{
 			return a.get_first() < b.get_first();
 		}
 	};
 
 	template <typename Key,
-	          typename Val, class Compare = default_key_compare<pair<Key, Val>>>
+	          typename Val, class Compare = default_key_compare<Key, Val>>
 	class map : public set<pair<Key, Val>, Compare>
 	{
 	public:

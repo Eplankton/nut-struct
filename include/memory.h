@@ -11,7 +11,7 @@ namespace nuts
 	{
 		void operator()(T* _ptr) const
 		{
-			static_assert(0 < sizeof(T),
+			static_assert(sizeof(T),
 			              "Can't delete an incomplete type!");
 			delete _ptr;
 		}
@@ -22,7 +22,7 @@ namespace nuts
 	{
 		void operator()(T* _ptr) const
 		{
-			static_assert(0 < sizeof(T),
+			static_assert(sizeof(T),
 			              "Can't delete an incomplete type!");
 			delete[] _ptr;
 		}
@@ -41,7 +41,7 @@ namespace nuts
 		unique_ptr(pointer obj) : _ptr(obj) {}
 		unique_ptr(const_pointer obj) : _ptr(const_cast<pointer>(obj)) {}
 		unique_ptr(std::nullptr_t _p) : _ptr(_p) {}
-		unique_ptr(unique_ptr<T, Dx>&& src) { this->move(src); }
+		unique_ptr(unique_ptr<T, Dx>&& src) { move(src); }
 		unique_ptr(unique_ptr<T, Dx>& src)
 		{
 			_ptr = src._ptr;
@@ -108,16 +108,16 @@ namespace nuts
 		}
 
 		bool operator==(unique_ptr<T, Dx>& obj)
-		        const { return this->_ptr == obj._ptr; }
+		        const { return _ptr == obj._ptr; }
 
 		bool operator==(const T* obj)
-		        const { return this->_ptr == obj; }
+		        const { return _ptr == obj; }
 
 		bool operator!=(unique_ptr<T, Dx>& obj)
-		        const { return this->_ptr != obj._ptr; }
+		        const { return _ptr != obj._ptr; }
 
 		bool operator!=(const_pointer obj)
-		        const { return this->_ptr != obj; }
+		        const { return _ptr != obj; }
 
 	protected:
 		pointer _ptr = nullptr;
@@ -198,16 +198,16 @@ namespace nuts
 		T* get() const { return _ptr; }
 
 		bool operator==(shared_ptr<T, Dx>& obj)
-		        const { return this->_ptr == obj._ptr; }
+		        const { return _ptr == obj._ptr; }
 
 		bool operator==(const T* obj)
-		        const { return this->_ptr == obj; }
+		        const { return _ptr == obj; }
 
 		bool operator!=(shared_ptr<T, Dx>& obj)
-		        const { return this->_ptr != obj._ptr; }
+		        const { return _ptr != obj._ptr; }
 
 		bool operator!=(const T* obj)
-		        const { return this->_ptr != obj; }
+		        const { return _ptr != obj; }
 
 		shared_ptr<T, Dx>& operator=(shared_ptr<T, Dx>& src)
 		{
@@ -342,16 +342,16 @@ namespace nuts
 		}
 
 		bool operator==(unique_ptr<T, Dx>& obj)
-		        const { return this->_ptr == obj._ptr; }
+		        const { return _ptr == obj._ptr; }
 
 		bool operator==(const T* obj)
-		        const { return this->_ptr == obj; }
+		        const { return _ptr == obj; }
 
 		bool operator!=(unique_ptr<T, Dx>& obj)
-		        const { return this->_ptr != obj._ptr; }
+		        const { return _ptr != obj._ptr; }
 
 		bool operator!=(const_pointer obj)
-		        const { return this->_ptr != obj; }
+		        const { return _ptr != obj; }
 
 	protected:
 		pointer _ptr = nullptr;

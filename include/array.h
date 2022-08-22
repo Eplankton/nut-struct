@@ -35,10 +35,10 @@ namespace nuts
 		constexpr bool empty() const { return size() == 0; }
 
 		T& front() { return data_ptr[0]; }
-		T& back() { return data_ptr[this->size() - 1]; }
+		T& back() { return data_ptr[size() - 1]; }
 
 		const T& front() const { return data_ptr[0]; }
-		const T& back() const { return data_ptr[this->size() - 1]; }
+		const T& back() const { return data_ptr[size() - 1]; }
 
 		T& operator[](u64 _n) { return data_ptr[_n]; }
 		const T& operator[](u64 _n) const { return data_ptr[_n]; }
@@ -171,13 +171,12 @@ namespace nuts
 	void array<T, N>::print() const
 	{
 		auto print = [this](const auto& x) {
-			std::cout << (T) x;
-			if (&x != &this->back())
-				printf(", ");
+			std::cout << x;
+			if (&x != &back()) printf(", ");
 		};
 
 		printf("\narray @%#llx = [", (u64) data());
-		if (!empty()) for_each(begin(), end(), print);
+		if (!empty()) for_each(*this, print);
 		printf("]\n");
 	}
 }

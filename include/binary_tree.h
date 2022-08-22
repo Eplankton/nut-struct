@@ -109,7 +109,7 @@ namespace nuts
 				if (_ptr == nullptr)
 				{
 					if (_ptr == nullptr)
-						return npos;
+						return const_cast<iterator&>(npos);
 				}
 				else if (_ptr->rc != nullptr)
 				{
@@ -143,7 +143,7 @@ namespace nuts
 				if (_ptr == nullptr)
 				{
 					if (_ptr == nullptr)
-						return npos;
+						return const_cast<iterator&>(npos);
 				}
 				else if (_ptr->lc != nullptr)
 				{
@@ -262,12 +262,8 @@ namespace nuts
 		constexpr static const Compare cmp {};
 
 	public:
-		static itr_type npos;
+		constexpr static const itr_type npos {};
 	};
-
-	template <typename T, class Compare>
-	typename binary_tree<T, Compare>::itr_type
-	        binary_tree<T, Compare>::npos;
 
 	template <typename T, class Compare>
 	binary_tree_node<T>* binary_tree<T, Compare>::min(const node_ptr& st)
@@ -760,7 +756,7 @@ namespace nuts
 	void AVL<T, Compare>::update_upon(const node_ptr& ptr)
 	{
 		if (ptr == nullptr) return;
-		node_ptr it(ptr.get());
+		node_ptr it {ptr.get()};
 		while (it != nullptr)
 		{
 			if (it->lc != nullptr)
@@ -952,6 +948,7 @@ namespace nuts
 	{
 		u64 before = this->size();
 		erase_ret_pos(_val);
+		update_upon(this->root);
 		return this->size() < before;
 	}
 
@@ -1001,7 +998,7 @@ namespace nuts
 	template <typename T, class Compare>
 	void binary_tree<T, Compare>::print_as_tree() const
 	{
-		printf("\nbinary_tree @%#llx:", (u64) this->root.get());
+		printf("\nbinary_tree @%#llx:", (u64) root.get());
 		if (root != nullptr)
 			printBT("", root, false);
 		else
