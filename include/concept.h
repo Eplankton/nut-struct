@@ -12,6 +12,7 @@ namespace nuts
 	{
 		typename T::value_type;
 		typename T::iterator;
+
 		x.begin();
 		x.end();
 		x.front();
@@ -64,8 +65,7 @@ namespace nuts
 	};
 
 	template <typename T>
-	concept Arithmetic = Add<T> &&
-	        Minus<T> && Multi<T> && Div<T>;
+	concept Arithmetic = Add<T> && Minus<T> && Multi<T> && Div<T>;
 }
 
 #endif

@@ -1,6 +1,7 @@
 # nut-struct
 
 ## **介绍**
+#### 华东师范大学(East China Normal University) 软件工程专业-2021级 数据结构与算法实验课作业 
 #### nut-struct 是泛型容器和算法库，使用 RAII 对动态内存进行管理。
 
 <br>

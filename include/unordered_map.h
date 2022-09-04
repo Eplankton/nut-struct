@@ -169,12 +169,11 @@ namespace nuts
 	{
 		this->bucket_size++;
 		vector<bucket_type> tmp(*this->bucket_size);
-		tmp.shrink_to_fit();
-
+		
 		auto opr = [this, &tmp](pair<Key, Val>& x) {
 			u64 index = this->hash_fn(x.first) % (*this->bucket_size);
 			tmp[index].emplace_back();
-			tmp[index].back() = std::move(x);
+			tmp[index].back() = nuts::move(x);
 		};
 
 		for_each(*this, opr);

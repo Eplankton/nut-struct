@@ -507,8 +507,7 @@ namespace nuts
 		};
 
 		printf("\ndeque @%#llx: \n", (u64) map.data());
-		if (!empty())
-			for_each(map, array_print);
+		if (!empty()) for_each(map, array_print);
 	}
 }
 

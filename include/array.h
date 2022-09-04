@@ -144,7 +144,7 @@ namespace nuts
 	array<T, N>::array(const std::initializer_list<T>& ilist)
 	{
 		auto st = ilist.begin();
-		for (u64 i: range(0, size())) data_ptr[i] = *(st++);
+		for (u64 i: range(0, ilist.size())) data_ptr[i] = *(st++);
 	}
 
 	template <typename T, u64 N>

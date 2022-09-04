@@ -5,6 +5,7 @@
 #include "list.h"
 #include "range.h"
 #include "vector.h"
+#include "move.h"
 
 namespace nuts
 {
@@ -186,7 +187,6 @@ namespace nuts
 	{
 		while (ilist.size() > *bucket_size) bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
-		tmp.shrink_to_fit();
 		bucket.move(tmp);
 		for (const auto& x: ilist) insert(x);
 	}
@@ -296,12 +296,11 @@ namespace nuts
 	{
 		bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
-		tmp.shrink_to_fit();
 
 		auto opr = [this, &tmp](Key& x) {
 			u64 index = hash_fn(x) % (*bucket_size);
 			tmp[index].emplace_back();
-			tmp[index].back() = std::move(x);
+			tmp[index].back() = nuts::move(x);
 		};
 
 		for_each(*this, opr);

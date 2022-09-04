@@ -14,6 +14,7 @@
 #include "option.h"
 #include "range.h"
 #include "concept.h"
+#include "move.h"
 
 #include "array.h"
 #include "vector.h"

@@ -1,8 +1,8 @@
 #ifndef _NUTS_MATRIX_
 #define _NUTS_MATRIX_ 1
 
-#include "array.h"
 #include "algorithm.h"
+#include "array.h"
 #include "concept.h"
 
 namespace nuts
@@ -16,8 +16,8 @@ namespace nuts
 	{
 	public:
 		using value_type = T;
-        using self_type = matrix<T, Row, Col>;
-        using base_type = array<array<T, Col>, Row>;
+		using self_type = matrix<T, Row, Col>;
+		using base_type = array<array<T, Col>, Row>;
 
 	protected:
 		base_type m;
@@ -151,8 +151,7 @@ namespace nuts
 		auto row_array_print = [](const auto& r) {
 			auto trav_in_col = [&r](const auto& c) {
 				std::cout << c;
-		    	if (&c != &r.back())
-					printf(", ");
+				if (&c != &r.back()) printf(", ");
 			};
 			printf("[");
 			for_each(r, trav_in_col);

@@ -2,6 +2,7 @@
 #define _NUTS_UTILI_ 1
 
 #include <iostream>
+#include "move.h"
 
 namespace nuts
 {
@@ -27,8 +28,8 @@ namespace nuts
 
 		pair<T1, T2>& move(pair<T1, T2>& src)
 		{
-			first = std::move(src.first);
-			second = std::move(src.second);
+			first = nuts::move(src.first);
+			second = nuts::move(src.second);
 			return *this;
 		}
 

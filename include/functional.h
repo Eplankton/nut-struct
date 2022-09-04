@@ -17,7 +17,7 @@ namespace nuts
 
 	public:
 		function() = default;
-		function(const FuncType& R) : fn(R) {}
+		function(const func_pointer R) : fn(static_cast<func_pointer>(R)) {}
 		function(const function<FuncType>& OBJ) : fn(OBJ.fn) {}
 		~function() { fn = nullptr; }
 
@@ -27,6 +27,12 @@ namespace nuts
 			return fn(args...);
 		}
 	};
+
+	template <typename FuncType>
+	auto make_function(const FuncType& F)
+	{
+		return nuts::function(F);
+	}
 
 	template <typename T>
 	struct less

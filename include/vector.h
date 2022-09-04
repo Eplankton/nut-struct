@@ -21,10 +21,6 @@ namespace nuts
 		using value_type = T;
 		using pointer = T*;
 
-	protected:
-		pointer data_ptr = nullptr;
-		u64 v_size = 0, v_capacity = 0;
-
 	public:
 		class iterator
 		    : public random_access_iterator
@@ -158,11 +154,15 @@ namespace nuts
 		const T& front() const { return data_ptr[0]; }
 		const T& back() const { return data_ptr[size() - 1]; }
 
-		template <typename Itr>
+		template <Forward_Itr Itr>
 		void assign(Itr st, Itr ed);
 
-		template <typename Itr>
+		template <Forward_Itr Itr>
 		vector(Itr st, Itr ed);
+
+	protected:
+		pointer data_ptr = nullptr;
+		u64 v_size = 0, v_capacity = 0;
 	};
 
 	template <class T>
@@ -195,13 +195,12 @@ namespace nuts
 	template <class T>
 	vector<T>::vector(const std::initializer_list<T>& ilist)
 	{
-		v_capacity = v_size + STD_CAPACITY;
-		data_ptr = new T[v_size + STD_CAPACITY];
+		reserve(ilist.size() + STD_CAPACITY);
 		for (const T& x: ilist) push_back(x);
 	}
 
 	template <class T>
-	template <typename Itr>
+	template <Forward_Itr Itr>
 	vector<T>::vector(Itr st, Itr ed)
 	{
 		assign(st, ed);
@@ -264,7 +263,7 @@ namespace nuts
 	template <class T>
 	vector<T>& vector<T>::emplace_back()
 	{
-		if (v_capacity - v_size == 0)
+		if (v_capacity == v_size)
 		{
 			if (v_size != 0)
 				reserve(v_size * EXPAN_COEF);
@@ -279,7 +278,7 @@ namespace nuts
 	vector<T>& vector<T>::push_back(const T& obj)
 	{
 		emplace_back();
-		data_ptr[v_size - 1] = obj;
+		back() = obj;
 		return *this;
 	}
 
@@ -287,7 +286,7 @@ namespace nuts
 	vector<T>& vector<T>::push_back(T&& src)
 	{
 		emplace_back();
-		data_ptr[v_size - 1] = static_cast<T&&>(src);
+		back() = static_cast<T&&>(src);
 		return *this;
 	}
 
@@ -354,7 +353,7 @@ namespace nuts
 	}
 
 	template <class T>
-	template <typename Itr>
+	template <Forward_Itr Itr>
 	void vector<T>::assign(Itr st, Itr ed)
 	{
 		for_each(st, ed, [this](const auto& x) { push_back(x); });

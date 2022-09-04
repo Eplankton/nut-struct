@@ -174,6 +174,9 @@ namespace nuts
 			iterator operator+(i64 n) { return advance(*this, n); }
 			iterator operator-(i64 n) { return advance(*this, -1 * n); }
 
+			void operator+=(i64 n) { *this = advance(*this, n); }
+			void operator-=(i64 n) { *this = advance(*this, -1 * n); }
+
 			T& operator*() { return _ptr->data; }
 			const T& operator*() const { return _ptr->data; }
 
@@ -988,7 +991,7 @@ namespace nuts
 			else
 				printf("%s", (isLeft ? "├── " : "└── "));
 			std::cout << st->data
-			          //   << " $" << (i16) st->bf
+			          // << " $" << (i16) st->bf
 			          << '\n';
 			printBT(prefix + (isLeft ? "│   " : "    "), st->lc, true);
 			printBT(prefix + (isLeft ? "│   " : "    "), st->rc, false);

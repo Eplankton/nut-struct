@@ -4,6 +4,7 @@
 #include "concept.h"
 #include "functional.h"
 #include "iterator.h"
+#include "move.h"
 #include "range.h"
 #include "type.h"
 
@@ -19,7 +20,7 @@ namespace nuts
 		return fn;
 	}
 
-	template <typename T, class Func>
+	template <Iterable T, class Func>
 	Func for_each(const T& x, Func fn)
 	{
 		for (auto& i: range(x)) fn(i);
@@ -97,9 +98,9 @@ namespace nuts
 	template <typename T>
 	void swap(T& a, T& b)// Swap value
 	{
-		auto tmp = std::move(b);
-		b = std::move(a);
-		a = std::move(tmp);
+		auto tmp = nuts::move(b);
+		b = nuts::move(a);
+		a = nuts::move(tmp);
 	}
 
 	template <typename Itr>
