@@ -15,8 +15,8 @@ namespace nuts
 	template <typename Itr, class Func>
 	Func for_each(Itr st, Itr ed, Func fn)
 	{
-		ed += 1;
-		for (; st != ed; ++st) fn(*st);
+		auto _end = ed + 1;
+		for (; st != _end; ++st) fn(*st);
 		return fn;
 	}
 
@@ -32,8 +32,8 @@ namespace nuts
 	{
 		if (st == ed) return 0;
 		i64 n = 0;
-		ed += 1;
-		while (st != ed)
+		auto _end = ed + 1;
+		while (st != _end)
 		{
 			++st;
 			++n;
@@ -78,9 +78,9 @@ namespace nuts
 	template <typename Itr>
 	Itr min_in(Itr st, Itr ed)// Give range by itr: st && ed -> O(N)
 	{
-		Itr tmp = st;
-		ed += 1;
-		for (auto i = st; i != ed; i++)
+		Itr tmp = ed;
+		auto _end = ed + 1;
+		for (auto i = st; i != _end; i++)
 			if (*i < *tmp) tmp = i;
 		return tmp;
 	}
@@ -88,9 +88,9 @@ namespace nuts
 	template <typename Itr>
 	Itr max_in(Itr st, Itr ed)// Give range by itr: st && ed -> O(N)
 	{
-		Itr tmp = st;
-		ed += 1;
-		for (auto i = st; i != ed; i++)
+		Itr tmp = ed;
+		auto _end = ed + 1;
+		for (auto i = st; i != _end; i++)
 			if (*i > *tmp) tmp = i;
 		return tmp;
 	}

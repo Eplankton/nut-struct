@@ -202,7 +202,7 @@ namespace nuts
 		binary_tree(const std::initializer_list<T>& ilist);
 		binary_tree(const binary_tree<T, Compare>& src);
 		binary_tree(binary_tree<T, Compare>&& src) { move(src); }
-		~binary_tree();
+		~binary_tree() { clear(); }
 
 		iterator begin() const
 		{
@@ -330,12 +330,6 @@ namespace nuts
 	binary_tree<T, Compare>::binary_tree(const std::initializer_list<T>& ilist)
 	{
 		for (const auto& x: ilist) insert(x);
-	}
-
-	template <typename T, class Compare>
-	inline binary_tree<T, Compare>::~binary_tree()
-	{
-		clear();
 	}
 
 	template <typename T, class Compare>
@@ -499,43 +493,8 @@ namespace nuts
 	auto binary_tree<T, Compare>::insert_ret_pos(const T& _val)
 	        -> itr_type
 	{
-		node_ptr new_node(new tree_node(_val));
-
-		if (root == nullptr)// if the tree is empty, then store value in the root node
-		{
-			root.move(new_node);
-			++_size;
-			return iterator {root.get()};
-		}
-
-		node_raw_ptr parent = nullptr;
-		node_raw_ptr child = root.get();
-
-		while (child != nullptr)
-		{
-			parent = child;
-			if (cmp(_val, child->data))
-				child = child->lc.get();
-			else if (cmp(child->data, _val))
-				child = child->rc.get();
-			else// if value already exist, then just return
-				return npos;
-		}
-
-		if (cmp(_val, parent->data))
-		{
-			parent->lc.move(new_node);
-			parent->lc->prev = parent;
-			++_size;
-			return iterator {parent->lc.get()};
-		}
-		else
-		{
-			parent->rc.move(new_node);
-			parent->rc->prev = parent;
-			++_size;
-			return iterator {parent->rc.get()};
-		}
+		auto tmp = _val;
+		return insert_ret_pos(static_cast<T&&>(tmp));
 	}
 
 	template <typename T, class Compare>
@@ -896,24 +855,8 @@ namespace nuts
 	typename BST<T, Compare>::iterator
 	AVL<T, Compare>::insert_ret_pos(const T& _val)
 	{
-		auto opt = BST<T, Compare>::insert_ret_pos(_val);
-		if (opt != this->npos)
-		{
-			node_ptr loc(opt.get());
-			this->update_upon(loc);
-			while (loc != nullptr)
-			{
-				if (loc->bf == 2 || loc->bf == -2)
-					break;
-				loc = loc->prev.get();
-			}
-			if (loc != nullptr)
-			{
-				balance(loc);
-				loc = nullptr;
-			}
-		}
-		return opt;
+		auto tmp = _val;
+		return AVL<T, Compare>::insert_ret_pos(static_cast<T&&>(tmp));
 	}
 
 	template <typename T, class Compare>
@@ -929,8 +872,8 @@ namespace nuts
 		auto opt = BST<T, Compare>::insert_ret_pos(static_cast<T&&>(_val));
 		if (opt != this->npos)
 		{
-			node_ptr loc(opt.get());
-			this->update_upon(loc);
+			node_ptr loc {opt.get()};
+			update_upon(loc);
 			while (loc != nullptr)
 			{
 				if (loc->bf == 2 || loc->bf == -2)
@@ -999,27 +942,27 @@ namespace nuts
 	}
 
 	template <typename T, class Compare>
+	void binary_tree<T, Compare>::printBT(const iterator& st) const
+	{
+		if (st != npos)
+		{
+			printf("\n");
+			node_ptr tmp {st.get()};
+			printBT("", tmp, false);
+			tmp = nullptr;
+		}
+		else
+			printf("\n└── #\n");
+	}
+
+	template <typename T, class Compare>
 	void binary_tree<T, Compare>::print_as_tree() const
 	{
 		printf("\nbinary_tree @%#llx:", (u64) root.get());
 		if (root != nullptr)
 			printBT("", root, false);
 		else
-			printf("\n└── ∧\n");
-	}
-
-	template <typename T, class Compare>
-	void binary_tree<T, Compare>::printBT(const iterator& st) const
-	{
-		if (st != npos)
-		{
-			std::cout << std::endl;
-			node_ptr tmp = st.get();
-			printBT("", tmp, false);
-			tmp = nullptr;
-		}
-		else
-			printf("\n└── ∧\n");
+			printf("\n└── #\n");
 	}
 }
 

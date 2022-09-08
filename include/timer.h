@@ -31,6 +31,6 @@ public:
 		auto tmd = elapsed();
 		std::cout << "\nTime count: " << tmd * 1000.0 << "(ms)\n";
 		reset();
-		return tmd;
+		return tmd * 1000.0;
 	}
 };

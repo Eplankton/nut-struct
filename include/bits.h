@@ -1,36 +1,36 @@
 #ifndef _NUTS_BITS_
 #define _NUTS_BITS_ 1
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
-#include "type.h"
-#include "utility.h"
-#include "memory.h"
-#include "functional.h"
-#include "tuple.h"
-#include "iterator.h"
 #include "algorithm.h"
+#include "concept.h"
+#include "functional.h"
+#include "iterator.h"
+#include "memory.h"
+#include "move.h"
 #include "option.h"
 #include "range.h"
-#include "concept.h"
-#include "move.h"
+#include "tuple.h"
+#include "type.h"
+#include "utility.h"
 
 #include "array.h"
-#include "vector.h"
-#include "list.h"
-#include "deque.h"
-#include "stack.h"
-#include "queue.h"
 #include "basic_string.h"
+#include "deque.h"
+#include "list.h"
 #include "matrix.h"
+#include "queue.h"
+#include "stack.h"
+#include "vector.h"
 
 #include "binary_tree.h"
-#include "set.h"
 #include "map.h"
+#include "set.h"
 
-#include "unordered_set.h"
 #include "unordered_map.h"
+#include "unordered_set.h"
 
 //	string in = "pi";
 //	// std::cout << "\nPlease enter a name: ";
@@ -67,5 +67,24 @@
 //	m.insert(1001, 7);
 //	m.insert(make_pair(6, 9));
 //	std::cout << m[3] << m[1001] << m[6] << std::endl;
+
+
+// nuts::stack<int> a;
+// std::stack<int> b;
+
+// for (int n = 1; n <= 10000; n++)
+// {
+// 	Timer ca;
+// 	for (auto i: range(0, n))
+// 		a.push(i);
+// 	double ra = ca.elapsed() * 1000.0;
+
+// 	Timer cb;
+// 	for (auto i: range(0, n))
+// 		b.push(i);
+// 	double rb = cb.elapsed() * 1000.0;
+
+// 	std::cout << "[N = " << n << "] " << rb / ra << '\n';
+// }
 
 #endif

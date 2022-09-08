@@ -47,22 +47,22 @@ namespace nuts
 
 		void print() const;
 
-		bool insert(const Key& _k, const Val& _v)
+		auto insert(const Key& _k, const Val& _v)
 		{
 			return base_type::insert({_k, _v});
 		}
 
-		bool insert(const pair<Key, Val>& _p)
+		auto insert(const pair<Key, Val>& _p)
 		{
 			return base_type::insert(_p);
 		}
 
-		bool insert(pair<Key, Val>&& _p)
+		auto insert(pair<Key, Val>&& _p)
 		{
 			return base_type::insert(static_cast<pair<Key, Val>&&>(_p));
 		}
 
-		bool erase(const Key& _k)
+		auto erase(const Key& _k)
 		{
 			pair<Key, Val> tmp;
 			tmp.first = _k;
@@ -111,27 +111,25 @@ namespace nuts
 	};
 
 	template <typename Key, typename Val, class Compare>
-	void map<Key, Val, Compare>::print() const
-	{
-		auto pr = [this](const auto& x) {
-			std::cout << x;
-			if (&x != &this->back())
-				printf(", ");
-		};
-
-		printf("\nmap @%#llx = {", (u64) this->root.get());
-		if (!this->empty())
-			for_each(*this, pr);
-		printf("}\n");
-	}
-
-	template <typename Key, typename Val, class Compare>
 	map<Key, Val, Compare>& map<Key, Val, Compare>::
 	operator=(const map<Key, Val, Compare>& src)
 	{
 		base_type::clear();
 		for_each(*this, [this](const auto& x) { insert(x); });
 		return *this;
+	}
+
+	template <typename Key, typename Val, class Compare>
+	void map<Key, Val, Compare>::print() const
+	{
+		auto printer = [this](const auto& x) {
+			std::cout << x;
+			if (&x != &this->back()) printf(", ");
+		};
+
+		printf("\nmap @%#llx = {", (u64) this->root.get());
+		if (!this->empty()) for_each(*this, printer);
+		printf("}\n");
 	}
 }
 

@@ -87,7 +87,7 @@ namespace nuts
 	// {
 	// 	typename Itr::value_type;
 	// };
-	
+
 	// template <typename Itr>
 	// concept InputItr = requires(Itr it)
 	// {
@@ -100,6 +100,7 @@ namespace nuts
 		typename Itr::value_type;
 		*it;
 		++it;
+		it++;
 	};
 
 	template <typename Itr>
@@ -117,7 +118,7 @@ namespace nuts
 	};
 
 	template <typename P>
-	concept NonVoidPointer = requires(P x, P y, i64 n)
+	concept Pointer = requires(P x, P y, i64 n)
 	{
 		requires requires { !Forward_Itr<P>; };
 		++x;

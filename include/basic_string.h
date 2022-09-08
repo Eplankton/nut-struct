@@ -210,28 +210,24 @@ namespace nuts
 		data_ptr = new T[src.size() + STD_EXPAN];
 		v_size = src.size();
 		v_capacity = v_size + STD_EXPAN;
-		for (size_t i = 0; i < v_size; i++)
-			data_ptr[i] = src.data_ptr[i];
+		strncpy(data_ptr, src.data_ptr, v_size);
 		_POP_EXC_0();
+		// for (size_t i = 0; i < v_size; i++)
+		// 	data_ptr[i] = src.data_ptr[i];
 	}
 
 	template <class T>
 	basic_string<T>::basic_string(const T* obj)
 	{
 		v_size = strlen(obj);
-		data_ptr = new T[v_size + STD_EXPAN];
 		v_capacity = v_size + STD_EXPAN;
-		for (size_t i = 0; i <= v_size; i++)
-			data_ptr[i] = obj[i];
+		data_ptr = new T[v_size + STD_EXPAN];
+		strncpy(data_ptr, obj, v_size + 1);
 		v_size++;
 		_POP_EXC_0();
 
-		// this->destroy();
-		// this->v_capacity = strlen(obj);
-		// this->v_size = this->v_capacity;
-		// data_ptr = new T[this->v_size + 1];
-		// strncpy(data_ptr, obj, this->v_size + 1);
-		// data_ptr[v_size] = '\0';
+		// for (size_t i = 0; i <= v_size; i++)
+		// 	data_ptr[i] = obj[i];
 	}
 
 	template <class T>
@@ -283,8 +279,7 @@ namespace nuts
 		if (v_capacity > v_size)
 		{
 			T* tmp = new T[v_size];
-			for (size_t i = 0; i < v_size; i++)
-				tmp[i] = data_ptr[i];
+			strncpy(tmp, data_ptr, v_size);
 			delete[] data_ptr;
 			data_ptr = tmp;
 			v_capacity = v_size;

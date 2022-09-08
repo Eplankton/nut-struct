@@ -172,8 +172,7 @@ namespace nuts
 		
 		auto opr = [this, &tmp](pair<Key, Val>& x) {
 			u64 index = this->hash_fn(x.first) % (*this->bucket_size);
-			tmp[index].emplace_back();
-			tmp[index].back() = nuts::move(x);
+			tmp[index].push_back(nuts::move(x));
 		};
 
 		for_each(*this, opr);

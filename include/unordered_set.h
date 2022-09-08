@@ -43,9 +43,9 @@ namespace nuts
 
 		public:
 			iterator() = default;
-			iterator(const Outside& o, const Outside& bt,
+			iterator(const Outside& o, const Outside& b,
 			         const Inside& i) : out_itr(o),
-			                            bkt_end(bt),
+			                            bkt_end(b),
 			                            in_itr(i) {}
 
 			iterator(const iterator& src) : out_itr(src.out_itr),
@@ -299,8 +299,7 @@ namespace nuts
 
 		auto opr = [this, &tmp](Key& x) {
 			u64 index = hash_fn(x) % (*bucket_size);
-			tmp[index].emplace_back();
-			tmp[index].back() = nuts::move(x);
+			tmp[index].push_back(nuts::move(x));
 		};
 
 		for_each(*this, opr);
