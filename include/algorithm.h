@@ -47,6 +47,14 @@ namespace nuts
 		return (st == ed) ? 0 : ed - st + 1;
 	}
 
+	template <Forward_Itr Itr>
+	Itr advance(Itr it, u64 n)
+	{
+		if (n >= 0)
+			while (n--) ++it;
+		return it;
+	}
+
 	template <Bidirectional_Itr Itr>
 	Itr advance(Itr it, i64 n)
 	{

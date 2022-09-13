@@ -219,8 +219,7 @@ namespace nuts
 		{
 			delete[] data_ptr;
 			data_ptr = nullptr;
-			v_size = 0;
-			v_capacity = 0;
+			v_capacity = v_size = 0;
 		}
 	}
 
@@ -316,7 +315,6 @@ namespace nuts
 	T& vector<T>::operator[](const u64 N)
 	{
 		assert(N < v_capacity);
-		if (N >= v_size) v_size++;
 		return data_ptr[N];
 	}
 
@@ -331,11 +329,7 @@ namespace nuts
 	vector<T>& vector<T>::operator=(const vector<T>& obj)
 	{
 		destroy();
-		data_ptr = new T[obj.size()];
-		v_size = obj.size();
-		v_capacity = v_size;
-		for (u64 i = 0; i < v_size; i++)
-			data_ptr[i] = obj.data_ptr[i];
+		assign(obj.begin(), obj.end());
 		return *this;
 	}
 

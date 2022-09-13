@@ -3,9 +3,9 @@
 
 #include "functional.h"
 #include "list.h"
+#include "move.h"
 #include "range.h"
 #include "vector.h"
-#include "move.h"
 
 namespace nuts
 {
@@ -44,8 +44,7 @@ namespace nuts
 		public:
 			iterator() = default;
 			iterator(const Outside& o, const Outside& b,
-			         const Inside& i) : out_itr(o),
-			                            bkt_end(b),
+			         const Inside& i) : out_itr(o), bkt_end(b),
 			                            in_itr(i) {}
 
 			iterator(const iterator& src) : out_itr(src.out_itr),
@@ -54,10 +53,8 @@ namespace nuts
 			~iterator() = default;
 
 			Key& operator*() { return *in_itr; }
-			Key& operator*() const { return *in_itr; }
-
-			Inside& operator->() { return in_itr; }
-			Inside& operator->() const { return in_itr; }
+			const Key& operator*() const { return *in_itr; }
+			const Inside& operator->() const { return in_itr; }
 
 			iterator& operator++()
 			{
@@ -84,13 +81,8 @@ namespace nuts
 				return res;
 			}
 
-			iterator operator+(i64 bias) const
-			{
-				iterator res = *this;
-				while (bias--)
-					++res;
-				return res;
-			}
+			iterator operator+(u64 bias)
+			        const { return nuts::advance(*this, bias); }
 
 			void operator+=(i64 bias)
 			{
@@ -159,10 +151,10 @@ namespace nuts
 		prime_pointer bucket_size = PRIME_LIST;
 		u64 _size = 0;
 		vector<bucket_type> bucket;
-		constexpr static const Hasher hash_fn {};
 
 	public:
-		constexpr static const iterator npos {};
+		constexpr static Hasher hash_fn {};
+		constexpr static iterator npos {};
 	};
 
 	template <class Key, class Hasher>

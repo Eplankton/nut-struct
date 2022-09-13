@@ -95,7 +95,7 @@ namespace nuts
 				return {this->bucket.begin() + index,
 				        this->bucket.end(), it};
 		}
-		return base_type::npos;// if not found
+		return base_type::npos;
 	}
 
 	template <class Key, class Val, class Hasher>
@@ -184,7 +184,7 @@ namespace nuts
 	operator=(const self_type& src)
 	{
 		this->bucket_size = src.bucket_size;
-		this->bucket = src.bucket;// Copy
+		this->bucket = src.bucket;
 		this->_size = src._size;
 	}
 }

@@ -7,11 +7,13 @@
 #include "type.h"
 
 #define DEQUE_BUF_SIZE 512ULL
-#define GET_BLOCK_SIZE(x) (sizeof(x) > DEQUE_BUF_SIZE ? sizeof(x) : DEQUE_BUF_SIZE / sizeof(x))
+#define GET_BLOCK_CAPACITY(x) (sizeof(x) > DEQUE_BUF_SIZE \
+	                                   ? sizeof(x)        \
+	                                   : DEQUE_BUF_SIZE / sizeof(x))
 
 namespace nuts
 {
-	template <typename T, u64 Buf = GET_BLOCK_SIZE(T)>
+	template <typename T, u64 Buf = GET_BLOCK_CAPACITY(T)>
 	class deque
 	{
 	public:
@@ -114,14 +116,14 @@ namespace nuts
 			}
 
 			iterator operator+(i64 bias)
-			        const { return advance(*this, bias); }
+			        const { return nuts::advance(*this, bias); }
 
-			void operator+=(i64 bias) { *this = advance(*this, bias); }
+			void operator+=(i64 bias) { *this = nuts::advance(*this, bias); }
 
 			iterator operator-(i64 bias)
-			        const { return advance(*this, -bias); }
+			        const { return nuts::advance(*this, -bias); }
 
-			void operator-=(i64 bias) { *this = advance(*this, -bias); }
+			void operator-=(i64 bias) { *this = nuts::advance(*this, -bias); }
 
 			bool operator==(const iterator& obj)
 			        const { return cur == obj.cur; }
@@ -169,6 +171,7 @@ namespace nuts
 		u64 size() const { return _size; }
 		bool empty() const { return size() == 0; }
 		void clear();
+		static constexpr u64 block_capacity() { return Buf; }
 
 		T& front() { return *begin(); }
 		T& back() { return *end(); }
@@ -390,7 +393,7 @@ namespace nuts
 			_n -= head_len;
 			u64 bias = (_n / Buf) + 1;
 			_n %= Buf;
-			auto it = advance(map.begin(), bias);
+			auto it = nuts::advance(map.begin(), bias);
 			return (*it)[_n];
 		}
 		if (_n < size())
@@ -416,7 +419,7 @@ namespace nuts
 			_n -= head_len;
 			u64 bias = (_n / Buf) + 1;
 			_n %= Buf;
-			auto it = advance(map.begin(), bias);
+			auto it = nuts::advance(map.begin(), bias);
 			return (*it)[_n];
 		}
 		if (_n < size())
@@ -443,7 +446,7 @@ namespace nuts
 			_n -= head_len;
 			u64 bias = (_n / Buf) + 1;
 			_n %= Buf;
-			auto it = advance(map.begin(), bias);
+			auto it = nuts::advance(map.begin(), bias);
 			return (*it)[_n];
 		}
 		if (_n < size())
@@ -470,7 +473,7 @@ namespace nuts
 			_n -= head_len;
 			u64 bias = (_n / Buf) + 1;
 			_n %= Buf;
-			auto it = advance(map.begin(), bias);
+			auto it = nuts::advance(map.begin(), bias);
 			return (*it)[_n];
 		}
 		if (_n < size())

@@ -171,11 +171,11 @@ namespace nuts
 				return res;
 			}
 
-			iterator operator+(i64 n) { return advance(*this, n); }
-			iterator operator-(i64 n) { return advance(*this, -1 * n); }
+			iterator operator+(i64 n) { return nuts::advance(*this, n); }
+			iterator operator-(i64 n) { return nuts::advance(*this, -1 * n); }
 
-			void operator+=(i64 n) { *this = advance(*this, n); }
-			void operator-=(i64 n) { *this = advance(*this, -1 * n); }
+			void operator+=(i64 n) { *this = nuts::advance(*this, n); }
+			void operator-=(i64 n) { *this = nuts::advance(*this, -1 * n); }
 
 			T& operator*() { return _ptr->data; }
 			const T& operator*() const { return _ptr->data; }
@@ -262,10 +262,10 @@ namespace nuts
 	protected:
 		node_ptr root = nullptr;
 		u64 _size = 0;
-		constexpr static const Compare cmp {};
 
 	public:
-		constexpr static const itr_type npos {};
+		constexpr static Compare cmp {};
+		constexpr static itr_type npos {};
 	};
 
 	template <typename T, class Compare>
@@ -297,7 +297,7 @@ namespace nuts
 	binary_tree<T, Compare>::move(binary_tree<T, Compare>& src)
 	{
 		clear();
-		root = src.root;
+		root.move(src.root);
 		_size = src._size;
 		src.root = nullptr;
 		src._size = 0;
@@ -604,7 +604,6 @@ namespace nuts
 				target->lc.move(rec);
 				target->lc->prev = target;
 			}
-			rec = nullptr;
 			--_size;
 			return res;
 		}
@@ -626,7 +625,6 @@ namespace nuts
 				target->rc.move(rec);
 				target->rc->prev = target;
 			}
-			rec = nullptr;
 			--_size;
 			return res;
 		}
@@ -649,7 +647,6 @@ namespace nuts
 				target->lc.move(rec);
 				target->lc->prev = target;
 			}
-			rec = nullptr;
 			--_size;
 			return res;
 		}

@@ -51,16 +51,12 @@ namespace nuts
 		list<T>& insert(node_ptr position, const T& obj, u64 num = 1);
 
 	public:
-		list() = default;                                              // Void constructor
-		explicit list(u64 userInputlength);                            // Init by several empty nodes
-		explicit list(const T& userInputData, u64 userInputlength = 1);// Init by several valued nodes
-
-		list(const list<T>& obj);// Init by another list(deep copy)
+		list() = default;                                     // Void constructor
+		list(const T& userInputData, u64 userInputlength = 1);// Init by several valued nodes
+		list(const list<T>& obj);                             // Init by another list(deep copy)
 		list(list<T>&& src) { move(src); }
-
 		list(const std::initializer_list<T>& ilist);// Init by a {ilist}
-
-		~list() { clear(); }// Clear and gain back memory
+		~list() { clear(); }                        // Clear and gain back memory
 
 		bool empty() const// Whether the list is empty
 		{
@@ -69,7 +65,7 @@ namespace nuts
 			       tail == nullptr;
 		}
 
-		node_ptr data() const { return const_cast<node_ptr>(head); }
+		node_ptr data() const { return head; }
 
 		bool exist() const { return empty(); }// Whether the list exists
 		u64 size() const { return length; }   // Get the length of the whole list
@@ -165,18 +161,18 @@ namespace nuts
 			iterator operator+(i64 bias) const
 			{
 				iterator res = *this;
-				return advance(res, bias);
+				return nuts::advance(res, bias);
 			}
 
-			void operator+=(i64 bias) { *this = advance(*this, bias); }
+			void operator+=(i64 bias) { *this = nuts::advance(*this, bias); }
 
 			iterator operator-(i64 bias) const
 			{
 				iterator res = *this;
-				return advance(res, -bias);
+				return nuts::advance(res, -bias);
 			}
 
-			void operator-=(i64 bias) { *this = advance(*this, -bias); }
+			void operator-=(i64 bias) { *this = nuts::advance(*this, -bias); }
 
 			T* operator->() const { return (T*) &_ptr->data; }
 		};
@@ -195,16 +191,16 @@ namespace nuts
 
 		list<T>& erase(iterator pos, u64 num = 0);
 
-		template <typename Itr>
-		void assign(Itr st, Itr ed);
-
 		template <typename Func>
 		iterator find(const Func& fn) const;// Find the first element match the condition
 
 		template <typename Func>
 		void erase_all(const Func& fn);// Remove all node match the condition,The number of elements removed
-
-		template <typename Itr>
+		
+		template <Forward_Itr Itr>
+		void assign(Itr st, Itr ed);
+		
+		template <Forward_Itr Itr>
 		list(Itr st, Itr ed);
 
 	protected:
@@ -214,32 +210,13 @@ namespace nuts
 	};
 
 	template <class T>
-	list<T>::list(u64 userInputlength)
-	{
-		if (userInputlength >= 1)
-		{
-			length = userInputlength;
-			head = new ListNode<T>;// Save the head node address.
-			auto p = head;
-			for (i64 i: range(1, userInputlength))
-			{
-				p->next = new ListNode<T>;
-				p->next->prev = p;
-				p = p->next;
-				p->next = nullptr;
-			}
-			tail = p;// Save the last node address.
-		}
-	}
-
-	template <class T>
 	list<T>::list(const T& userInputData, u64 userInputlength)
 	{
 		push_back(userInputData, userInputlength);// better way
 	}
 
 	template <class T>
-	template <typename Itr>
+	template <Forward_Itr Itr>
 	list<T>::list(Itr st, Itr ed)
 	{
 		assign(st, ed);
@@ -266,7 +243,7 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T>& list<T>::erase(ListNode<T>* start_node, u64 N_far)
+	list<T>& list<T>::erase(node_ptr start_node, u64 N_far)
 	{
 		assert(N_far < size() && !empty());
 		i64 i = 0;
@@ -344,11 +321,7 @@ namespace nuts
 	list<T>& list<T>::clear()
 	{
 		if (!empty())
-		{
-			for (i64 i: range(size() - 1, -1, -1))
-				erase(head, i);
-			head = tail = nullptr;
-		}
+			while (!empty()) pop_back();
 		return *this;
 	}
 
@@ -358,7 +331,7 @@ namespace nuts
 		if (!empty())
 		{
 			auto p = tail;
-			p->next = new ListNode<T>;
+			p->next = new node;
 			p->next->prev = p;
 			p = p->next;
 			p->next = nullptr;
@@ -368,7 +341,7 @@ namespace nuts
 		}
 		else// If it's an empty list,add a node.
 		{
-			auto p = new ListNode<T>;
+			auto p = new node;
 			p->prev = p->next = nullptr;
 			head = p;
 			tail = p;
@@ -380,36 +353,12 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::push_back(const T& obj, u64 num)
 	{
-		if (!empty())
+		for (auto i: range(0, num))
 		{
-			auto p = tail;
-			for (i64 i: range(0, num))
-			{
-				p->next = new ListNode<T>(obj);
-				p->next->prev = p;
-				p = p->next;
-				p->next = nullptr;
-				length++;
-			}
-			tail = p;
-			return *this;
+			emplace_back();
+			back() = obj;
 		}
-		else// If it's an empty list,add several node.
-		{
-			auto p = new ListNode<T>(obj);
-			head = p;
-			length++;
-			for (i64 i: range(1, num))
-			{
-				p->next = new ListNode<T>(obj);
-				p->next->prev = p;
-				p = p->next;
-				p->next = nullptr;
-				length++;
-			}
-			tail = p;
-			return *this;
-		}
+		return *this;
 	}
 
 	template <class T>
@@ -426,7 +375,7 @@ namespace nuts
 		if (!empty())
 		{
 			auto tmp = head;
-			head = new ListNode<T>;
+			head = new node;
 			head->next = tmp;
 			tmp->prev = head;
 			length++;
@@ -434,7 +383,7 @@ namespace nuts
 		}
 		else
 		{
-			head = new ListNode<T>;
+			head = new node;
 			tail = head;
 			length++;
 			return *this;
@@ -444,47 +393,19 @@ namespace nuts
 	template <class T>
 	list<T>& list<T>::push_front(const T& obj, u64 num)
 	{
-		if (!empty())
+		for (auto i: range(0, num))
 		{
-			auto tmp = head;
-			head = new ListNode<T>(obj);
-			length++;
-			auto p = head;
-			for (i64 i: range(1, num))
-			{
-				p->next = new ListNode<T>(obj);
-				p->next->prev = p;
-				p = p->next;
-				p->next = nullptr;
-				length++;
-			}
-			p->next = tmp;
-			tmp->prev = p;
-			return *this;
+			emplace_front();
+			front() = obj;
 		}
-		else// If it's an empty list,add several node.
-		{
-			auto* p = new ListNode<T>(obj);
-			head = p;
-			length++;
-			for (i64 i: range(1, num))
-			{
-				p->next = new ListNode<T>(obj);
-				p->next->prev = p;
-				p = p->next;
-				p->next = nullptr;
-				length++;
-			}
-			tail = p;
-			return *this;
-		}
+		return *this;
 	}
 
 	template <class T>
 	list<T>& list<T>::push_front(T&& obj)
 	{
 		emplace_front();
-		back() = static_cast<T&&>(obj);
+		front() = static_cast<T&&>(obj);
 		return *this;
 	}
 
@@ -509,7 +430,6 @@ namespace nuts
 		{
 			if (!empty())
 			{
-				// Pass ownership.
 				length = size() + after.size();
 				tail->next = after.head;
 				after.head->prev = tail;
@@ -520,7 +440,7 @@ namespace nuts
 			}
 			else
 			{
-				length = after.size();// Pass ownership.
+				length = after.size();
 				head = after.head;
 				tail = after.tail;
 				after.head = after.tail = nullptr;
@@ -549,7 +469,7 @@ namespace nuts
 	}
 
 	template <class T>
-	list<T>& list<T>::insert(ListNode<T>* position, const T& obj, u64 num)
+	list<T>& list<T>::insert(node_ptr position, const T& obj, u64 num)
 	{
 		for (auto p = head; p != nullptr; p = p->next)
 		{
@@ -558,7 +478,7 @@ namespace nuts
 				auto temp = p->next;
 				for (int i = 0; i < num; i++)
 				{
-					p->next = new ListNode<T>(obj);
+					p->next = new node(obj);
 					p->next->prev = p;
 					p = p->next;
 					p->next = nullptr;
@@ -599,7 +519,7 @@ namespace nuts
 	}
 
 	template <class T>
-	template <typename Itr>
+	template <Forward_Itr Itr>
 	void list<T>::assign(Itr st, Itr ed)
 	{
 		for_each(st, ed, [this](const auto& x) { push_back(x); });
@@ -613,7 +533,7 @@ namespace nuts
 			if (&x != &back()) printf(", ");
 		};
 
-		printf("\nlist @%#llx = [", (u64) head);
+		printf("\nlist @%#llx = [", (u64) data());
 		if (!empty()) for_each(*this, print);
 		printf("]\n");
 	}

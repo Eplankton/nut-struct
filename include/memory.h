@@ -121,7 +121,7 @@ namespace nuts
 
 	protected:
 		pointer _ptr = nullptr;
-		constexpr static const Dx deleter {};
+		constexpr static Dx deleter {};
 	};
 
 	template <typename T, class Dx = default_delete<T>>
@@ -220,7 +220,7 @@ namespace nuts
 	protected:
 		pointer _ptr = nullptr;
 		u64_ptr _cnt = nullptr;
-		constexpr static const Dx deleter {};
+		constexpr static Dx deleter {};
 	};
 
 	template <class T, class Dx>
@@ -355,7 +355,7 @@ namespace nuts
 
 	protected:
 		pointer _ptr = nullptr;
-		constexpr static const default_delete<T[]> deleter {};
+		constexpr static default_delete<T[]> deleter {};
 	};
 }
 
