@@ -26,13 +26,14 @@ namespace nuts
 	public:
 		array() = default;
 		explicit array(const T& _val);
+		array(const array<T, N>& src) = default;
 		array(const std::initializer_list<T>& ilist);
 		~array() = default;
 
 		void fill(const T& _val);
 		pointer data() const { return const_cast<pointer>(data_ptr); }
-		constexpr u64 size() const { return N; }
-		constexpr bool empty() const { return size() == 0; }
+		static constexpr u64 size() { return N; }
+		static constexpr bool empty() { return size() == 0; }
 
 		T& front() { return data_ptr[0]; }
 		T& back() { return data_ptr[size() - 1]; }
@@ -144,7 +145,8 @@ namespace nuts
 	array<T, N>::array(const std::initializer_list<T>& ilist)
 	{
 		auto st = ilist.begin();
-		for (u64 i: range(0, ilist.size())) data_ptr[i] = *(st++);
+		for (u64 i: range(0, N < ilist.size() ? N : ilist.size()))
+			data_ptr[i] = *(st++);
 	}
 
 	template <typename T, u64 N>
@@ -175,7 +177,7 @@ namespace nuts
 			if (&x != &back()) printf(", ");
 		};
 
-		printf("\narray @%#llx = [", (u64) data());
+		printf("array @%#llx = [", (u64) data());
 		if (!empty()) for_each(*this, print);
 		printf("]\n");
 	}

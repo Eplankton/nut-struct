@@ -1,8 +1,8 @@
 #ifndef _NUTS_UTILI_
 #define _NUTS_UTILI_ 1
 
-#include <iostream>
 #include "move.h"
+#include <iostream>
 
 namespace nuts
 {
@@ -13,11 +13,9 @@ namespace nuts
 		T2 second;
 
 		pair() = default;
+		pair(const pair<T1, T2>& obj) = default;
 		pair(const T1& _first, const T2& _last)
 		    : first(_first), second(_last) {}
-
-		pair(const pair<T1, T2>& obj)
-		    : first(obj.first), second(obj.second) {}
 
 		pair(pair<T1, T2>&& src) { move(src); }
 

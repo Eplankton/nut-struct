@@ -15,6 +15,7 @@
 #include "tuple.h"
 #include "type.h"
 #include "utility.h"
+#include "bitset.h"
 
 #include "array.h"
 #include "basic_string.h"

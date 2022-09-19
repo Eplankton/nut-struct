@@ -12,8 +12,8 @@ namespace nuts
 	struct default_key_compare
 	{
 		default_key_compare() = default;
-		bool operator()(const pair<K, V>& a,
-		                const pair<K, V>& b) const
+		bool
+		operator()(const pair<K, V>& a, const pair<K, V>& b) const
 		{
 			return a.get_first() < b.get_first();
 		}
@@ -24,7 +24,9 @@ namespace nuts
 	class map : public set<pair<Key, Val>, Compare>
 	{
 	public:
-		using value_type = Key;
+		using value_type = pair<Key, Val>;
+		using key_type = Key;
+		using val_type = Val;
 		using itr_type = typename AVL<pair<Key, Val>, Compare>::iterator;
 		using base_type = set<pair<Key, Val>, Compare>;
 
@@ -127,7 +129,7 @@ namespace nuts
 			if (&x != &this->back()) printf(", ");
 		};
 
-		printf("\nmap @%#llx = {", (u64) this->root.get());
+		printf("map @%#llx = {", (u64) this->root.get());
 		if (!this->empty()) for_each(*this, printer);
 		printf("}\n");
 	}

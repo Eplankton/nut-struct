@@ -58,7 +58,7 @@ namespace nuts
 				printf(", ");
 		};
 
-		printf("\nset @%#llx = {", (u64) this->root.get());
+		printf("set @%#llx = {", (u64) this->root.get());
 		if (!this->empty())
 			for_each(*this, pr);
 		printf("}\n");

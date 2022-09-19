@@ -245,15 +245,15 @@ namespace nuts
 	template <typename T, u64 Buf>
 	bool deque<T, Buf>::is_back_full() const
 	{
-		auto tmp = (&map.back()[0]) - 1;
-		return last == &map.back()[Buf - 1] || last == tmp;
+		return last == &map.back()[Buf - 1] ||
+		       last == (&map.back()[0]) - 1;
 	}
 
 	template <typename T, u64 Buf>
 	bool deque<T, Buf>::is_front_full() const
 	{
-		auto tmp = (&map.front()[Buf - 1]) + 1;
-		return first == &map.front()[0] || first == tmp;
+		return first == &map.front()[0] ||
+		       first == (&map.front()[Buf - 1]) + 1;
 	}
 
 	template <typename T, u64 Buf>
@@ -492,7 +492,7 @@ namespace nuts
 			if (&x != last) printf(", ");
 		};
 
-		printf("\ndeque @%#llx = [", (u64) map.data());
+		printf("deque @%#llx = [", (u64) map.data());
 		if (!empty()) for_each(*this, print);
 		printf("]\n");
 	}
@@ -510,7 +510,7 @@ namespace nuts
 			printf("]\n");
 		};
 
-		printf("\ndeque @%#llx: \n", (u64) map.data());
+		printf("deque @%#llx: \n", (u64) map.data());
 		if (!empty()) for_each(map, array_print);
 	}
 }

@@ -31,11 +31,6 @@ namespace nuts
 			/* Because the variable 'data' will call its own deconstructor  */
 			/* And if 'data' is not a pointer, you can't delete it manually anyway */
 		}
-
-		// template <class>
-		// friend class list;
-		/* Don't need an explicit class/typename T */
-		/* Very import, this authorizes the manager class */
 	};
 
 	template <class T>
@@ -192,14 +187,14 @@ namespace nuts
 		list<T>& erase(iterator pos, u64 num = 0);
 
 		template <typename Func>
-		iterator find(const Func& fn) const;// Find the first element match the condition
+		iterator find(Func fn) const;// Find the first element match the condition
 
 		template <typename Func>
 		void erase_all(const Func& fn);// Remove all node match the condition,The number of elements removed
-		
+
 		template <Forward_Itr Itr>
 		void assign(Itr st, Itr ed);
-		
+
 		template <Forward_Itr Itr>
 		list(Itr st, Itr ed);
 
@@ -510,12 +505,9 @@ namespace nuts
 	template <class T>
 	template <typename Func>
 	typename list<T>::iterator
-	list<T>::find(const Func& fn) const
+	list<T>::find(Func fn) const
 	{
-		auto ed = end() + 1;
-		for (auto p = begin(); p != ed; ++p)
-			if (fn(*p)) return p;
-		return iterator {nullptr};
+		return nuts::find_if(begin(), end(), fn);
 	}
 
 	template <class T>
@@ -533,7 +525,7 @@ namespace nuts
 			if (&x != &back()) printf(", ");
 		};
 
-		printf("\nlist @%#llx = [", (u64) data());
+		printf("list @%#llx = [", (u64) data());
 		if (!empty()) for_each(*this, print);
 		printf("]\n");
 	}

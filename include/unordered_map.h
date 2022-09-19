@@ -11,6 +11,9 @@ namespace nuts
 	    : public unordered_set<pair<Key, Val>, Hasher>
 	{
 	public:
+		using value_type = pair<Key, Val>;
+		using key_type = Key;
+		using val_type = Val;
 		using base_type = unordered_set<pair<Key, Val>, Hasher>;
 		using self_type = unordered_map<Key, Val, Hasher>;
 		using bucket_type = list<pair<Key, Val>>;
@@ -169,7 +172,7 @@ namespace nuts
 	{
 		this->bucket_size++;
 		vector<bucket_type> tmp(*this->bucket_size);
-		
+
 		auto opr = [this, &tmp](pair<Key, Val>& x) {
 			u64 index = this->hash_fn(x.first) % (*this->bucket_size);
 			tmp[index].push_back(nuts::move(x));

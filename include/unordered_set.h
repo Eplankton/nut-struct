@@ -153,8 +153,8 @@ namespace nuts
 		vector<bucket_type> bucket;
 
 	public:
-		constexpr static Hasher hash_fn {};
-		constexpr static iterator npos {};
+		static constexpr Hasher hash_fn {};
+		static constexpr iterator npos {};
 	};
 
 	template <class Key, class Hasher>
@@ -306,7 +306,7 @@ namespace nuts
 			if (x != *end()) printf(", ");
 		};
 
-		printf("\nhash_table @%#llx = {", (u64) bucket.data());
+		printf("hash_set @%#llx = {", (u64) bucket.data());
 		for_each(*this, pr);
 		printf("}\n");
 	}

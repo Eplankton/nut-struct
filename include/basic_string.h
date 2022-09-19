@@ -33,6 +33,7 @@ namespace nuts
 		basic_string(const basic_string<T>& obj, T* start, T* stop);// Copy part of string range in [start, stop]
 		basic_string(const T* obj);                                 // Init by a cstring with '\0'
 		basic_string(const std::initializer_list<T>& ilist);        // Init by a {ilist}
+		basic_string(u64 init_size);
 		~basic_string() { destroy(); }
 
 		size_t size() const { return v_size; }            // Return the number of elements
@@ -202,7 +203,6 @@ namespace nuts
 	};
 
 	using string = basic_string<char>;// Default in char_8bit type
-	// typedef basic_string<char> string;
 
 	template <class T>
 	basic_string<T>::basic_string(const basic_string<T>& src)
@@ -253,6 +253,13 @@ namespace nuts
 		src.v_size = 0;
 		src.v_capacity = 0;
 		return *this;
+	}
+
+	template <class T>
+	basic_string<T>::basic_string(u64 init_size)
+	{
+		data_ptr = new T[init_size];
+		v_size = v_capacity = init_size;
 	}
 
 	template <class T>

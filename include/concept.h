@@ -7,11 +7,11 @@
 
 namespace nuts
 {
-	template <typename T>
-	concept Iterable = requires(T x)
+	template <typename Box>
+	concept Iterable = requires(Box x)
 	{
-		typename T::value_type;
-		typename T::iterator;
+		typename Box::value_type;
+		typename Box::iterator;
 
 		x.begin();
 		x.end();
@@ -19,9 +19,9 @@ namespace nuts
 		x.back();
 	};
 
-	template <typename T>
-	concept Container = Iterable<T> &&
-	        requires(T x)
+	template <typename Box>
+	concept Container = Iterable<Box> &&
+	        requires(Box x)
 	{
 		x.size();
 		x.clear();
@@ -29,39 +29,46 @@ namespace nuts
 	};
 
 	template <typename T>
-	concept Display = requires(T x)
+	concept StreamOutput = requires(T x)
 	{
-		requires requires
-		{
-			std::cout << x;
-		} || requires
-		{
-			x.print();
-		};
+		std::cout << x;
 	};
+
+	template <typename T>
+	concept HasPrintMethod = requires(T x)
+	{
+		x.print();
+	};
+
+	template <typename T>
+	concept Display = StreamOutput<T> || HasPrintMethod<T>;
 
 	template <typename T>
 	concept Add = requires(T a, T b)
 	{
 		a + b;
+		b + a;
 	};
 
 	template <typename T>
 	concept Minus = requires(T a, T b)
 	{
 		a - b;
+		b - a;
 	};
 
 	template <typename T>
 	concept Multi = requires(T a, T b)
 	{
 		a* b;
+		b* a;
 	};
 
 	template <typename T>
 	concept Div = requires(T a, T b)
 	{
 		a / b;
+		b / a;
 	};
 
 	template <typename T>

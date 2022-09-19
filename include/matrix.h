@@ -20,33 +20,33 @@ namespace nuts
 		using base_type = array<array<T, Col>, Row>;
 
 	protected:
-		base_type m;
+		base_type impl;
 
 	public:
 		matrix() = default;
 		matrix(const T& _val);
-		matrix(const self_type& src);
+		matrix(const self_type& src) = default;
 		matrix(const std::initializer_list<array<T, Col>>& ilist);
 		matrix(const std::initializer_list<T>& ilist);
 		~matrix() = default;
 
-		constexpr u64 row() const { return Row; }
-		constexpr u64 col() const { return Col; }
+		static constexpr u64 row() { return Row; }
+		static constexpr u64 col() { return Col; }
 		void print() const;
 
-		array<T, Col>& operator[](u64 _r) { return m[_r]; }
-		const array<T, Col>& operator[](u64 _r) const { return m[_r]; }
+		array<T, Col>& operator[](u64 _r) { return impl[_r]; }
+		const array<T, Col>& operator[](u64 _r) const { return impl[_r]; }
 
 		T& at(u64 _r, u64 _c)
 		{
 			assert(_r < row() && _c < col());
-			return m[_r][_c];
+			return impl[_r][_c];
 		}
 
 		const T& at(u64 _r, u64 _c) const
 		{
 			assert(_r < row() && _c < col());
-			return m[_r][_c];
+			return impl[_r][_c];
 		}
 
 		template <typename Ty, u64 R, u64 C>
@@ -70,7 +70,7 @@ namespace nuts
 	{
 		for (u64 i = 0; i < row(); ++i)
 			for (u64 j = 0; j < col(); ++j)
-				m[i][j] = _val;
+				impl[i][j] = _val;
 	}
 
 	template <typename T, u64 Row, u64 Col>
@@ -79,7 +79,7 @@ namespace nuts
 	{
 		auto st = ilist.begin();
 		for (u64 i = 0; i < row(); ++i)
-			m[i] = *(st++);
+			impl[i] = *(st++);
 	}
 
 	template <typename T, u64 Row, u64 Col>
@@ -89,15 +89,7 @@ namespace nuts
 		auto st = ilist.begin();
 		for (u64 i = 0; i < row(); ++i)
 			for (u64 j = 0; j < col(); ++j)
-				m[i][j] = *(st++);
-	}
-
-	template <typename T, u64 Row, u64 Col>
-	matrix<T, Row, Col>::matrix(const self_type& src)
-	{
-		for (u64 i = 0; i < row(); ++i)
-			for (u64 j = 0; j < col(); ++j)
-				m[i][j] = src[i][j];
+				impl[i][j] = *(st++);
 	}
 
 	template <typename T, u64 Row, u64 Col>
@@ -105,7 +97,7 @@ namespace nuts
 	{
 		for (u64 i = 0; i < row(); ++i)
 			for (u64 j = 0; j < col(); ++j)
-				m[i][j] = src[i][j];
+				impl[i][j] = src[i][j];
 		return *this;
 	}
 
@@ -147,7 +139,6 @@ namespace nuts
 	template <typename T, u64 Row, u64 Col>
 	void matrix<T, Row, Col>::print() const
 	{
-		printf("\n");
 		auto row_array_print = [](const auto& r) {
 			auto trav_in_col = [&r](const auto& c) {
 				std::cout << c;
@@ -159,9 +150,8 @@ namespace nuts
 		};
 
 		for (u64 i = 0; i < row(); ++i)
-		{
-			row_array_print(m[i]);
-		}
+			row_array_print(impl[i]);
+		printf("\n");
 	}
 }
 

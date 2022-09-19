@@ -41,6 +41,7 @@
 |  函数对象  | [functional.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/functional.h) |
 |  智能指针  |     [memory.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/memory.h)     |
 | 多用途对象 |    [utility.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/utility.h)    |
+| 比特集 |    [bitset.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/bitset.h)    |
 |    元组    |      [tuple.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/tuple.h)      |
 |    矩阵    |     [matrix.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/matrix.h)     |
 |    异常处理    |     [option.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/option.h)     |

@@ -12,42 +12,41 @@
 
 namespace nuts
 {
-	template <typename T>
-	concept Queue_Base = Container<T> &&
-	        requires(T x, typename T::value_type val)
+	template <typename Box>
+	concept Queue_Base = Container<Box> &&
+	        requires(Box x, typename Box::value_type val)
 	{
 		x.push_back(val);
 		x.pop_front();
 	};
 
-	template <class T, Queue_Base base = deque<T>>
+	template <class T, Queue_Base C = deque<T>>
 	class queue
 	{
 	public:
 		using value_type = T;
-		using itr_type = typename base::iterator;
+		using itr_type = typename C::iterator;
 
-	public:
 		queue() = default;
+		queue(const queue<T, C>& src) = default;
 		queue(const std::initializer_list<T>& ilist);
-		queue(const queue<T, base>& src) { _Base = src._Base; }
-		queue(queue<T, base>&& src) { move(src); }
+		queue(queue<T, C>&& src) { move(src); }
 		~queue() = default;
 
-		queue<T, base>& push(const T& obj);
-		queue<T, base>& push(T&& obj);
-		queue<T, base>& pop();
-		queue<T, base>& clear();
-		bool empty() const { return _Base.empty(); }
-		u64 size() const { return _Base.size(); }
+		queue<T, C>& push(const T& obj);
+		queue<T, C>& push(T&& obj);
+		queue<T, C>& pop();
+		queue<T, C>& clear();
+		bool empty() const { return impl.empty(); }
+		u64 size() const { return impl.size(); }
 
-		T& front() { return _Base.front(); }
-		T& back() { return _Base.back(); }
-		const T& front() const { return _Base.front(); }
-		const T& back() const { return _Base.back(); }
-		queue<T, base>& operator=(const queue<T, base>& obj);
-		queue<T, base>& operator=(queue<T, base>&& src) { return move(src); }
-		queue<T, base>& move(queue<T, base>& src);
+		T& front() { return impl.front(); }
+		T& back() { return impl.back(); }
+		const T& front() const { return impl.front(); }
+		const T& back() const { return impl.back(); }
+		queue<T, C>& operator=(const queue<T, C>& obj);
+		queue<T, C>& operator=(queue<T, C>&& src) { return move(src); }
+		queue<T, C>& move(queue<T, C>& src);
 
 		itr_type begin() const;
 		itr_type end() const;
@@ -55,84 +54,85 @@ namespace nuts
 		void print() const;
 
 	protected:
-		base _Base;
+		C impl;
 	};
 
-	template <class T, Queue_Base base>
-	queue<T, base>::queue(const std::initializer_list<T>& ilist)
+	template <class T, Queue_Base C>
+	queue<T, C>::queue(const std::initializer_list<T>& ilist)
 	{
-		base copy {ilist};
-		_Base.move(copy);
+		C copy {ilist};
+		impl.move(copy);
 	}
 
-	template <class T, Queue_Base base>
-	typename base::iterator queue<T, base>::begin() const
+	template <class T, Queue_Base C>
+	typename C::iterator
+	queue<T, C>::begin() const
 	{
-		return _Base.begin();
+		return impl.begin();
 	}
 
-	template <class T, Queue_Base base>
-	typename base::iterator queue<T, base>::end() const
+	template <class T, Queue_Base C>
+	typename C::iterator
+	queue<T, C>::end() const
 	{
-		return _Base.end();
+		return impl.end();
 	}
 
-	template <class T, Queue_Base base>
-	queue<T, base>& queue<T, base>::push(const T& obj)
+	template <class T, Queue_Base C>
+	queue<T, C>& queue<T, C>::push(const T& obj)
 	{
-		_Base.push_back(obj);
+		impl.push_back(obj);
 		return *this;
 	}
 
-	template <class T, Queue_Base base>
-	queue<T, base>& queue<T, base>::push(T&& obj)
+	template <class T, Queue_Base C>
+	queue<T, C>& queue<T, C>::push(T&& obj)
 	{
-		_Base.push_back(static_cast<T&&>(obj));
+		impl.push_back(static_cast<T&&>(obj));
 		return *this;
 	}
 
-	template <class T, Queue_Base base>
-	queue<T, base>& queue<T, base>::pop()
+	template <class T, Queue_Base C>
+	queue<T, C>& queue<T, C>::pop()
 	{
 		if (!empty())
-			_Base.pop_front();
+			impl.pop_front();
 		return *this;
 	}
 
-	template <class T, Queue_Base base>
-	queue<T, base>& queue<T, base>::clear()
+	template <class T, Queue_Base C>
+	queue<T, C>& queue<T, C>::clear()
 	{
-		_Base.clear();
+		impl.clear();
 		return *this;
 	}
 
-	template <class T, Queue_Base base>
-	queue<T, base>& queue<T, base>::operator=(const queue<T, base>& obj)
-	{
-		clear();
-		_Base = obj._Base;
-		return *this;
-	}
-
-	template <class T, Queue_Base base>
-	queue<T, base>& queue<T, base>::move(queue<T, base>& src)
+	template <class T, Queue_Base C>
+	queue<T, C>& queue<T, C>::operator=(const queue<T, C>& obj)
 	{
 		clear();
-		_Base.move(src._Base);
+		impl = obj.impl;
 		return *this;
 	}
 
-	template <class T, Queue_Base base>
-	void queue<T, base>::print() const
+	template <class T, Queue_Base C>
+	queue<T, C>& queue<T, C>::move(queue<T, C>& src)
+	{
+		clear();
+		impl.move(src.impl);
+		return *this;
+	}
+
+	template <class T, Queue_Base C>
+	void queue<T, C>::print() const
 	{
 		auto print = [this](const auto& x) {
 			std::cout << x;
 			if (&x != &back()) printf(", ");
 		};
 
-		printf("\nqueue @%#llx = [", (u64) _Base.data());
-		if (!empty())
-			for_each(_Base, print);
+		printf("queue @%#llx = [", (u64) impl.data());
+		if (!empty()) for_each(impl, print);
 		printf("]\n");
 	}
 }
