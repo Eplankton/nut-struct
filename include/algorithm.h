@@ -24,6 +24,18 @@ namespace nuts
 		x.print();
 	}
 
+	template <StreamOutput T>
+	void print(const T& x)
+	{
+		std::cout << x;
+	}
+
+	template <HasPrintMethod T>
+	void print(const T& x)
+	{
+		x.print();
+	}
+
 	template <typename Itr, class Func>
 	Func for_each(Itr st, Itr ed, Func fn)
 	{

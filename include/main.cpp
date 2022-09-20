@@ -7,7 +7,7 @@ int main()
 {
 	// set<i32> A {7, 8, 0, 4, 2, 6, 9, 3, 5, 1};
 	set<i32> A;
-	unordered_set<i32> B {1, 4, 7, 10, 13, 16, 19, 22, 25, 28};
+	hash_set<i32> B {1, 4, 7, 10, 13, 16, 19, 22, 25, 28};
 	for (auto i: range(0, 20))
 		A.insert((i32) i);
 	// A.print();
@@ -17,7 +17,7 @@ int main()
 	for_each(A, [&m, &B](const auto& x) { m[x] = !B.contains(x); });
 	// m.print();
 
-	unordered_map<i32, bool> hmap;
+	hash_map<i32, bool> hmap;
 	for_each(m, [&hmap](const auto& x) { hmap.insert(x); });
 	// hmap.print_as_table();
 
@@ -26,9 +26,6 @@ int main()
 
 	// reverse(s.begin(), s.end());
 	// s.print_detail();
-
-	// A.clear();
-	A.print_as_tree();
 
 	return 0;
 }

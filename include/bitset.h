@@ -3,6 +3,7 @@
 
 #include "array.h"
 #include "basic_string.h"
+#include "functional.h"
 
 #define BITSET_BLOCK_SIZE (u8) 8
 #define GET_BLOCK_NUM(x) ((x / BITSET_BLOCK_SIZE) + 1)
@@ -30,8 +31,8 @@ namespace nuts
 			{
 				u64 i = _p / 8,
 				    ofs = _p % 8,
-				    tmp = 1 << (7 - ofs);
-				if (val == true)
+				    tmp = (u8) 1 << (u8) (7 - ofs);
+				if (val)
 					(*_m)[i] |= (tmp);
 				else
 					(*_m)[i] &= ~(tmp);
@@ -41,7 +42,7 @@ namespace nuts
 			bool get() const
 			{
 				u64 i = _p / 8, ofs = _p % 8;
-				return (((*_m)[i] >> (7 - ofs)) & 1) == 1;
+				return (((*_m)[i] >> (u8) (7 - ofs)) & (u8) 1) == (u8) 1;
 			}
 
 			bool operator==(bool val) const { return get() == val; }
@@ -70,7 +71,11 @@ namespace nuts
 		bool all() const;
 		bool any() const;
 		bool none() const;
-		bool test(u64 pos) const { return bit_ref(*this, pos).get(); }
+		bool test(u64 pos) const
+		{
+			assert(pos < N);
+			return bit_ref(*this, pos).get();
+		}
 
 		self_type& set();
 		self_type& set(u64 pos, bool val = true);
@@ -78,10 +83,22 @@ namespace nuts
 		self_type& reset(u64 pos);
 		self_type& flip();
 		self_type& flip(u64 pos);
+		self_type& operator=(const string& bit_str);
 
 		string to_string() const;
 		void print_by_word() const;
-		void print() const;
+		// void print() const;
+
+		bool operator==(const self_type& y) const;
+		bool operator!=(const self_type& y) const;
+
+		friend std::ostream&
+		operator<<(std::ostream& output, const bitset<N>& obj)
+		{
+			for (int i = 0; i < obj.size(); i++)
+				output << obj[i];
+			return output;
+		}
 
 	protected:
 		base_type impl;
@@ -204,18 +221,53 @@ namespace nuts
 	{
 		for (u64 i = 0; i < 8 * base_type::size(); i++)
 		{
-			printf("%u", test(i));
+			printf("%u", (*this)[i]);
 			if ((i + 1) % 8 == 0) printf("\n");
 		}
 	}
 
 	template <u64 N>
-	void bitset<N>::print() const
+	bitset<N>& bitset<N>::operator=(const string& bit_str)
+	{
+		nuts::fill_n(impl.begin(), impl.size(), (u8) 0);
+		for (u64 i = 0; i < bit_str.size() - 1; i++)
+			(*this)[i] = static_cast<bool>(bit_str[i] - 48);
+		return *this;
+	}
+
+	template <u64 N>
+	bool bitset<N>::operator==(const self_type& y) const
 	{
 		for (u64 i = 0; i < N; i++)
-			printf("%u", test(i));
-		printf("\n");
+		{
+			if ((*this)[i] != y[i]) return false;
+		}
+		return true;
 	}
+
+	template <u64 N>
+	bool bitset<N>::operator!=(const self_type& y) const
+	{
+		return !((*this) == y);
+	}
+
+
+	// template <u64 N>
+	// void bitset<N>::print() const
+	// {
+	// 	for (u64 i = 0; i < N; i++)
+	// 		printf("%u", test(i));
+	// 	printf("\n");
+	// }
+
+	template <u64 N>
+	struct hash<bitset<N>>
+	{
+		u64 operator()(const bitset<N>& x) const
+		{
+			return hash<u64> {}(x.count() + x.size());
+		}
+	};
 }
 
 #endif

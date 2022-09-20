@@ -11,23 +11,26 @@ namespace nuts
 	public:
 		using value_type = T;
 		using base_type = AVL<T, Compare>;
+		using self_type = set<T, Compare>;
 
 	public:
 		set() { this->root = nullptr, this->_size = 0; }
 		set(const std::initializer_list<T>& ilist);
-		set(const set<T, Compare>& src);
-		set(set<T, Compare>&& src) { base_type::move(src); }
+		set(const self_type& src);
+		set(self_type&& src) { base_type::move(src); }
 		~set() { this->_size = 0; }
 
-		set<T, Compare>& operator=(const set<T, Compare>& src);
-		set<T, Compare>& operator=(set<T, Compare>&& src)
-		{
-			base_type::move(src);
-			return *this;
-		}
-
+		self_type& operator=(const self_type& src);
+		self_type& operator=(self_type&& src);
 		void print() const;
 	};
+
+	template <typename T, class Compare>
+	set<T, Compare>& set<T, Compare>::operator=(self_type&& src)
+	{
+		base_type::move(src);
+		return *this;
+	}
 
 	template <typename T, class Compare>
 	set<T, Compare>::set(const std::initializer_list<T>& ilist)
@@ -36,13 +39,13 @@ namespace nuts
 	}
 
 	template <typename T, class Compare>
-	set<T, Compare>::set(const set<T, Compare>& src)
+	set<T, Compare>::set(const self_type& src)
 	{
 		for_each(src, [](const T& x) { base_type::insert(x); });
 	}
 
 	template <typename T, class Compare>
-	set<T, Compare>& set<T, Compare>::operator=(const set<T, Compare>& src)
+	set<T, Compare>& set<T, Compare>::operator=(const self_type& src)
 	{
 		base_type::clear();
 		for_each(src, [](const T& x) { base_type::insert(x); });
@@ -53,14 +56,13 @@ namespace nuts
 	void set<T, Compare>::print() const
 	{
 		auto pr = [this](const auto& x) {
-			std::cout << x;
+			nuts::print(x);
 			if (&x != &this->back())
 				printf(", ");
 		};
 
 		printf("set @%#llx = {", (u64) this->root.get());
-		if (!this->empty())
-			for_each(*this, pr);
+		if (!this->empty()) for_each(*this, pr);
 		printf("}\n");
 	}
 }

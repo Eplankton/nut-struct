@@ -157,6 +157,9 @@ namespace nuts
 		static constexpr iterator npos {};
 	};
 
+	template <class Key, class Hasher = nuts::hash<Key>>
+	using hash_set = unordered_set<Key, Hasher>;
+
 	template <class Key, class Hasher>
 	unordered_set<Key, Hasher>::unordered_set()
 	{
@@ -302,8 +305,8 @@ namespace nuts
 	void unordered_set<Key, Hasher>::print() const
 	{
 		auto pr = [this](const auto& x) {
-			std::cout << x;
-			if (x != *end()) printf(", ");
+			nuts::print(x);
+			if (&x != &(*end())) printf(", ");
 		};
 
 		printf("hash_set @%#llx = {", (u64) bucket.data());
@@ -314,7 +317,6 @@ namespace nuts
 	template <class Key, class Hasher>
 	void unordered_set<Key, Hasher>::print_as_table() const
 	{
-		printf("\n");
 		u64 collison = 0;
 		for (u64 n = 0; n < *bucket_size; ++n)
 		{
@@ -323,7 +325,7 @@ namespace nuts
 				collison += bucket[n].size() - 1;
 				printf("#%lld: ", n);
 				for_each(bucket[n],
-				         [](const auto& x) { std::cout << x << " -> "; });
+				         [](const auto& x) { nuts::print(x); nuts::print("->"); });
 				printf("\n");
 			}
 		}

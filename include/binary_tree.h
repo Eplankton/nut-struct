@@ -649,7 +649,10 @@ namespace nuts
 		using tree_node = nuts::binary_tree_node<T>;
 		using node_ptr = nuts::unique_ptr<tree_node>;
 		using node_raw_ptr = binary_tree_node<T>*;
-		using itr_type = typename BST<T, Compare>::iterator;
+
+		using base_type = BST<T, Compare>;
+		using self_type = AVL<T, Compare>;
+		using itr_type = typename base_type::iterator;
 
 	private:
 		void single_rotate_left(node_ptr& ptr);
@@ -662,8 +665,8 @@ namespace nuts
 	public:
 		AVL() { this->root = nullptr, this->_size = 0; }
 		AVL(const std::initializer_list<T>& ilist);
-		AVL(const AVL<T, Compare>& src);
-		AVL(AVL<T, Compare>&& src) { BST<T, Compare>::move(src); }
+		AVL(const self_type& src);
+		AVL(self_type&& src) { base_type::move(src); }
 		~AVL() { this->_size = 0; }
 
 		bool insert(const T& _val);
@@ -674,13 +677,13 @@ namespace nuts
 		itr_type insert_ret_pos(T&& _val);
 		itr_type erase_ret_pos(const T& _val);
 
-		AVL<T, Compare>& operator=(const AVL<T, Compare>& src);
-		AVL<T, Compare>&
-		operator=(AVL<T, Compare>&& src) { return BST<T, Compare>::move(src); }
+		self_type& operator=(const AVL<T, Compare>& src);
+		self_type&
+		operator=(AVL<T, Compare>&& src) { return base_type::move(src); }
 	};
 
 	template <typename T, class Compare>
-	AVL<T, Compare>::AVL(const AVL<T, Compare>& src)
+	AVL<T, Compare>::AVL(const self_type& src)
 	{
 		for_each(src, [this](const T& x) { this->insert(x); });
 	}
@@ -692,10 +695,10 @@ namespace nuts
 	}
 
 	template <typename T, class Compare>
-	AVL<T, Compare>& AVL<T, Compare>::operator=(const AVL<T, Compare>& src)
+	AVL<T, Compare>& AVL<T, Compare>::operator=(const self_type& src)
 	{
-		AVL<T, Compare> copy(src);
-		BST<T, Compare>::move(copy);
+		self_type copy(src);
+		base_type::move(copy);
 		return *this;
 	}
 
@@ -827,7 +830,7 @@ namespace nuts
 			else
 				double_rotate_right(ptr);
 		}
-		this->update_upon(ptr);
+		update_upon(ptr);
 	}
 
 	template <typename T, class Compare>
@@ -840,8 +843,8 @@ namespace nuts
 	typename BST<T, Compare>::iterator
 	AVL<T, Compare>::insert_ret_pos(const T& _val)
 	{
-		auto tmp = _val;
-		return AVL<T, Compare>::insert_ret_pos(static_cast<T&&>(tmp));
+		auto tmp = _val;// make a copy
+		return insert_ret_pos(static_cast<T&&>(tmp));
 	}
 
 	template <typename T, class Compare>
@@ -854,7 +857,7 @@ namespace nuts
 	typename BST<T, Compare>::iterator
 	AVL<T, Compare>::insert_ret_pos(T&& _val)
 	{
-		auto opt = BST<T, Compare>::insert_ret_pos(static_cast<T&&>(_val));
+		auto opt = base_type::insert_ret_pos(static_cast<T&&>(_val));
 		if (opt != this->npos)
 		{
 			node_ptr loc {opt.get()};
@@ -887,7 +890,7 @@ namespace nuts
 	typename BST<T, Compare>::iterator
 	AVL<T, Compare>::erase_ret_pos(const T& _val)
 	{
-		auto opt = BST<T, Compare>::erase_ret_pos(_val);
+		auto opt = base_type::erase_ret_pos(_val);
 		if (opt != this->npos)
 		{
 			node_ptr loc(opt.get());
@@ -920,7 +923,7 @@ namespace nuts
 			else
 				printf("%s", (isLeft ? "├── " : "└── "));
 			std::cout << st->data
-			        //   << " \"" << (i16) st->bf
+			          //   << " \"" << (i16) st->bf
 			          << '\n';
 			printBT(prefix + (isLeft ? "│   " : "    "), st->lc, true);
 			printBT(prefix + (isLeft ? "│   " : "    "), st->rc, false);

@@ -36,6 +36,7 @@ namespace nuts
 		basic_string(u64 init_size);
 		~basic_string() { destroy(); }
 
+		T* data() const { return data_ptr; }
 		size_t size() const { return v_size; }            // Return the number of elements
 		size_t capacity() const { return v_capacity; }    // Return the current capacity
 		void clear();                                     // Clear all values, but don't destroy

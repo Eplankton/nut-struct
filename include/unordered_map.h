@@ -21,7 +21,7 @@ namespace nuts
 
 		unordered_map();
 		unordered_map(const self_type& src);
-		unordered_map(self_type&& src) { this->move(src); }
+		unordered_map(self_type&& src) { move(src); }
 		~unordered_map() { base_type::clear(); }
 
 		self_type& move(self_type& src);
@@ -42,7 +42,12 @@ namespace nuts
 
 		self_type& operator=(const self_type& src);
 		self_type& operator=(self_type&& src) { return move(src); }
+
+		void print() const;
 	};
+
+	template <class Key, class Val, class Hasher = nuts::hash<Key>>
+	using hash_map = unordered_map<Key, Val, Hasher>;
 
 	template <class Key, class Val, class Hasher>
 	unordered_map<Key, Val, Hasher>::unordered_map()
@@ -64,10 +69,7 @@ namespace nuts
 	unordered_map<Key, Val, Hasher>&
 	unordered_map<Key, Val, Hasher>::move(self_type& src)
 	{
-		this->bucket_size = src.bucket_size;
-		this->bucket.move(src.bucket);
-		this->_size = src._size;
-		src._size = 0;
+		base_type::move(src);
 		return *this;
 	}
 
@@ -186,9 +188,21 @@ namespace nuts
 	unordered_map<Key, Val, Hasher>& unordered_map<Key, Val, Hasher>::
 	operator=(const self_type& src)
 	{
-		this->bucket_size = src.bucket_size;
-		this->bucket = src.bucket;
-		this->_size = src._size;
+		base_type::operator=(src);
+		return *this;
+	}
+
+	template <class Key, class Val, class Hasher>
+	void unordered_map<Key, Val, Hasher>::print() const
+	{
+		auto pr = [this](const auto& x) {
+			nuts::print(x);
+			if (&x != &(*this->end())) printf(", ");
+		};
+
+		printf("hash_map @%#llx = {", (u64) this->bucket.data());
+		for_each(*this, pr);
+		printf("}\n");
 	}
 }
 

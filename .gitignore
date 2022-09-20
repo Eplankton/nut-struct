@@ -36,6 +36,7 @@ main
 core
 tags
 CMakeLists.txt
+/.cache
 /cmake-build-debug/
 /.idea/
-.main.cpp.swp
+*.swp

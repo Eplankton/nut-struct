@@ -125,7 +125,7 @@ namespace nuts
 	void map<Key, Val, Compare>::print() const
 	{
 		auto printer = [this](const auto& x) {
-			std::cout << x;
+			nuts::print(x);
 			if (&x != &this->back()) printf(", ");
 		};
 

@@ -488,7 +488,7 @@ namespace nuts
 	void deque<T, Buf>::print() const
 	{
 		auto print = [this](const auto& x) {
-			std::cout << x;
+			nuts::print(x);
 			if (&x != last) printf(", ");
 		};
 
@@ -505,7 +505,7 @@ namespace nuts
 			for_each(arr.begin(), arr.end(),
 			         [&arr, this](const T& x) { 
 						if (&x == first || &x == last)
-							 printf("*"); std::cout << x; 
+							 printf("*"); nuts::print(x);
                         if (&x != &arr.back()) printf(", "); });
 			printf("]\n");
 		};

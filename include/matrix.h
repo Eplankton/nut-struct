@@ -141,7 +141,7 @@ namespace nuts
 	{
 		auto row_array_print = [](const auto& r) {
 			auto trav_in_col = [&r](const auto& c) {
-				std::cout << c;
+				nuts::print(c);
 				if (&c != &r.back()) printf(", ");
 			};
 			printf("[");

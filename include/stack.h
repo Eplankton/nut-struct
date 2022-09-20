@@ -145,7 +145,7 @@ namespace nuts
 	void stack<T, C>::print() const
 	{
 		auto print = [this](const auto& x) {
-			std::cout << x;
+			nuts::print(x);
 			if (&x != &back()) printf(", ");
 		};
 

@@ -118,6 +118,6 @@ namespace nuts
 			return x;
 		}
 	};
-}// namespace nuts
+}
 
 #endif
