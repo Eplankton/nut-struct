@@ -48,8 +48,7 @@ namespace nuts
 		basic_string<T>& push_back(const T& obj);         // Add an element to the end
 		basic_string<T>& pop_back();                      // Remove the last element
 		basic_string<T>& move(basic_string<T>& src);
-
-		T* get() const { return data_ptr; }
+		
 		T& front() { return data_ptr[0]; }
 		T& back() { return data_ptr[size() - 1]; }
 		const T& front() const { return data_ptr[0]; }
