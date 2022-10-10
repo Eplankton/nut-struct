@@ -107,10 +107,7 @@ namespace nuts
 			{
 				node_raw_ptr p;
 				if (_ptr == nullptr)
-				{
-					if (_ptr == nullptr)
-						return const_cast<iterator&>(npos);
-				}
+					return const_cast<iterator&>(npos);
 				else if (_ptr->rc != nullptr)
 				{
 					_ptr = _ptr->rc.get();
@@ -141,10 +138,7 @@ namespace nuts
 			{
 				node_raw_ptr p;
 				if (_ptr == nullptr)
-				{
-					if (_ptr == nullptr)
-						return const_cast<iterator&>(npos);
-				}
+					return const_cast<iterator&>(npos);
 				else if (_ptr->lc != nullptr)
 				{
 					_ptr = _ptr->lc.get();
@@ -451,23 +445,23 @@ namespace nuts
 		node_raw_ptr st = root.get();
 		while (st != nullptr)
 		{
-			if (!cmp(_val, st->data) &&
-			    !cmp(st->data, _val))// Found or duplicated
+			bool go_left = cmp(_val, st->data),
+			     go_right = cmp(st->data, _val),
+			     found = !go_left && !go_right;
+
+			if (found) return iterator {st};
+			if (go_left)
 			{
-				return iterator {st};
-			}
-			if (cmp(_val, st->data))// Go left
-			{
-				st = get_raw(st->lc);
+				st = st->lc.get();
 				continue;
 			}
-			if (cmp(st->data, _val))// Go right
+			if (go_right)
 			{
-				st = get_raw(st->rc);
+				st = st->rc.get();
 				continue;
 			}
 		}
-		return npos;// Not Found
+		return npos;
 	}
 
 	template <typename T, class Compare>
@@ -494,7 +488,7 @@ namespace nuts
 	auto binary_tree<T, Compare>::insert_ret_pos(T&& _val)
 	        -> itr_type
 	{
-		node_ptr new_node(new tree_node {static_cast<T&&>(_val)});
+		node_ptr new_node = new tree_node {static_cast<T&&>(_val)};
 
 		if (root == nullptr)
 		{
@@ -509,15 +503,15 @@ namespace nuts
 		while (child != nullptr)
 		{
 			parent = child;
-			if (cmp(_val, child->data))
+			if (cmp(new_node->data, child->data))
 				child = child->lc.get();
-			else if (cmp(child->data, _val))
+			else if (cmp(child->data, new_node->data))
 				child = child->rc.get();
 			else
 				return npos;
 		}
 
-		if (cmp(_val, parent->data))
+		if (cmp(new_node->data, parent->data))
 		{
 			parent->lc.move(new_node);
 			parent->lc->prev = parent;
@@ -678,8 +672,7 @@ namespace nuts
 		itr_type erase_ret_pos(const T& _val);
 
 		self_type& operator=(const AVL<T, Compare>& src);
-		self_type&
-		operator=(AVL<T, Compare>&& src) { return base_type::move(src); }
+		self_type& operator=(AVL<T, Compare>&& src) { return base_type::move(src); }
 	};
 
 	template <typename T, class Compare>

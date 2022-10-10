@@ -37,6 +37,7 @@ namespace nuts
 		~basic_string() { destroy(); }
 
 		T* data() const { return data_ptr; }
+		T* c_str() const { return data_ptr; }
 		size_t size() const { return v_size; }            // Return the number of elements
 		size_t capacity() const { return v_capacity; }    // Return the current capacity
 		void clear();                                     // Clear all values, but don't destroy
@@ -48,7 +49,7 @@ namespace nuts
 		basic_string<T>& push_back(const T& obj);         // Add an element to the end
 		basic_string<T>& pop_back();                      // Remove the last element
 		basic_string<T>& move(basic_string<T>& src);
-		
+
 		T& front() { return data_ptr[0]; }
 		T& back() { return data_ptr[size() - 1]; }
 		const T& front() const { return data_ptr[0]; }
@@ -60,38 +61,26 @@ namespace nuts
 		basic_string<T>& operator=(basic_string<T>&& src) { return move(src); }
 		basic_string<T>& operator=(const T* obj);                         // Covered by a cstring
 		basic_string<T>& operator=(const std::initializer_list<T>& ilist);// Covered by a {ilist}
-		bool operator==(const basic_string<T>& obj) const;                // Compare two strings
-		bool operator==(const T* obj) const;                              // Compare two strings in cstring
-		bool operator!=(const basic_string<T>& obj) const;
-		bool operator!=(const T* obj) const;
-		bool operator<(const basic_string<T>& obj) const;
-		bool operator<(const T* obj) const;
-		bool operator>(const basic_string<T>& obj) const;
-		bool operator>(const T* obj) const;
 
-		basic_string<T> operator+(const basic_string<T>& obj) const;// Connect two strings
-		basic_string<T> operator+(const T* obj) const;              // Connect two strings
-		basic_string<T>& operator+=(const basic_string<T>& obj);    // Connect two strings
-		basic_string<T>& operator+=(const T* obj);                  // Connect two strings
+		basic_string<T>& operator+=(const basic_string<T>& obj);// Connect two strings
+		basic_string<T>& operator+=(const T* obj);              // Connect two strings
 
 		basic_string<T> operator()(const T* obj) const;
 
-		size_t find(const T& c) const;  // search a char
-		size_t find(const T* obj) const;// search a substr
+		size_t find(const T& c) const;                // search a char
+		size_t find(const T* obj) const;              // search a substr
+		size_t find(const basic_string<T>& obj) const;// search a substr
 
 		void _POP_EXC_0()
 		{
-			while (size() >= 2 && data_ptr[size() - 2] == '\0') pop_back();
+			while (size() >= 2 &&
+			       data_ptr[size() - 2] == '\0') pop_back();
 		}
-
-		template <class Type>
-		friend basic_string<Type> operator+(const Type* array, const basic_string<Type>& str);// Connect two strings
 
 		friend std::ostream&
 		operator<<(std::ostream& output, const basic_string<T>& obj)
 		{
-			for (int i = 0; i < obj.size(); i++)
-				output << obj.data_ptr[i];
+			output << obj.data();
 			return output;
 		}
 
@@ -205,6 +194,88 @@ namespace nuts
 	using string = basic_string<char>;// Default in char_8bit type
 
 	template <class T>
+	bool operator==(const basic_string<T>& a, const basic_string<T>& b)
+	{
+		u64 _n = a.size() < b.size() ? a.size() : b.size();
+		return __memcmpeq(a.data(), b.data(), _n) == 0;
+	}
+
+	template <class T>
+	bool operator==(const basic_string<T>& a, const T* b)
+	{
+		u64 _n = a.size() < strlen(b) ? a.size() : strlen(b);
+		return __memcmpeq(a.data(), b, _n) == 0;
+	}
+
+	template <class T>
+	bool operator!=(const basic_string<T>& a, const basic_string<T>& b)
+	{
+		return !(a == b);
+	}
+
+	template <class T>
+	bool operator!=(const basic_string<T>& a, const T* b)
+	{
+		return !(a == b);
+	}
+
+	template <class T>
+	bool operator<(const basic_string<T>& a, const basic_string<T>& b)
+	{
+		u64 _n = a.size() < b.size() ? a.size() : b.size();
+		return memcmp(a.data(), b.data(), _n) < 0;
+	}
+
+	template <class T>
+	bool operator<(const basic_string<T>& a, const T* b)
+	{
+		u64 _n = a.size() < strlen(b) ? a.size() : strlen(b);
+		return memcmp(a.data(), b, _n) < 0;
+	}
+
+	template <class T>
+	bool operator>(const basic_string<T>& a, const basic_string<T>& b)
+	{
+		u64 _n = a.size() < b.size() ? a.size() : b.size();
+		return memcmp(a.data(), b.data(), _n) > 0;
+	}
+
+	template <class T>
+	bool operator>(const basic_string<T>& a, const T* b)
+	{
+		u64 _n = a.size() < strlen(b) ? a.size() : strlen(b);
+		return memcmp(a.data(), b, _n) > 0;
+	}
+
+	template <class T>
+	bool operator<=(const basic_string<T>& a, const basic_string<T>& b)
+	{
+		u64 _n = a.size() < b.size() ? a.size() : b.size();
+		return memcmp(a.data(), b.data(), _n) <= 0;
+	}
+
+	template <class T>
+	bool operator<=(const basic_string<T>& a, const T* b)
+	{
+		u64 _n = a.size() < strlen(b) ? a.size() : strlen(b);
+		return memcmp(a.data(), b, _n) <= 0;
+	}
+
+	template <class T>
+	bool operator>=(const basic_string<T>& a, const basic_string<T>& b)
+	{
+		u64 _n = a.size() < b.size() ? a.size() : b.size();
+		return memcmp(a.data(), b.data(), _n) >= 0;
+	}
+
+	template <class T>
+	bool operator>=(const basic_string<T>& a, const T* b)
+	{
+		u64 _n = a.size() < strlen(b) ? a.size() : strlen(b);
+		return memcmp(a.data(), b, _n) >= 0;
+	}
+
+	template <class T>
 	basic_string<T>::basic_string(const basic_string<T>& src)
 	{
 		data_ptr = new T[src.size() + STD_EXPAN];
@@ -212,8 +283,6 @@ namespace nuts
 		v_capacity = v_size + STD_EXPAN;
 		strncpy(data_ptr, src.data_ptr, v_size);
 		_POP_EXC_0();
-		// for (size_t i = 0; i < v_size; i++)
-		// 	data_ptr[i] = src.data_ptr[i];
 	}
 
 	template <class T>
@@ -222,12 +291,9 @@ namespace nuts
 		v_size = strlen(obj);
 		v_capacity = v_size + STD_EXPAN;
 		data_ptr = new T[v_size + STD_EXPAN];
-		strncpy(data_ptr, obj, v_size + 1);
+		memcpy(data_ptr, obj, v_size + 1);
 		v_size++;
 		_POP_EXC_0();
-
-		// for (size_t i = 0; i <= v_size; i++)
-		// 	data_ptr[i] = obj[i];
 	}
 
 	template <class T>
@@ -303,8 +369,7 @@ namespace nuts
 		if (N != v_size)
 		{
 			T* tmp = new T[N];
-			for (size_t i = 0; i < v_size && i < N; i++)
-				tmp[i] = data_ptr[i];
+			memcpy(tmp, data_ptr, N < size() ? N : size());
 			delete[] data_ptr;
 			data_ptr = tmp;
 			v_capacity = N;
@@ -340,20 +405,6 @@ namespace nuts
 		return *this;
 	}
 
-	// template <class T>
-	// basic_string<T> &basic_string<T>::deprive(basic_string<T> &after)
-	// {
-	//     this->destroy();
-	//     this->data_ptr = after.data_ptr; // Pass ownership
-	//     this->v_size = after.v_size;
-	//     this->v_capacity = after.v_capacity;
-
-	//     after.data_ptr = nullptr; // Set invalid
-	//     after.v_size = 0;
-	//     after.v_capacity = 0;
-	//     return *this;
-	// }
-
 	template <class T>
 	T& basic_string<T>::operator[](const size_t N)
 	{
@@ -375,8 +426,7 @@ namespace nuts
 		data_ptr = new T[obj.size()];
 		v_size = obj.size();
 		v_capacity = v_size;
-		for (size_t i = 0; i < v_size; i++)
-			data_ptr[i] = obj.data_ptr[i];
+		strncpy(data_ptr, obj.data(), obj.size());
 		return *this;
 	}
 
@@ -389,13 +439,6 @@ namespace nuts
 		data_ptr = new T[v_size + 1];
 		strncpy(data_ptr, obj, v_size + 1);
 		return *this;
-
-		// for (size_t i = 0; obj[i] != '\0'; i++)
-		// 	this->v_size++;
-		// this->data_ptr = new T[this->v_size + STD_EXPAN];
-		// this->v_capacity = this->v_size + STD_EXPAN;
-		// strcpy(data_ptr, obj);
-		// return *this;
 	}
 
 	template <class T>
@@ -410,126 +453,29 @@ namespace nuts
 	}
 
 	template <class T>
-	bool basic_string<T>::operator==(const basic_string<T>& obj) const
+	basic_string<T> operator+(const basic_string<T>& a, const basic_string<T>& b)
 	{
-		unsigned count = 0;
-		for (size_t i = 0; i < v_size && i < obj.v_size; i++)
-		{
-			if (data_ptr[i] == obj.data_ptr[i])
-				count++;
-		}
-		return count == v_size && count == obj.v_size;
-	}
-
-	template <class T>
-	bool basic_string<T>::operator==(const T* obj) const
-	{
-		size_t obj_len = 0;
-		for (size_t i = 0; obj[i] != '\0'; i++)
-			obj_len++;
-		unsigned count = 0;
-		for (size_t i = 0; i < v_size && i < obj_len; i++)
-		{
-			if (data_ptr[i] == obj[i])
-				count++;
-		}
-		return count == v_size && count == obj_len;
-	}
-
-	template <class T>
-	bool basic_string<T>::operator!=(const basic_string<T>& obj) const
-	{
-		bool flag = this->operator==(obj);
-		return !flag;
-	}
-
-	template <class T>
-	bool basic_string<T>::operator!=(const T* obj) const
-	{
-		bool flag = this->operator==(obj);
-		return !flag;
-	}
-
-	template <class T>
-	bool basic_string<T>::operator<(const basic_string<T>& obj) const
-	{
-		for (size_t i = 0; i < size(); i++)
-		{
-			if ((*this)[i] != obj[i])
-				return (*this)[i] < obj[i];
-		}
-		if (size() == obj.size())
-			return false;
-		else
-			return size() < obj.size();
-	}
-
-	template <class T>
-	bool basic_string<T>::operator<(const T* obj) const
-	{
-		string copy = obj;
-		return this->operator<(copy);
-	}
-
-	template <class T>
-	bool basic_string<T>::operator>(const basic_string<T>& obj) const
-	{
-		bool flag = this->operator<(obj);
-		return !flag;
-	}
-
-	template <class T>
-	bool basic_string<T>::operator>(const T* obj) const
-	{
-		string copy = obj;
-		return this->operator>(copy);
-	}
-
-	template <class T>
-	basic_string<T> basic_string<T>::operator+(const basic_string<T>& obj) const
-	{
-		_POP_EXC_0();
-		basic_string<T> result = *this;
-		result.resize(v_size + obj.v_size + STD_EXPAN);
-		for (size_t i = 0; i < obj.size(); i++)
-			result[v_size + i] = obj.data_ptr[i];
-		result.v_size = v_size + obj.v_size;
-		result.shrink_to_fit();
+		basic_string<T> result = a;
+		result._POP_EXC_0();
+		result += b;
 		return result;
 	}
 
 	template <class T>
-	basic_string<T>
-	basic_string<T>::operator+(const T* obj) const
+	basic_string<T> operator+(const basic_string<T>& a, const T* b)
 	{
-		_POP_EXC_0();
-		size_t obj_len = 0;
-		for (size_t i = 0; obj[i] != '\0'; i++)
-			obj_len++;
-		basic_string<T> result(*this);
-		result.resize(v_size + obj_len + STD_EXPAN);
-		for (size_t i = 0; i <= obj_len; i++)
-			result[v_size + i - 1] = obj[i];
-		result.v_size = v_size + obj_len;
-		result.push_back('\0');
-		result.shrink_to_fit();
+		basic_string<T> result = a;
+		result._POP_EXC_0();
+		result += b;
 		return result;
 	}
 
-	template <class Type>
-	basic_string<Type> operator+(const Type* array, const basic_string<Type>& str)
+	template <class T>
+	basic_string<T> operator+(const T* a, const basic_string<T>& b)
 	{
-		// str._POP_EXC_0();
-		size_t a_len = 0;
-		for (size_t i = 0; array[i] != '\0'; i++)
-			a_len++;
-		basic_string<Type> result(array);
-		result.resize(a_len + str.v_size + STD_EXPAN);
-		for (size_t i = 0; i < str.v_size; i++)
-			result[a_len + i] = str[i];
-		result.v_size = str.v_size + a_len;
-		result.push_back('\0');
-		result.shrink_to_fit();
+		basic_string<T> result = a;
+		result._POP_EXC_0();
+		result += b;
 		return result;
 	}
 
@@ -538,8 +484,10 @@ namespace nuts
 	basic_string<T>::operator+=(const basic_string<T>& obj)
 	{
 		_POP_EXC_0();
-		for (int i = 0; i < obj.size(); i++)
-			push_back(obj[i]);
+		u64 _n = size() + obj.size() + STD_EXPAN;
+		resize(_n);
+		v_size = _n;
+		strcat(data_ptr, obj.data());
 		_POP_EXC_0();
 		return *this;
 	}
@@ -548,11 +496,10 @@ namespace nuts
 	basic_string<T>& basic_string<T>::operator+=(const T* obj)
 	{
 		_POP_EXC_0();
-		size_t obj_len = 0;
-		for (size_t i = 0; obj[i] != '\0'; i++)
-			obj_len++;
-		for (size_t i = 0; i <= obj_len; i++)
-			push_back(obj[i]);
+		u64 _n = size() + strlen(obj) + STD_EXPAN;
+		resize(_n);
+		v_size = _n;
+		strcat(data_ptr, obj);
 		_POP_EXC_0();
 		return *this;
 	}
@@ -567,11 +514,7 @@ namespace nuts
 	template <class T>
 	size_t basic_string<T>::find(const T& c) const
 	{
-		for (size_t i = 0, s = size(); i < s; i++)
-		{
-			if (*(this)[i] == c[i])
-				return i;
-		}
+		return (strchr(data_ptr, c) - data_ptr) / sizeof(T);
 	}
 
 	template <class T>
@@ -580,15 +523,77 @@ namespace nuts
 		return (strstr(data_ptr, target) - data_ptr) / sizeof(T);
 	}
 
-	//  Hash Specialization
-	template <>
-	struct hash<nuts::string>
+	template <class T>
+	size_t basic_string<T>::find(const basic_string<T>& target) const
 	{
-		u64 operator()(const nuts::string& x) const
+		return (strstr(data_ptr, target.data()) - data_ptr) / sizeof(T);
+	}
+
+	template <class T = char>
+	class small_string
+	{
+	public:
+		using value_type = T;
+		using self_type = small_string<T>;
+
+		small_string() = default;
+		~small_string() = default;
+		small_string(const T* src);
+		small_string(const self_type& src);
+
+		T& operator[](u64 pos) { return impl[pos]; }
+		const T& operator[](u64 pos) const { return impl[pos]; }
+
+		self_type& operator=(const T* src);
+		self_type& operator=(const self_type& src);
+
+		friend std::ostream&
+		operator<<(std::ostream& output, const small_string<T>& obj)
+		{
+			for (int i = 0; i < 24; i++)
+				output << obj[i];
+			return output;
+		}
+
+	protected:
+		value_type impl[24] = {'\0'};
+	};
+
+	template <typename T>
+	small_string<T>::small_string(const value_type* src)
+	{
+		auto k = strlen(src) + 1;
+		strncpy(impl, src, k <= 24 ? k : 24);
+	}
+
+	template <typename T>
+	small_string<T>::small_string(const self_type& src)
+	{
+		strncpy(impl, src.impl, 24);
+	}
+
+	template <typename T>
+	small_string<T>& small_string<T>::operator=(const value_type* src)
+	{
+		auto k = strlen(src) + 1;
+		strncpy(impl, src, k <= 24 ? k : 24);
+		return *this;
+	}
+
+	template <typename T>
+	small_string<T>& small_string<T>::operator=(const self_type& src)
+	{
+		strncpy(impl, src.impl, 24);
+		return *this;
+	}
+
+	template <>
+	struct hash<string>
+	{
+		u64 operator()(const string& x) const
 		{
 			u64 i = 0;
-			for_each(x.begin(), x.end(),
-			         [&i](const auto& c) { i += (u64) c; });
+			for_each(x, [&i](const auto& c) { i += (u64) c & 0xbf5847; });
 
 			auto hasher = [](u64 x) -> u64 {
 				x = (x ^ (x >> 30)) * u64(0xbf58476d1ce4e5b9);

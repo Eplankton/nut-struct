@@ -35,9 +35,9 @@ namespace nuts
 	};
 
 	template <typename T>
-	concept HasPrintMethod = requires(T x)
+	concept HasPrintMethod = requires(T Box)
 	{
-		x.print();
+		Box.print();
 	};
 
 	template <typename T>
@@ -60,8 +60,8 @@ namespace nuts
 	template <typename T>
 	concept Multi = requires(T a, T b)
 	{
-		a* b;
-		b* a;
+		a * b;
+		b * a;
 	};
 
 	template <typename T>

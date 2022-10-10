@@ -5,4 +5,4 @@ echo -e "\n\e[36;1m[Demo]\e[0m: Success with no error...\n\n====================
 ./demo
 rm demo
 echo -e "\n================================"
-echo -e "\n\e[36;1m[Demo]\e[0m: Exit...\n"
+echo -e "\n\e[36;1m[Demo]\e[0m: Exit...\n\n"

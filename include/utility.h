@@ -1,6 +1,7 @@
 #ifndef _NUTS_UTILI_
 #define _NUTS_UTILI_ 1
 
+#include "algorithm.h"
 #include "move.h"
 #include <iostream>
 
@@ -67,13 +68,13 @@ namespace nuts
 
 		pair<T1, T2>& operator=(pair<T1, T2>&& src)
 		{
-			return move(src);
+			return this->move(src);
 		}
 
 		friend std::ostream&
 		operator<<(std::ostream& output, const pair<T1, T2>& obj)
 		{
-			std::cout << '(' << obj.first << ", " << obj.second << ')';
+			nuts::print('(', obj.first, ", ", obj.second, ')');
 			return output;
 		}
 	};

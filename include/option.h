@@ -7,6 +7,7 @@
      */
 
 #include "basic_string.h"
+#include "utility.h"
 
 namespace nuts
 {

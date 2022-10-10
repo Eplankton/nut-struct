@@ -1,5 +1,5 @@
-#ifndef _NUTS_UNO_SET_
-#define _NUTS_UNO_SET_ 1
+#ifndef _NUTS_HASH_SET_
+#define _NUTS_HASH_SET_ 1
 
 #include "functional.h"
 #include "list.h"

@@ -2,7 +2,6 @@
 #define _NUTS_FUNC_ 1
 
 #include "type.h"
-#include "utility.h"
 
 namespace nuts
 {

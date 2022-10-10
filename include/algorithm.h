@@ -12,30 +12,12 @@
 
 namespace nuts
 {
-	template <StreamOutput T>
-	void println(const T& x)
+	template <typename... T>
+	auto sum(T... s)
 	{
-		std::cout << x << '\n';
+		return (... + s);
 	}
-
-	template <HasPrintMethod T>
-	void println(const T& x)
-	{
-		x.print();
-	}
-
-	template <StreamOutput T>
-	void print(const T& x)
-	{
-		std::cout << x;
-	}
-
-	template <HasPrintMethod T>
-	void print(const T& x)
-	{
-		x.print();
-	}
-
+	
 	template <typename Itr, class Func>
 	Func for_each(Itr st, Itr ed, Func fn)
 	{
@@ -45,9 +27,9 @@ namespace nuts
 	}
 
 	template <Iterable C, class Func>
-	Func for_each(const C& x, Func fn)
+	Func for_each(const C& Box, Func fn)
 	{
-		for (auto& i: range(x)) fn(i);
+		for (auto& i: range(Box)) fn(i);
 		return fn;
 	}
 
@@ -256,6 +238,56 @@ namespace nuts
 			++st;
 		}
 		return res;
+	}
+
+	template <StreamOutput T>
+	void print(const T& fmt)
+	{
+		std::cout << fmt;
+	}
+
+	template <HasPrintMethod T>
+	void print(const T& Box)
+	{
+		Box.print();
+	}
+
+	template <typename T>
+	requires StreamOutput<T> && HasPrintMethod<T>
+	void print(const T& x)
+	{
+		std::cout << x;
+	}
+
+	template <typename... T>
+	void print(T&&... args)
+	{
+		(..., [](const Display auto& x) { print(x); }(args));
+	}
+
+	template <StreamOutput T>
+	void println(const T& fmt)
+	{
+		print(fmt, '\n');
+	}
+
+	template <HasPrintMethod T>
+	void println(const T& Box)
+	{
+		print(Box);
+	}
+
+	template <typename T>
+	requires StreamOutput<T> && HasPrintMethod<T>
+	void println(const T& x)
+	{
+		print(x, '\n');
+	}
+
+	template <typename... T>
+	void println(T&&... args)
+	{
+		(..., [](const Display auto& x) { println(x); }(args));
 	}
 
 	// template <typename Itr>

@@ -172,8 +172,8 @@ namespace nuts
 			T* operator->() const { return (T*) &_ptr->data; }
 		};
 
-		iterator begin() const { return {const_cast<node_ptr>(head)}; }
-		iterator end() const { return {const_cast<node_ptr>(tail)}; }
+		iterator begin() const { return iterator(const_cast<node_ptr>(head)); }
+		iterator end() const { return iterator(const_cast<node_ptr>(tail)); }
 
 		T& front() { return head->data; }
 		T& back() { return tail->data; }

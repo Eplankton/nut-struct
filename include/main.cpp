@@ -8,7 +8,7 @@ int main()
 	// set<i32> A {7, 8, 0, 4, 2, 6, 9, 3, 5, 1};
 	set<i32> A;
 	hash_set<i32> B {1, 4, 7, 10, 13, 16, 19, 22, 25, 28};
-	for (auto i: range(0, 20))
+	for (auto i: range(0, 10))
 		A.insert((i32) i);
 	// A.print();
 	// B.print();

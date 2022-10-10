@@ -341,7 +341,7 @@ namespace nuts
 			if (&x != &back()) printf(", ");
 		};
 
-		printf("\nvector @%#llx = [", (u64) data());
+		printf("vector @%#llx = [", (u64) data());
 		for_each(*this, print);
 		printf("]\n");
 	}
