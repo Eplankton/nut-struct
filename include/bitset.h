@@ -25,14 +25,14 @@ namespace nuts
 			bit_ref() = default;
 			bit_ref(const bit_ref&) = default;
 			bit_ref(const bitset& obj, u64 pos)
-					: _p(pos),
-					  _m(const_cast<base_type *>(&obj.impl)) {}
+			    : _p(pos),
+			      _m(const_cast<base_type*>(&obj.impl)) {}
 
 			bit_ref& operator=(bool val)
 			{
 				u64 i = _p / 8,
-						ofs = _p % 8,
-						tmp = (u8) 1 << (u8) (7 - ofs);
+				    ofs = _p % 8,
+				    tmp = (u8) 1 << (u8) (7 - ofs);
 				if (val)
 					(*_m)[i] |= (tmp);
 				else
@@ -55,7 +55,7 @@ namespace nuts
 			bool operator!=(const bit_ref& y) const { return get() != y.get(); }
 
 		protected:
-			base_type *_m = nullptr;
+			base_type* _m = nullptr;
 			u64 _p = 0;
 		};
 
@@ -65,7 +65,7 @@ namespace nuts
 		bitset(const bitset<N>& src) = default;
 		explicit bitset(bool val);
 		explicit bitset(const string& bit_str);
-		explicit bitset(const char *src);
+		explicit bitset(const char* src);
 
 		static constexpr u64 size() { return N; }
 
@@ -264,7 +264,7 @@ namespace nuts
 	}
 
 	template <u64 N>
-	bitset<N>::bitset(const char *src)
+	bitset<N>::bitset(const char* src)
 	{
 		nuts::fill_n(impl.begin(), impl.size(), (u8) 0);
 		for (u64 i = 0; i < strlen(src) - 1; i++)
