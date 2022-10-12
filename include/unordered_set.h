@@ -18,22 +18,22 @@ namespace nuts
 	        50331653ul, 100663319ul, 201326611ul, 402653189ul,
 	        805306457ul, 1610612741ul, 3221225473ul, 429496729ul};
 
-	template <typename Key,
-	          typename Hasher = nuts::hash<Key>>
+	template <typename K,
+	          typename Hasher = nuts::hash<K>>
 	class unordered_set
 	{
 	public:
 		using prime_pointer = const u64*;
-		using value_type = Key;
-		using self_type = unordered_set<Key, Hasher>;
-		using bucket_type = list<Key>;
+		using value_type = K;
+		using self_type = unordered_set<K, Hasher>;
+		using bucket_type = list<K>;
 
 	public:
 		class iterator
 		    : public forward_iterator
 		{
 		public:
-			using value_type = Key;
+			using value_type = K;
 			using Outside = typename vector<bucket_type>::iterator;
 			using Inside = typename bucket_type::iterator;
 
@@ -52,8 +52,8 @@ namespace nuts
 			                                in_itr(src.in_itr) {}
 			~iterator() = default;
 
-			Key& operator*() { return *in_itr; }
-			const Key& operator*() const { return *in_itr; }
+			K& operator*() { return *in_itr; }
+			const K& operator*() const { return *in_itr; }
 			const Inside& operator->() const { return in_itr; }
 
 			iterator& operator++()
@@ -121,23 +121,23 @@ namespace nuts
 		unordered_set();
 		unordered_set(const self_type& src);
 		unordered_set(self_type&& src) { move(src); }
-		unordered_set(const std::initializer_list<Key>& ilist);
+		unordered_set(const std::initializer_list<K>& ilist);
 		~unordered_set() { clear(); }
 
-		Key& front() { return *begin(); }
-		Key& back() { return *end(); }
-		const Key& front() const { return *begin(); }
-		const Key& back() const { return *end(); }
+		K& front() { return *begin(); }
+		K& back() { return *end(); }
+		const K& front() const { return *begin(); }
+		const K& back() const { return *end(); }
 
 		u64 size() const { return _size; }
 		bool empty() const { return _size == 0; };
 		self_type& move(self_type& src);
 
-		iterator find(const Key& _k) const;
-		bool contains(const Key& _k) const;
-		void insert(const Key& _k);
-		void insert(Key&& _k);
-		bool erase(const Key& _k);
+		iterator find(const K& _k) const;
+		bool contains(const K& _k) const;
+		void insert(const K& _k);
+		void insert(K&& _k);
+		bool erase(const K& _k);
 		void rehash();
 		void clear();
 
@@ -157,18 +157,18 @@ namespace nuts
 		static constexpr iterator npos {};
 	};
 
-	template <class Key, class Hasher = nuts::hash<Key>>
-	using hash_set = unordered_set<Key, Hasher>;
+	template <class K, class Hasher = nuts::hash<K>>
+	using hash_set = unordered_set<K, Hasher>;
 
-	template <class Key, class Hasher>
-	unordered_set<Key, Hasher>::unordered_set()
+	template <class K, class Hasher>
+	unordered_set<K, Hasher>::unordered_set()
 	{
 		vector<bucket_type> tmp(*bucket_size);
 		bucket.move(tmp);
 	}
 
-	template <class Key, class Hasher>
-	unordered_set<Key, Hasher>::
+	template <class K, class Hasher>
+	unordered_set<K, Hasher>::
 	        unordered_set(const self_type& src)
 	{
 		bucket_size = src.bucket_size;
@@ -176,9 +176,9 @@ namespace nuts
 		_size = src._size;
 	}
 
-	template <class Key, class Hasher>
-	unordered_set<Key, Hasher>::
-	        unordered_set(const std::initializer_list<Key>& ilist)
+	template <class K, class Hasher>
+	unordered_set<K, Hasher>::
+	        unordered_set(const std::initializer_list<K>& ilist)
 	{
 		while (ilist.size() > *bucket_size) bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
@@ -186,9 +186,9 @@ namespace nuts
 		for (const auto& x: ilist) insert(x);
 	}
 
-	template <class Key, class Hasher>
-	typename unordered_set<Key, Hasher>::iterator
-	unordered_set<Key, Hasher>::find(const Key& _k) const
+	template <class K, class Hasher>
+	typename unordered_set<K, Hasher>::iterator
+	unordered_set<K, Hasher>::find(const K& _k) const
 	{
 		u64 index = hash_fn(_k) % *bucket_size;
 		auto ed = bucket[index].end() + 1;
@@ -202,8 +202,8 @@ namespace nuts
 		return npos;
 	}
 
-	template <class Key, class Hasher>
-	unordered_set<Key, Hasher>& unordered_set<Key, Hasher>::
+	template <class K, class Hasher>
+	unordered_set<K, Hasher>& unordered_set<K, Hasher>::
 	        move(self_type& src)
 	{
 		bucket_size = src.bucket_size;
@@ -214,8 +214,8 @@ namespace nuts
 		return *this;
 	}
 
-	template <class Key, class Hasher>
-	unordered_set<Key, Hasher>& unordered_set<Key, Hasher>::
+	template <class K, class Hasher>
+	unordered_set<K, Hasher>& unordered_set<K, Hasher>::
 	operator=(const self_type& src)
 	{
 		bucket_size = src.bucket_size;
@@ -224,15 +224,15 @@ namespace nuts
 		return *this;
 	}
 
-	template <class Key, class Hasher>
-	bool unordered_set<Key, Hasher>::
-	        contains(const Key& _k) const
+	template <class K, class Hasher>
+	bool unordered_set<K, Hasher>::
+	        contains(const K& _k) const
 	{
 		return find(_k) != npos;
 	}
 
-	template <class Key, class Hasher>
-	void unordered_set<Key, Hasher>::insert(const Key& _k)
+	template <class K, class Hasher>
+	void unordered_set<K, Hasher>::insert(const K& _k)
 	{
 		auto it = find(_k);
 		if (it == npos)
@@ -244,21 +244,21 @@ namespace nuts
 		}
 	}
 
-	template <class Key, class Hasher>
-	void unordered_set<Key, Hasher>::insert(Key&& _k)
+	template <class K, class Hasher>
+	void unordered_set<K, Hasher>::insert(K&& _k)
 	{
 		auto it = find(_k);
 		if (it == npos)
 		{
 			if (_size == *bucket_size - 1) rehash();
 			u64 index = hash_fn(_k) % *bucket_size;
-			bucket[index].push_back(static_cast<Key&&>(_k));
+			bucket[index].push_back(static_cast<K&&>(_k));
 			++_size;
 		}
 	}
 
-	template <class Key, class Hasher>
-	bool unordered_set<Key, Hasher>::erase(const Key& _k)
+	template <class K, class Hasher>
+	bool unordered_set<K, Hasher>::erase(const K& _k)
 	{
 		u64 index = hash_fn(_k) % *bucket_size;
 		auto ed = bucket[index].end() + 1;
@@ -275,8 +275,8 @@ namespace nuts
 		return false;
 	}
 
-	template <class Key, class Hasher>
-	void unordered_set<Key, Hasher>::clear()
+	template <class K, class Hasher>
+	void unordered_set<K, Hasher>::clear()
 	{
 		if (!empty())
 		{
@@ -286,13 +286,13 @@ namespace nuts
 		}
 	}
 
-	template <class Key, class Hasher>
-	void unordered_set<Key, Hasher>::rehash()
+	template <class K, class Hasher>
+	void unordered_set<K, Hasher>::rehash()
 	{
 		bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
 
-		auto opr = [this, &tmp](Key& x) {
+		auto opr = [this, &tmp](K& x) {
 			u64 index = hash_fn(x) % (*bucket_size);
 			tmp[index].push_back(nuts::move(x));
 		};
@@ -301,8 +301,8 @@ namespace nuts
 		bucket.move(tmp);
 	}
 
-	template <class Key, class Hasher>
-	void unordered_set<Key, Hasher>::print() const
+	template <class K, class Hasher>
+	void unordered_set<K, Hasher>::print() const
 	{
 		auto pr = [this](const auto& x) {
 			nuts::print(x);
@@ -314,8 +314,8 @@ namespace nuts
 		printf("}\n");
 	}
 
-	template <class Key, class Hasher>
-	void unordered_set<Key, Hasher>::print_as_table() const
+	template <class K, class Hasher>
+	void unordered_set<K, Hasher>::print_as_table() const
 	{
 		u64 collison = 0;
 		for (u64 n = 0; n < *bucket_size; ++n)

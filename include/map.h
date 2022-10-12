@@ -19,29 +19,29 @@ namespace nuts
 		}
 	};
 
-	template <typename Key,
-	          typename Val, class Compare = default_key_compare<Key, Val>>
-	class map : public set<pair<Key, Val>, Compare>
+	template <typename K,
+	          typename V, class Compare = default_key_compare<K, V>>
+	class map : public set<pair<K, V>, Compare>
 	{
 	public:
-		using value_type = pair<Key, Val>;
-		using key_type = Key;
-		using val_type = Val;
-		using itr_type = typename AVL<pair<Key, Val>, Compare>::iterator;
-		using base_type = set<pair<Key, Val>, Compare>;
+		using value_type = pair<K, V>;
+		using key_type = K;
+		using val_type = V;
+		using itr_type = typename AVL<pair<K, V>, Compare>::iterator;
+		using base_type = set<pair<K, V>, Compare>;
 
 	public:
 		map() = default;
-		map(const map<Key, Val, Compare>& src)
+		map(const map<K, V, Compare>& src)
 		{
 			for_each(*this, [this](const auto& x) { insert(x); });
 		}
 
-		map(map<Key, Val, Compare>&& src) { base_type::move(src); }
+		map(map<K, V, Compare>&& src) { base_type::move(src); }
 		~map() = default;
 
-		map<Key, Val, Compare>& operator=(const map<Key, Val, Compare>& src);
-		map<Key, Val, Compare>& operator=(map<Key, Val, Compare>&& src)
+		map<K, V, Compare>& operator=(const map<K, V, Compare>& src);
+		map<K, V, Compare>& operator=(map<K, V, Compare>&& src)
 		{
 			base_type::move(src);
 			return *this;
@@ -49,58 +49,58 @@ namespace nuts
 
 		void print() const;
 
-		auto insert(const Key& _k, const Val& _v)
+		auto insert(const K& _k, const V& _v)
 		{
 			return base_type::insert({_k, _v});
 		}
 
-		auto insert(const pair<Key, Val>& _p)
+		auto insert(const pair<K, V>& _p)
 		{
 			return base_type::insert(_p);
 		}
 
-		auto insert(pair<Key, Val>&& _p)
+		auto insert(pair<K, V>&& _p)
 		{
-			return base_type::insert(static_cast<pair<Key, Val>&&>(_p));
+			return base_type::insert(static_cast<pair<K, V>&&>(_p));
 		}
 
-		auto erase(const Key& _k)
+		auto erase(const K& _k)
 		{
-			pair<Key, Val> tmp;
+			pair<K, V> tmp;
 			tmp.first = _k;
 			return base_type::erase(tmp);
 		}
 
-		itr_type find(const Key& _k) const
+		itr_type find(const K& _k) const
 		{
-			pair<Key, Val> tmp;
+			pair<K, V> tmp;
 			tmp.first = _k;
 			return base_type::find(tmp);
 		}
 
-		bool contains(const Key& _k)
+		bool contains(const K& _k)
 		        const { return this->find(_k) != this->npos; }
 
-		Val& at(const Key& _k)
+		V& at(const K& _k)
 		{
 			auto loc = this->find(_k);
 			assert(loc != this->npos);
 			return loc->second;
 		}
 
-		const Val& at(const Key& _k) const
+		const V& at(const K& _k) const
 		{
 			auto loc = this->find(_k);
 			assert(loc != this->npos);
 			return loc->second;
 		}
 
-		Val& operator[](const Key& _k)
+		V& operator[](const K& _k)
 		{
 			auto loc = this->find(_k);
 			if (loc == this->npos)
 			{
-				pair<Key, Val> tmp;
+				pair<K, V> tmp;
 				tmp.first = _k;
 				auto at = base_type::insert_ret_pos(tmp);
 				return at->second;
@@ -109,20 +109,20 @@ namespace nuts
 				return loc->second;
 		}
 
-		const Val& operator[](const Key& _k) const { return at(_k); }
+		const V& operator[](const K& _k) const { return at(_k); }
 	};
 
-	template <typename Key, typename Val, class Compare>
-	map<Key, Val, Compare>& map<Key, Val, Compare>::
-	operator=(const map<Key, Val, Compare>& src)
+	template <typename K, typename V, class Compare>
+	map<K, V, Compare>& map<K, V, Compare>::
+	operator=(const map<K, V, Compare>& src)
 	{
 		base_type::clear();
 		for_each(*this, [this](const auto& x) { insert(x); });
 		return *this;
 	}
 
-	template <typename Key, typename Val, class Compare>
-	void map<Key, Val, Compare>::print() const
+	template <typename K, typename V, class Compare>
+	void map<K, V, Compare>::print() const
 	{
 		auto printer = [this](const auto& x) {
 			nuts::print(x);
