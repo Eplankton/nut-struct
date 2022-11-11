@@ -23,15 +23,6 @@ namespace nuts
 		using buf_type = array<T, Buf>;
 		using map_type = list<buf_type>;
 
-	private:
-		bool is_front_full() const;
-		bool is_back_full() const;
-		void allocate_front();
-		void allocate_back();
-		void free_front();
-		void free_back();
-
-	public:
 		class iterator
 		    : public bidirectional_iterator
 		{
@@ -203,6 +194,14 @@ namespace nuts
 		void print() const;
 		void print_detail() const;
 
+	private:
+		bool is_front_full() const;
+		bool is_back_full() const;
+		void allocate_front();
+		void allocate_back();
+		void free_front();
+		void free_back();
+
 	protected:
 		map_type impl;
 		u64 _size = 0;
@@ -218,7 +217,7 @@ namespace nuts
 	template <typename T, u64 Buf>
 	deque<T, Buf>::deque(const deque<T, Buf>& src)
 	{
-		for_each(src, [this](const T& x) { push_back(x); });
+		for (const T& x: range(src)) push_back(x);
 	}
 
 	template <typename T, u64 Buf>

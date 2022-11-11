@@ -84,7 +84,8 @@ namespace nuts
 		return {some, tmp.first, tmp.second};
 	}
 
-	// How-to-use?
+	// ## How-to-use?
+	
 	// auto detect_scheme = [&m](const auto& it) {
 	// 				if (it == m.npos)
 	// 	        		return make_pair(Panic, (string)"Get npos iterator!");

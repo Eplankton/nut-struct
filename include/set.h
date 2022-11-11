@@ -22,11 +22,18 @@ namespace nuts
 
 		self_type& operator=(const self_type& src);
 		self_type& operator=(self_type&& src);
+		self_type& move(self_type& src);
 		void print() const;
 	};
 
 	template <typename T, class Compare>
 	set<T, Compare>& set<T, Compare>::operator=(self_type&& src)
+	{
+		return move(src);
+	}
+
+	template <typename T, class Compare>
+	set<T, Compare>& set<T, Compare>::move(self_type& src)
 	{
 		base_type::move(src);
 		return *this;

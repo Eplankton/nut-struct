@@ -25,6 +25,9 @@ namespace nuts
 		unordered_map(self_type&& src) { move(src); }
 		~unordered_map() { base_type::clear(); }
 
+		inline u64 get_index(const K& _k)
+		        const { return this->hash_fn(_k) % *(this->bucket_size); }
+
 		self_type& move(self_type& src);
 		void rehash();
 		bool contains(const K& _k) const;
@@ -76,7 +79,7 @@ namespace nuts
 	template <class K, class V, class Hasher>
 	bool unordered_map<K, V, Hasher>::contains(const K& _k) const
 	{
-		u64 index = hash_fn(_k) % *this->bucket_size;
+		u64 index = get_index(_k);
 		auto ed = this->bucket[index].end() + 1;
 		for (auto it = this->bucket[index].begin();
 		     it != ed; ++it)
@@ -91,7 +94,7 @@ namespace nuts
 	typename unordered_set<nuts::pair<K, V>, Hasher>::iterator
 	unordered_map<K, V, Hasher>::find(const K& _k) const
 	{
-		u64 index = this->hash_fn(_k) % *this->bucket_size;
+		u64 index = get_index(_k);
 		auto ed = this->bucket[index].end() + 1;
 		for (auto it = this->bucket[index].begin();
 		     it != nullptr && it != ed; ++it)
@@ -130,7 +133,7 @@ namespace nuts
 		{
 			if (this->_size == *this->bucket_size)
 				this->rehash();
-			u64 index = this->hash_fn(_k) % *this->bucket_size;
+			u64 index = get_index(_k);
 			this->bucket[index].emplace_back();
 			this->bucket[index].back().first = _k;
 			++this->_size;
@@ -176,7 +179,7 @@ namespace nuts
 		vector<bucket_type> tmp(*this->bucket_size);
 
 		auto opr = [this, &tmp](pair<K, V>& x) {
-			u64 index = this->hash_fn(x.first) % (*this->bucket_size);
+			u64 index = get_index(x.first);
 			tmp[index].push_back(nuts::move(x));
 		};
 
@@ -200,7 +203,7 @@ namespace nuts
 			if (&x != &(*this->end())) printf(", ");
 		};
 
-		printf("hash_map @%#llx = {", (u64) this->bucket.data());
+		printf("hash_map = {");
 		for_each(*this, pr);
 		printf("}\n");
 	}

@@ -655,6 +655,7 @@ namespace nuts
 		void double_rotate_right(node_ptr& ptr);
 		void update_upon(const node_ptr& ptr);
 		void balance(node_ptr& ptr);
+		void adjust(const itr_type& opt);
 
 	public:
 		AVL() { this->root = nullptr, this->_size = 0; }
@@ -699,7 +700,7 @@ namespace nuts
 	void AVL<T, Compare>::update_upon(const node_ptr& ptr)
 	{
 		if (ptr == nullptr) return;
-		node_ptr it {ptr.get()};
+		node_ptr it = ptr.get();
 		while (it != nullptr)
 		{
 			if (it->lc != nullptr)
@@ -836,7 +837,7 @@ namespace nuts
 	typename BST<T, Compare>::iterator
 	AVL<T, Compare>::insert_ret_pos(const T& _val)
 	{
-		auto tmp = _val;// make a copy
+		auto tmp = _val;
 		return insert_ret_pos(static_cast<T&&>(tmp));
 	}
 
@@ -847,13 +848,11 @@ namespace nuts
 	}
 
 	template <typename T, class Compare>
-	typename BST<T, Compare>::iterator
-	AVL<T, Compare>::insert_ret_pos(T&& _val)
+	void AVL<T, Compare>::adjust(const itr_type& opt)
 	{
-		auto opt = base_type::insert_ret_pos(static_cast<T&&>(_val));
 		if (opt != this->npos)
 		{
-			node_ptr loc {opt.get()};
+			node_ptr loc = opt.get();
 			update_upon(loc);
 			while (loc != nullptr)
 			{
@@ -867,6 +866,14 @@ namespace nuts
 				loc = nullptr;
 			}
 		}
+	}
+
+	template <typename T, class Compare>
+	typename BST<T, Compare>::iterator
+	AVL<T, Compare>::insert_ret_pos(T&& _val)
+	{
+		auto opt = base_type::insert_ret_pos(static_cast<T&&>(_val));
+		adjust(opt);
 		return opt;
 	}
 
@@ -884,22 +891,7 @@ namespace nuts
 	AVL<T, Compare>::erase_ret_pos(const T& _val)
 	{
 		auto opt = base_type::erase_ret_pos(_val);
-		if (opt != this->npos)
-		{
-			node_ptr loc(opt.get());
-			update_upon(loc);
-			while (loc != nullptr)
-			{
-				if (loc->bf == 2 || loc->bf == -2)
-					break;
-				loc = loc->prev.get();
-			}
-			if (loc != nullptr)
-			{
-				balance(loc);
-				loc = nullptr;
-			}
-		}
+		adjust(opt);
 		return opt;
 	}
 

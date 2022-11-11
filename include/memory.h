@@ -54,6 +54,113 @@ namespace nuts
 			_ptr = nullptr;
 		}
 
+		inline T& operator*()
+		{
+			assert(_ptr != nullptr);
+			return *_ptr;
+		}
+
+		inline const T& operator*() const
+		{
+			assert(_ptr != nullptr);
+			return *_ptr;
+		}
+
+		inline pointer operator->()
+		{
+			assert(_ptr != nullptr);
+			return _ptr;
+		}
+
+		inline const_pointer operator->() const
+		{
+			assert(_ptr != nullptr);
+			return _ptr;
+		}
+
+		inline pointer
+		get() const { return const_cast<pointer>(_ptr); }
+
+		pointer release()
+		{
+			auto tmp = _ptr;
+			_ptr = nullptr;
+			return tmp;
+		}
+
+		unique_ptr& operator=(unique_ptr<T, Dx>&& src)
+		// Only allow moveable rvalue
+		{
+			_ptr = src._ptr;
+			src._ptr = nullptr;
+			return *this;
+		}
+
+		unique_ptr& operator=(T* src)
+		{
+			_ptr = src;
+			return *this;
+		}
+
+		unique_ptr<T>& move(unique_ptr<T, Dx>& src)
+		{
+			_ptr = src._ptr;
+			src._ptr = nullptr;
+			return *this;
+		}
+
+		bool operator==(unique_ptr<T, Dx>& obj)
+		        const { return _ptr == obj._ptr; }
+
+		bool operator==(const T* obj)
+		        const { return _ptr == obj; }
+
+		bool operator!=(unique_ptr<T, Dx>& obj)
+		        const { return _ptr != obj._ptr; }
+
+		bool operator!=(const_pointer obj)
+		        const { return _ptr != obj; }
+
+	protected:
+		pointer _ptr = nullptr;
+		static constexpr Dx deleter {};
+	};
+
+	template <class T, class Dx>
+	class unique_ptr<T[], Dx>
+	{
+	public:
+		using value_type = T;
+		using pointer = T*;
+		using const_pointer = const T*;
+
+		unique_ptr() = default;
+		unique_ptr(pointer src) : _ptr(src) {}
+		unique_ptr(const_pointer src) : _ptr(const_cast<pointer>(src)) {}
+		unique_ptr(unique_ptr<T, Dx>& src)
+		{
+			_ptr = src._ptr;
+			src._ptr = nullptr;
+		}
+
+		~unique_ptr()
+		{
+			deleter(_ptr);
+			_ptr = nullptr;
+		}
+
+		T& operator[](u64 _n)
+		{
+			assert(_ptr != nullptr);
+			return _ptr[_n];
+		}
+
+		T& operator[](u64 _n) const
+		{
+			assert(_ptr != nullptr);
+			return _ptr[_n];
+		}
+
 		T& operator*()
 		{
 			assert(_ptr != nullptr);
@@ -64,12 +171,6 @@ namespace nuts
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
-		}
-
-		pointer operator->()
-		{
-			assert(_ptr != nullptr);
-			return _ptr;
 		}
 
 		const_pointer operator->() const
@@ -121,7 +222,7 @@ namespace nuts
 
 	protected:
 		pointer _ptr = nullptr;
-		static constexpr Dx deleter {};
+		static constexpr default_delete<T[]> deleter {};
 	};
 
 	template <typename T, class Dx = default_delete<T>>
@@ -242,15 +343,15 @@ namespace nuts
 	}
 
 	template <class T, class Dx = default_delete<T>>
-	shared_ptr<T, Dx> make_shared()
-	{
-		return shared_ptr<T, Dx> {new T};
-	}
-
-	template <class T, class Dx = default_delete<T>>
 	unique_ptr<T, Dx> make_unique(const T& _val)
 	{
 		return unique_ptr<T, Dx> {new T(_val)};
+	}
+
+	template <class T, class Dx = default_delete<T>>
+	shared_ptr<T, Dx> make_shared()
+	{
+		return shared_ptr<T, Dx> {new T};
 	}
 
 	template <class T, class Dx = default_delete<T>>
@@ -258,105 +359,6 @@ namespace nuts
 	{
 		return shared_ptr<T, Dx> {new T(_val)};
 	}
-
-	template <class T, class Dx>
-	class unique_ptr<T[], Dx>
-	{
-	public:
-		using value_type = T;
-		using pointer = T*;
-		using const_pointer = const T*;
-
-		unique_ptr() = default;
-		unique_ptr(pointer src) : _ptr(src) {}
-		unique_ptr(const_pointer src) : _ptr(const_cast<pointer>(src)) {}
-		unique_ptr(unique_ptr<T, Dx>& src)
-		{
-			_ptr = src._ptr;
-			src._ptr = nullptr;
-		}
-
-		~unique_ptr()
-		{
-			deleter(_ptr);
-			_ptr = nullptr;
-		}
-
-		T& operator[](u64 _n)
-		{
-			assert(_ptr != nullptr);
-			return _ptr[_n];
-		}
-
-		T& operator[](u64 _n) const
-		{
-			assert(_ptr != nullptr);
-			return _ptr[_n];
-		}
-
-		T& operator*()
-		{
-			assert(_ptr != nullptr);
-			return *_ptr;
-		}
-
-		const T& operator*() const
-		{
-			assert(_ptr != nullptr);
-			return *_ptr;
-		}
-
-		const_pointer operator->() const
-		{
-			assert(_ptr != nullptr);
-			return _ptr;
-		}
-
-		pointer get() const { return const_cast<pointer>(_ptr); }
-
-		pointer release()
-		{
-			auto tmp = _ptr;
-			_ptr = nullptr;
-			return tmp;
-		}
-
-		unique_ptr& operator=(unique_ptr<T, Dx>& src)
-		{
-			_ptr = src._ptr;
-			src._ptr = nullptr;
-			return *this;
-		}
-
-		unique_ptr& operator=(T* src)
-		{
-			_ptr = src;
-			return *this;
-		}
-
-		unique_ptr<T>& move(unique_ptr<T, Dx>& src)
-		{
-			_ptr = src._ptr;
-			src._ptr = nullptr;
-			return *this;
-		}
-
-		bool operator==(unique_ptr<T, Dx>& obj)
-		        const { return _ptr == obj._ptr; }
-
-		bool operator==(const T* obj)
-		        const { return _ptr == obj; }
-
-		bool operator!=(unique_ptr<T, Dx>& obj)
-		        const { return _ptr != obj._ptr; }
-
-		bool operator!=(const_pointer obj)
-		        const { return _ptr != obj; }
-
-	protected:
-		pointer _ptr = nullptr;
-		static constexpr default_delete<T[]> deleter {};
-	};
 }
 
 #endif

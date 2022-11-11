@@ -17,7 +17,7 @@ namespace nuts
 	{
 		return (... + s);
 	}
-	
+
 	template <typename Itr, class Func>
 	Func for_each(Itr st, Itr ed, Func fn)
 	{
@@ -26,10 +26,10 @@ namespace nuts
 		return fn;
 	}
 
-	template <Iterable C, class Func>
-	Func for_each(const C& Box, Func fn)
+	template <Iterable Box, class Func>
+	Func for_each(const Box& x, Func fn)
 	{
-		for (auto& i: range(Box)) fn(i);
+		for (auto& i: range(x)) fn(i);
 		return fn;
 	}
 

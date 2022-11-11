@@ -21,7 +21,7 @@ namespace nuts
 		using const_pointer = const T*;
 
 	protected:
-		value_type data_ptr[N];
+		value_type impl[N];
 
 	public:
 		array() = default;
@@ -31,18 +31,18 @@ namespace nuts
 		~array() = default;
 
 		void fill(const T& _val);
-		pointer data() const { return const_cast<pointer>(data_ptr); }
+		pointer data() const { return const_cast<pointer>(impl); }
 		static constexpr u64 size() { return N; }
 		static constexpr bool empty() { return size() == 0; }
 
-		T& front() { return data_ptr[0]; }
-		T& back() { return data_ptr[size() - 1]; }
+		T& front() { return impl[0]; }
+		T& back() { return impl[size() - 1]; }
 
-		const T& front() const { return data_ptr[0]; }
-		const T& back() const { return data_ptr[size() - 1]; }
+		const T& front() const { return impl[0]; }
+		const T& back() const { return impl[size() - 1]; }
 
-		T& operator[](u64 _n) { return data_ptr[_n]; }
-		const T& operator[](u64 _n) const { return data_ptr[_n]; }
+		T& operator[](u64 _n) { return impl[_n]; }
+		const T& operator[](u64 _n) const { return impl[_n]; }
 		T& at(u64 _n);
 		const T& at(u64 _n) const;
 
@@ -132,13 +132,13 @@ namespace nuts
 		};
 
 		iterator begin() const { return {data()}; }
-		iterator end() const { return {&data_ptr[size() - 1]}; }
+		iterator end() const { return {&impl[size() - 1]}; }
 	};
 
 	template <typename T, u64 N>
 	array<T, N>::array(const T& val)
 	{
-		nuts::fill_n(data_ptr, N, val);
+		nuts::fill_n(impl, N, val);
 	}
 
 	template <typename T, u64 N>
@@ -146,27 +146,27 @@ namespace nuts
 	{
 		auto st = ilist.begin();
 		for (u64 i: range(0, N < ilist.size() ? N : ilist.size()))
-			data_ptr[i] = *(st++);
+			impl[i] = *(st++);
 	}
 
 	template <typename T, u64 N>
 	T& array<T, N>::at(u64 _n)
 	{
 		assert(_n < size() && "Index_Bound");
-		return data_ptr[_n];
+		return impl[_n];
 	}
 
 	template <typename T, u64 N>
 	const T& array<T, N>::at(u64 _n) const
 	{
 		assert(_n < size() && "Index_Bound");
-		return data_ptr[_n];
+		return impl[_n];
 	}
 
 	template <typename T, u64 N>
 	void array<T, N>::fill(const T& _val)
 	{
-		nuts::fill_n(data_ptr, N, _val);
+		nuts::fill_n(impl, N, _val);
 	}
 
 	template <typename T, u64 N>

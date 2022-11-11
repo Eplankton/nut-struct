@@ -188,8 +188,7 @@ namespace nuts
 		data_ptr = new T[obj.size() + STD_CAPACITY];
 		v_size = obj.size();
 		v_capacity = v_size + STD_CAPACITY;
-		for (u64 i = 0; i < v_size; i++)
-			data_ptr[i] = obj.data_ptr[i];
+		memcpy(data_ptr, obj.data(), sizeof(T) * obj.size());
 	}
 
 	template <class T>

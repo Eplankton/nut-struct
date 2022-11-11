@@ -28,7 +28,6 @@ namespace nuts
 		using self_type = unordered_set<K, Hasher>;
 		using bucket_type = list<K>;
 
-	public:
 		class iterator
 		    : public forward_iterator
 		{
@@ -133,6 +132,7 @@ namespace nuts
 		bool empty() const { return _size == 0; };
 		self_type& move(self_type& src);
 
+		inline u64 get_index(const K& _k) const { return hash_fn(_k) % *bucket_size; }
 		iterator find(const K& _k) const;
 		bool contains(const K& _k) const;
 		void insert(const K& _k);
@@ -190,7 +190,7 @@ namespace nuts
 	typename unordered_set<K, Hasher>::iterator
 	unordered_set<K, Hasher>::find(const K& _k) const
 	{
-		u64 index = hash_fn(_k) % *bucket_size;
+		u64 index = get_index(_k);
 		auto ed = bucket[index].end() + 1;
 		for (auto it = bucket[index].begin();
 		     it != ed; ++it)
@@ -238,7 +238,7 @@ namespace nuts
 		if (it == npos)
 		{
 			if (_size == *bucket_size - 1) rehash();
-			u64 index = hash_fn(_k) % *bucket_size;
+			u64 index = get_index(_k);
 			bucket[index].push_back(_k);
 			++_size;
 		}
@@ -251,7 +251,7 @@ namespace nuts
 		if (it == npos)
 		{
 			if (_size == *bucket_size - 1) rehash();
-			u64 index = hash_fn(_k) % *bucket_size;
+			u64 index = get_index(_k);
 			bucket[index].push_back(static_cast<K&&>(_k));
 			++_size;
 		}
@@ -260,7 +260,7 @@ namespace nuts
 	template <class K, class Hasher>
 	bool unordered_set<K, Hasher>::erase(const K& _k)
 	{
-		u64 index = hash_fn(_k) % *bucket_size;
+		u64 index = get_index(_k);
 		auto ed = bucket[index].end() + 1;
 		for (auto it = bucket[index].begin();
 		     it != ed && it != nullptr; ++it)
@@ -293,7 +293,7 @@ namespace nuts
 		vector<bucket_type> tmp(*bucket_size);
 
 		auto opr = [this, &tmp](K& x) {
-			u64 index = hash_fn(x) % (*bucket_size);
+			u64 index = get_index(x);
 			tmp[index].push_back(nuts::move(x));
 		};
 
@@ -309,7 +309,7 @@ namespace nuts
 			if (&x != &(*end())) printf(", ");
 		};
 
-		printf("hash_set @%#llx = {", (u64) bucket.data());
+		printf("hash_set = {");
 		for_each(*this, pr);
 		printf("}\n");
 	}
