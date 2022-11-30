@@ -82,18 +82,8 @@ namespace nuts
 		return itr_type();
 	}
 
-	// template <typename Itr>
-	// concept OutputItr = requires(Itr it)
-	// {
-	// 	typename Itr::value_type;
-	// };
-
-	// template <typename Itr>
-	// concept InputItr = requires(Itr it)
-	// {
-	// 	typename Itr::value_type;
-	// };
-
+	// Since C++20:
+	
 	template <typename Itr>
 	concept Forward_Itr = requires(Itr it)
 	{
@@ -108,25 +98,31 @@ namespace nuts
 	        Forward_Itr<Itr> && requires(Itr it)
 	{
 		--it;
+		it--;
 	};
 
 	template <typename Itr>
 	concept Random_Itr =
-	        Bidirectional_Itr<Itr> && requires(Itr it, u64 n)
+	        Bidirectional_Itr<Itr> && requires(Itr x, Itr y, i64 n)
 	{
-		it[n];
+		x + n;
+		x - n;
+		x[n];
+		x - y;
+		y - x;
 	};
 
-	template <typename P>
-	concept Pointer = requires(P x, P y, i64 n)
+	template <typename T>
+	concept Pointer = requires(T x, T y, i64 n)
 	{
-		requires requires { !Forward_Itr<P>; };
+		requires requires { !Forward_Itr<T>; };
+		*x;
 		++x;
 		--x;
 		x + n;
 		x - n;
 		x - y;
-		*x;
+		x[n];
 	};
 }
 

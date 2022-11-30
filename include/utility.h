@@ -32,7 +32,7 @@ namespace nuts
 			return *this;
 		}
 
-		bool operator<(const pair<T1, T2>& after) const
+		inline bool operator<(const pair<T1, T2>& after) const
 		{
 			if (first == after.first)
 				return second < after.second;
@@ -40,7 +40,7 @@ namespace nuts
 				return first < after.first;
 		}
 
-		bool operator>(const pair<T1, T2>& after) const
+		inline bool operator>(const pair<T1, T2>& after) const
 		{
 			if (first == after.first)
 				return second > after.second;
@@ -48,13 +48,13 @@ namespace nuts
 				return first > after.first;
 		}
 
-		bool operator==(const pair<T1, T2>& after) const
+		inline bool operator==(const pair<T1, T2>& after) const
 		{
 			return (first == after.first) &&
 			       (second == after.second);
 		}
 
-		bool operator!=(const pair<T1, T2>& after) const
+		inline bool operator!=(const pair<T1, T2>& after) const
 		{
 			bool res = !this->operator==(after);
 			return res;

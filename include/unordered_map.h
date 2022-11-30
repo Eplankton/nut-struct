@@ -23,6 +23,7 @@ namespace nuts
 		unordered_map();
 		unordered_map(const self_type& src);
 		unordered_map(self_type&& src) { move(src); }
+		unordered_map(const std::initializer_list<value_type>& ilist);
 		~unordered_map() { base_type::clear(); }
 
 		inline u64 get_index(const K& _k)
@@ -57,6 +58,13 @@ namespace nuts
 	{
 		vector<bucket_type> tmp(*this->bucket_size);
 		this->bucket.move(tmp);
+	}
+
+	template <class K, class V, class Hasher>
+	unordered_map<K, V, Hasher>::
+	        unordered_map(const std::initializer_list<value_type>& ilist)
+	{
+		for (auto& i: ilist) insert(i);
 	}
 
 	template <class K, class V, class Hasher>

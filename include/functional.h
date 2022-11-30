@@ -17,11 +17,12 @@ namespace nuts
 	public:
 		function() = default;
 		function(const func_pointer R) : fn(static_cast<func_pointer>(R)) {}
-		function(const function<FuncType>& OBJ) : fn(OBJ.fn) {}
+		function(const function<FuncType>& src) = default;
 		~function() { fn = nullptr; }
+		func_pointer get() const { return fn; }
 
 		template <typename... _ArgTypes>
-		auto operator()(_ArgTypes... args)
+		auto operator()(_ArgTypes&&... args)
 		{
 			return fn(args...);
 		}
@@ -30,7 +31,7 @@ namespace nuts
 	template <typename FuncType>
 	auto make_function(const FuncType& F)
 	{
-		return nuts::function(F);
+		return function<FuncType>(F);
 	}
 
 	template <typename T>

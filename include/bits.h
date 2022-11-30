@@ -12,7 +12,7 @@
 #include "move.h"
 #include "option.h"
 #include "range.h"
-#include "tuple.h"
+// #include "tuple.h"
 #include "type.h"
 #include "utility.h"
 #include "bitset.h"
@@ -86,6 +86,59 @@
 // 	double rb = cb.elapsed() * 1000.0;
 
 // 	std::cout << "[N = " << n << "] " << rb / ra << '\n';
+// }
+
+// #include "bits.h"
+// #include "timer.h"
+
+// #include <thread>
+
+// using namespace nuts;
+
+// int main()
+// {
+// 	// set<i32> A {7, 8, 0, 4, 2, 6, 9, 3, 5, 1};
+// 	set<i32> A;
+// 	hash_set<i32> B {1, 4, 7, 10, 13, 16, 19, 22, 25, 28};
+// 	for (auto i: range(0, 10))
+// 		A.insert((i32) i);
+// 	// A.print();
+// 	// B.print();
+
+// 	map<i32, bool> m;
+// 	for_each(A, [&m, &B](const auto& x) { m[x] = !B.contains(x); });
+// 	// m.print();
+
+// 	hash_map<i32, bool> hmap;
+// 	for_each(m, [&hmap](const auto& x) { hmap.insert(x); });
+// 	// hmap.print_as_table();
+
+// 	deque<string> s {"human", "dog", "cat", "cow",
+// 	                 "sheep", "monkey", "turtle", "elephant"};
+
+// 	// reverse(s.begin(), s.end());
+// 	// s.print_detail();
+
+// 	auto foo = [&](Iterable auto& x) {
+// 		auto st1 = x.begin(),
+// 		     ed2 = x.end(),
+// 		     ed1 = advance(st1, distance(st1, ed2) / 2),
+// 		     st2 = advance(ed1, 1);
+
+// 		vector<std::thread> p;
+// 		p.push_back(std::thread {[&] { insertion_sort(st1, ed1); }});
+// 		p.push_back(std::thread {[&] { insertion_sort(st2, ed2); }});
+// 		for (auto& i: range(p)) i.join();
+// 		return x;
+// 	};
+
+// 	vector<i32> v {5, 1, 0, 9, 7, 3, 6, 4, 2};
+// 	println(foo(v), foo(s), "\n");
+
+// 	bitset<42> a {"1101101010111011101010111011111001101111"};
+// 	a.dump();
+
+// 	return 0;
 // }
 
 #endif

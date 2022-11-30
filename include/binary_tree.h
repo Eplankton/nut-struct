@@ -183,10 +183,10 @@ namespace nuts
 			node_raw_ptr get() const { return _ptr; }
 			T* operator->() const { return &_ptr->data; }
 
-			bool operator==(const iterator& other)
+			inline bool operator==(const iterator& other)
 			        const { return _ptr == other._ptr; }
 
-			bool operator!=(const iterator& other)
+			inline bool operator!=(const iterator& other)
 			        const { return _ptr != other._ptr; }
 		};
 

@@ -49,8 +49,8 @@ namespace nuts
 			i64 operator*() { return curr; }
 			i64 operator*() const { return curr; }
 
-			bool operator==(const iterator& obj) const { return curr == obj.curr; }
-			bool operator!=(const iterator& obj)
+			inline bool operator==(const iterator& obj) const { return curr == obj.curr; }
+			inline bool operator!=(const iterator& obj)
 			const
 			{
 				return step > 0 ? (curr <= obj.curr &&

@@ -116,16 +116,16 @@ namespace nuts
 
 			void operator-=(i64 bias) { *this = nuts::advance(*this, -bias); }
 
-			bool operator==(const iterator& obj)
+			inline bool operator==(const iterator& obj)
 			        const { return cur == obj.cur; }
 
-			bool operator!=(const iterator& obj)
+			inline bool operator!=(const iterator& obj)
 			        const { return cur != obj.cur; }
 
-			bool operator==(pointer obj)
+			inline bool operator==(pointer obj)
 			        const { return cur == obj; }
 
-			bool operator!=(pointer obj)
+			inline bool operator!=(pointer obj)
 			        const { return cur != obj; }
 
 			iterator& operator=(const iterator& src)

@@ -88,12 +88,12 @@ namespace nuts
 				while (bias--) ++(*this);
 			}
 
-			bool operator==(const iterator& x) const
+			inline bool operator==(const iterator& x) const
 			{
 				return in_itr == x.in_itr;
 			}
 
-			bool operator!=(const iterator& x) const
+			inline bool operator!=(const iterator& x) const
 			{
 				return in_itr != x.in_itr;
 			}

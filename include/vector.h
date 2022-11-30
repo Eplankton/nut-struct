@@ -29,22 +29,22 @@ namespace nuts
 			using value_type = T;
 
 		protected:
-			T* _ptr = nullptr;
+			value_type* _ptr = nullptr;
 
 		public:
 			iterator() = default;
-			iterator(T* obj) { _ptr = obj; }
+			iterator(value_type* obj) { _ptr = obj; }
 			iterator(std::nullptr_t obj) : _ptr(obj) {}
 			iterator(const iterator& obj) : _ptr(obj._ptr) {}
 
 			pointer get() const { return _ptr; }
 
-			T& operator*() { return *_ptr; }
-			const T& operator*() const { return *_ptr; }
+			value_type& operator*() { return *_ptr; }
+			const value_type& operator*() const { return *_ptr; }
 
 			pointer operator->() const { return _ptr; }
 
-			iterator& operator=(T* obj)
+			iterator& operator=(value_type* obj)
 			{
 				_ptr = obj;
 				return *this;
@@ -56,17 +56,17 @@ namespace nuts
 				return *this;
 			}
 
-			bool operator==(T* obj) const { return _ptr == obj; }
-			bool operator!=(T* obj) const { return _ptr != obj; }
+			inline bool operator==(T* obj) const { return _ptr == obj; }
+			inline bool operator!=(T* obj) const { return _ptr != obj; }
 
-			bool operator==(const iterator& obj) const { return _ptr == obj._ptr; }
-			bool operator!=(const iterator& obj) const { return _ptr != obj._ptr; }
+			inline bool operator==(const iterator& obj) const { return _ptr == obj._ptr; }
+			inline bool operator!=(const iterator& obj) const { return _ptr != obj._ptr; }
 
-			bool operator<(const iterator& obj) const { return _ptr < obj._ptr; }
-			bool operator<=(const iterator& obj) const { return _ptr <= obj._ptr; }
+			inline bool operator<(const iterator& obj) const { return _ptr < obj._ptr; }
+			inline bool operator<=(const iterator& obj) const { return _ptr <= obj._ptr; }
 
-			bool operator>(const iterator& obj) const { return _ptr > obj._ptr; }
-			bool operator>=(const iterator& obj) const { return _ptr >= obj._ptr; }
+			inline bool operator>(const iterator& obj) const { return _ptr > obj._ptr; }
+			inline bool operator>=(const iterator& obj) const { return _ptr >= obj._ptr; }
 
 			iterator& operator++()
 			{
@@ -104,7 +104,7 @@ namespace nuts
 
 			void operator-=(i64 bias) { _ptr -= bias; }
 
-			T& operator[](u64 _n) { return *((*this) + _n); }
+			value_type& operator[](u64 _n) { return *((*this) + _n); }
 			const T& operator[](u64 _n) const { return *((*this) + _n); }
 
 			friend i64
@@ -229,7 +229,7 @@ namespace nuts
 		{
 			T* tmp = new T[v_size];
 			for (u64 i = 0; i < v_size; i++)
-				tmp[i] = data_ptr[i];
+				tmp[i] = nuts::move(data_ptr[i]);
 			delete[] data_ptr;
 			data_ptr = tmp;
 			v_capacity = v_size;
@@ -244,7 +244,7 @@ namespace nuts
 		{
 			T* tmp = new T[N];
 			for (u64 i = 0; i < v_size; i++)
-				tmp[i] = data_ptr[i];
+				tmp[i] = nuts::move(data_ptr[i]);
 			delete[] data_ptr;
 			data_ptr = tmp;
 			v_capacity = N;

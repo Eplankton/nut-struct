@@ -109,16 +109,16 @@ namespace nuts
 			return *this;
 		}
 
-		bool operator==(unique_ptr<T, Dx>& obj)
+		inline bool operator==(unique_ptr<T, Dx>& obj)
 		        const { return _ptr == obj._ptr; }
 
-		bool operator==(const T* obj)
+		inline bool operator==(const T* obj)
 		        const { return _ptr == obj; }
 
-		bool operator!=(unique_ptr<T, Dx>& obj)
+		inline bool operator!=(unique_ptr<T, Dx>& obj)
 		        const { return _ptr != obj._ptr; }
 
-		bool operator!=(const_pointer obj)
+		inline bool operator!=(const_pointer obj)
 		        const { return _ptr != obj; }
 
 	protected:
@@ -161,25 +161,25 @@ namespace nuts
 			return _ptr[_n];
 		}
 
-		T& operator*()
+		inline T& operator*()
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
 		}
 
-		const T& operator*() const
+		inline const T& operator*() const
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
 		}
 
-		const_pointer operator->() const
+		inline const_pointer operator->() const
 		{
 			assert(_ptr != nullptr);
 			return _ptr;
 		}
 
-		pointer get() const { return const_cast<pointer>(_ptr); }
+		inline pointer get() const { return const_cast<pointer>(_ptr); }
 
 		pointer release()
 		{
@@ -278,13 +278,13 @@ namespace nuts
 			}
 		}
 
-		T& operator*()
+		inline T& operator*()
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
 		}
 
-		const T& operator*() const
+		inline const T& operator*() const
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
@@ -296,7 +296,7 @@ namespace nuts
 			return _ptr;
 		}
 
-		T* get() const { return _ptr; }
+		inline T* get() const { return _ptr; }
 
 		bool operator==(shared_ptr<T, Dx>& obj)
 		        const { return _ptr == obj._ptr; }
@@ -336,28 +336,16 @@ namespace nuts
 		return const_cast<T*>(src.get());
 	}
 
-	template <class T, class Dx = default_delete<T>>
-	unique_ptr<T, Dx> make_unique()
+	template <class T, class... Args, class Dx = default_delete<T>>
+	unique_ptr<T, Dx> make_unique(const Args&... pac)
 	{
-		return unique_ptr<T, Dx> {new T};
+		return unique_ptr<T, Dx> {new T(pac...)};
 	}
 
-	template <class T, class Dx = default_delete<T>>
-	unique_ptr<T, Dx> make_unique(const T& _val)
+	template <class T, class... Args, class Dx = default_delete<T>>
+	shared_ptr<T, Dx> make_shared(const Args&... pac)
 	{
-		return unique_ptr<T, Dx> {new T(_val)};
-	}
-
-	template <class T, class Dx = default_delete<T>>
-	shared_ptr<T, Dx> make_shared()
-	{
-		return shared_ptr<T, Dx> {new T};
-	}
-
-	template <class T, class Dx = default_delete<T>>
-	shared_ptr<T, Dx> make_shared(const T& _val)
-	{
-		return shared_ptr<T, Dx> {new T(_val)};
+		return shared_ptr<T, Dx> {new T(pac...)};
 	}
 }
 

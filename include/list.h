@@ -115,11 +115,11 @@ namespace nuts
 				return *this;
 			}
 
-			bool operator==(node_ptr obj) const { return _ptr == obj; }
-			bool operator!=(node_ptr obj) const { return _ptr != obj; }
+			inline bool operator==(node_ptr obj) const { return _ptr == obj; }
+			inline bool operator!=(node_ptr obj) const { return _ptr != obj; }
 
-			bool operator==(const iterator& obj) const { return _ptr == obj._ptr; }
-			bool operator!=(const iterator& obj) const { return _ptr != obj._ptr; }
+			inline bool operator==(const iterator& obj) const { return _ptr == obj._ptr; }
+			inline bool operator!=(const iterator& obj) const { return _ptr != obj._ptr; }
 
 			iterator& operator++()
 			{
