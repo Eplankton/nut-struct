@@ -93,10 +93,7 @@ namespace nuts
 	template <class K, class V, class Hasher>
 	bool unordered_map<K, V, Hasher>::contains(const K& _k) const
 	{
-		u64 i = get_index(_k);
-		auto it = nuts::find_if(bucket[i],
-		                        [&](const auto& p) { return p._0() == _k; });
-		return it != bucket_type::npos;
+		return find(_k) != npos;
 	}
 
 	template <class K, class V, class Hasher>

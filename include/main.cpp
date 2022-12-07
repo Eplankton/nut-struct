@@ -65,7 +65,7 @@ int main()
 	// xxsort_test(a);
 
 	vector<i32> v;
-	auto n = 1e5;
+	auto n = 1e4;
 	std::random_device rd;
 	for (int i = 0; i < n; ++i)
 		v.push_back(rd() % (u64) n);
