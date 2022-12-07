@@ -25,6 +25,11 @@ namespace nuts
 		const T1& get_first() const { return first; }
 		const T2& get_second() const { return second; }
 
+		T1& _0() { return first; }
+		T2& _1() { return second; }
+		const T1& _0() const { return first; }
+		const T2& _1() const { return second; }
+		
 		pair<T1, T2>& move(pair<T1, T2>& src)
 		{
 			first = nuts::move(src.first);

@@ -139,8 +139,8 @@ namespace nuts
 		vector<T>& pop_back();            // Remove the last element
 		vector<T>& move(vector<T>& after);// Deprive other's ownership
 
-		T& operator[](u64 N);// Access specified element
-		const T& operator[](u64 N) const;
+		inline T& operator[](u64 N);// Access specified element
+		inline const T& operator[](u64 N) const;
 
 		vector<T>& operator=(const vector<T>& obj);// Deep copy operator
 		vector<T>& operator=(vector<T>&& src) { return move(src); }
@@ -284,7 +284,7 @@ namespace nuts
 	vector<T>& vector<T>::push_back(T&& src)
 	{
 		emplace_back();
-		back() = static_cast<T&&>(src);
+		back() = nuts::move(src);
 		return *this;
 	}
 
@@ -311,14 +311,14 @@ namespace nuts
 	}
 
 	template <class T>
-	T& vector<T>::operator[](const u64 N)
+	inline T& vector<T>::operator[](const u64 N)
 	{
 		assert(N < v_capacity);
 		return data_ptr[N];
 	}
 
 	template <class T>
-	const T& vector<T>::operator[](const u64 N) const
+	inline const T& vector<T>::operator[](const u64 N) const
 	{
 		assert(N < v_size);
 		return data_ptr[N];

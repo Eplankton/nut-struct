@@ -11,15 +11,71 @@ namespace nuts
 {
 	// Capacity of the bucket
 	static const u64 PRIME_LIST[] = {
-	        17ul, 29ul, 53ul, 97ul, 113ul, 193ul, 271ul, 389ul,
-	        769ul, 1543ul, 3079ul, 6151ul, 12289ul, 24593ul,
-	        49157ul, 98317ul, 196613ul, 393241ul, 786433ul,
-	        1572869ul, 3145739ul, 6291469ul, 12582917ul, 25165843ul,
-	        50331653ul, 100663319ul, 201326611ul, 402653189ul,
-	        805306457ul, 1610612741ul, 3221225473ul, 429496729ul};
+	        /* 0     */ 5ul,
+	        /* 1     */ 11ul,
+	        /* 2     */ 23ul,
+	        /* 3     */ 47ul,
+	        /* 4     */ 97ul,
+	        /* 5     */ 199ul,
+	        /* 6     */ 409ul,
+	        /* 7     */ 823ul,
+	        /* 8     */ 1741ul,
+	        /* 9     */ 3469ul,
+	        /* 10    */ 6949ul,
+	        /* 11    */ 14033ul,
+	        /* 12    */ 28411ul,
+	        /* 13    */ 57557ul,
+	        /* 14    */ 116731ul,
+	        /* 15    */ 236897ul,
+	        /* 16    */ 480881ul,
+	        /* 17    */ 976369ul,
+	        /* 18    */ 1982627ul,
+	        /* 19    */ 4026031ul,
+	        /* 20    */ 8175383ul,
+	        /* 21    */ 16601593ul,
+	        /* 22    */ 33712729ul,
+	        /* 23    */ 68460391ul,
+	        /* 24    */ 139022417ul,
+	        /* 25    */ 282312799ul,
+	        /* 26    */ 573292817ul,
+	        /* 27    */ 1164186217ul,
+	        /* 28    */ 2364114217ul,
+	        /* 29    */ 4294967291ul,
+	        /* 30    */ 8589934583ULL,
+	        /* 31    */ 17179869143ULL,
+	        /* 32    */ 34359738337ULL,
+	        /* 33    */ 68719476731ULL,
+	        /* 34    */ 137438953447ULL,
+	        /* 35    */ 274877906899ULL,
+	        /* 36    */ 549755813881ULL,
+	        /* 37    */ 1099511627689ULL,
+	        /* 38    */ 2199023255531ULL,
+	        /* 39    */ 4398046511093ULL,
+	        /* 40    */ 8796093022151ULL,
+	        /* 41    */ 17592186044399ULL,
+	        /* 42    */ 35184372088777ULL,
+	        /* 43    */ 70368744177643ULL,
+	        /* 44    */ 140737488355213ULL,
+	        /* 45    */ 281474976710597ULL,
+	        /* 46    */ 562949953421231ULL,
+	        /* 47    */ 1125899906842597ULL,
+	        /* 48    */ 2251799813685119ULL,
+	        /* 49    */ 4503599627370449ULL,
+	        /* 50    */ 9007199254740881ULL,
+	        /* 51    */ 18014398509481951ULL,
+	        /* 52    */ 36028797018963913ULL,
+	        /* 53    */ 72057594037927931ULL,
+	        /* 54    */ 144115188075855859ULL,
+	        /* 55    */ 288230376151711717ULL,
+	        /* 56    */ 576460752303423433ULL,
+	        /* 57    */ 1152921504606846883ULL,
+	        /* 58    */ 2305843009213693951ULL,
+	        /* 59    */ 4611686018427387847ULL,
+	        /* 60    */ 9223372036854775783ULL,
+	        /* 61    */ 18446744073709551557ULL,
+	};
 
-	template <typename K,
-	          typename Hasher = nuts::hash<K>>
+	template <typename K, typename Hasher = hash<K>>
 	class unordered_set
 	{
 	public:
@@ -58,7 +114,7 @@ namespace nuts
 			iterator& operator++()
 			{
 				++in_itr;
-				if (in_itr == nullptr)
+				if (in_itr == bucket_type::npos)
 				{
 					while (out_itr != bkt_end)
 					{
@@ -132,7 +188,9 @@ namespace nuts
 		bool empty() const { return _size == 0; };
 		self_type& move(self_type& src);
 
-		inline u64 get_index(const K& _k) const { return hash_fn(_k) % *bucket_size; }
+		inline u64 get_index(const K& _k)
+		        const { return hash_fn(_k) % *bucket_size; }
+
 		iterator find(const K& _k) const;
 		bool contains(const K& _k) const;
 		void insert(const K& _k);
@@ -180,7 +238,8 @@ namespace nuts
 	unordered_set<K, Hasher>::
 	        unordered_set(const std::initializer_list<K>& ilist)
 	{
-		while (ilist.size() > *bucket_size) bucket_size++;
+		while (ilist.size() > *bucket_size &&
+		       *bucket_size != PRIME_LIST[31]) ++bucket_size;
 		vector<bucket_type> tmp(*bucket_size);
 		bucket.move(tmp);
 		for (const auto& x: ilist) insert(x);
@@ -190,16 +249,12 @@ namespace nuts
 	typename unordered_set<K, Hasher>::iterator
 	unordered_set<K, Hasher>::find(const K& _k) const
 	{
-		u64 index = get_index(_k);
-		auto ed = bucket[index].end() + 1;
-		for (auto it = bucket[index].begin();
-		     it != ed; ++it)
-		{
-			if (it != nullptr && *it == _k)
-				return {bucket.begin() + index,
-				        bucket.end(), it};
-		}
-		return npos;
+		u64 i = get_index(_k);
+		auto it = nuts::find(bucket[i], _k);
+		if (it == bucket_type::npos)
+			return npos;
+		else
+			return {bucket.begin() + i, bucket.end(), it};
 	}
 
 	template <class K, class Hasher>
@@ -260,19 +315,16 @@ namespace nuts
 	template <class K, class Hasher>
 	bool unordered_set<K, Hasher>::erase(const K& _k)
 	{
-		u64 index = get_index(_k);
-		auto ed = bucket[index].end() + 1;
-		for (auto it = bucket[index].begin();
-		     it != ed && it != nullptr; ++it)
+		u64 i = get_index(_k);
+		auto it = nuts::find(bucket[i], _k);
+		if (it == bucket_type::npos)
+			return false;
+		else
 		{
-			if (*it == _k)
-			{
-				bucket[index].erase(it);
-				_size--;
-				return true;
-			}
+			bucket[i].erase(it);
+			_size--;
+			return true;
 		}
-		return false;
 	}
 
 	template <class K, class Hasher>
@@ -292,7 +344,7 @@ namespace nuts
 		bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
 
-		auto opr = [this, &tmp](K& x) {
+		auto opr = [&](K& x) {
 			u64 index = get_index(x);
 			tmp[index].push_back(nuts::move(x));
 		};
@@ -304,14 +356,14 @@ namespace nuts
 	template <class K, class Hasher>
 	void unordered_set<K, Hasher>::print() const
 	{
-		auto pr = [this](const auto& x) {
+		auto pr = [&](const auto& x) {
 			nuts::print(x);
-			if (&x != &(*end())) printf(", ");
+			if (&x != &back()) nuts::print(", ");
 		};
 
-		printf("hash_set = {");
+		nuts::print("hash_set = {");
 		for_each(*this, pr);
-		printf("}\n");
+		nuts::println("}");
 	}
 
 	template <class K, class Hasher>
@@ -325,7 +377,7 @@ namespace nuts
 				collison += bucket[n].size() - 1;
 				printf("#%lld: ", n);
 				for_each(bucket[n],
-				         [](const auto& x) { nuts::print(x); nuts::print("->"); });
+				         [](const auto& x) { nuts::print(x, "->"); });
 				printf("\n");
 			}
 		}

@@ -25,7 +25,7 @@ namespace nuts
 		explicit binary_tree_node(const T& _val) : data(_val),
 		                                           prev(nullptr),
 		                                           lc(nullptr), rc(nullptr) {}
-		explicit binary_tree_node(T&& _val) : data(static_cast<T&&>(_val)),
+		explicit binary_tree_node(T&& _val) : data(nuts::move(_val)),
 		                                      prev(nullptr),
 		                                      lc(nullptr), rc(nullptr) {}
 		binary_tree_node(const tree_node& obj) : data(obj.data),
@@ -475,7 +475,7 @@ namespace nuts
 	        -> itr_type
 	{
 		auto tmp = _val;
-		return insert_ret_pos(static_cast<T&&>(tmp));
+		return insert_ret_pos(nuts::move(tmp));
 	}
 
 	template <typename T, class Compare>
@@ -488,7 +488,7 @@ namespace nuts
 	auto binary_tree<T, Compare>::insert_ret_pos(T&& _val)
 	        -> itr_type
 	{
-		node_ptr new_node = new tree_node {static_cast<T&&>(_val)};
+		node_ptr new_node = new tree_node {nuts::move(_val)};
 
 		if (root == nullptr)
 		{
@@ -838,13 +838,13 @@ namespace nuts
 	AVL<T, Compare>::insert_ret_pos(const T& _val)
 	{
 		auto tmp = _val;
-		return insert_ret_pos(static_cast<T&&>(tmp));
+		return insert_ret_pos(nuts::move(tmp));
 	}
 
 	template <typename T, class Compare>
 	bool AVL<T, Compare>::insert(T&& _val)
 	{
-		return insert_ret_pos(static_cast<T&&>(_val)) != this->npos;
+		return insert_ret_pos(nuts::move(_val)) != this->npos;
 	}
 
 	template <typename T, class Compare>
@@ -872,7 +872,7 @@ namespace nuts
 	typename BST<T, Compare>::iterator
 	AVL<T, Compare>::insert_ret_pos(T&& _val)
 	{
-		auto opt = base_type::insert_ret_pos(static_cast<T&&>(_val));
+		auto opt = base_type::insert_ret_pos(nuts::move(_val));
 		adjust(opt);
 		return opt;
 	}

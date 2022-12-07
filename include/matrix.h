@@ -34,8 +34,8 @@ namespace nuts
 		static constexpr u64 col() { return Col; }
 		void print() const;
 
-		array<T, Col>& operator[](u64 _r) { return impl[_r]; }
-		const array<T, Col>& operator[](u64 _r) const { return impl[_r]; }
+		inline array<T, Col>& operator[](u64 _r) { return impl[_r]; }
+		inline const array<T, Col>& operator[](u64 _r) const { return impl[_r]; }
 
 		T& at(u64 _r, u64 _c)
 		{
@@ -49,17 +49,17 @@ namespace nuts
 			return impl[_r][_c];
 		}
 
-		template <typename Ty, u64 R, u64 C>
-		friend matrix<Ty, R, C> operator+(const matrix<Ty, R, C>& A,
-		                                  const matrix<Ty, R, C>& B);
+		template <typename RetType, u64 R, u64 C>
+		friend matrix<RetType, R, C> operator+(const matrix<RetType, R, C>& A,
+		                                       const matrix<RetType, R, C>& B);
 
-		template <typename Ty, u64 R, u64 C>
-		friend matrix<Ty, R, C> operator-(const matrix<Ty, R, C>& A,
-		                                  const matrix<Ty, R, C>& B);
+		template <typename RetType, u64 R, u64 C>
+		friend matrix<RetType, R, C> operator-(const matrix<RetType, R, C>& A,
+		                                       const matrix<RetType, R, C>& B);
 
-		template <typename Ty, u64 R1, u64 C1, u64 C2>
-		friend matrix<Ty, R1, C2> operator*(const matrix<Ty, R1, C1>& A,
-		                                    const matrix<Ty, C1, C2>& B);
+		template <typename RetType, u64 R1, u64 C1, u64 C2>
+		friend matrix<RetType, R1, C2> operator*(const matrix<RetType, R1, C1>& A,
+		                                         const matrix<RetType, C1, C2>& B);
 
 		self_type& operator=(const self_type& src);
 	};
@@ -123,12 +123,12 @@ namespace nuts
 		return res;
 	}
 
-	template <typename Ty, u64 R1, u64 C1, u64 C2>
-	matrix<Ty, R1, C2>
-	operator*(const matrix<Ty, R1, C1>& A,
-	          const matrix<Ty, C1, C2>& B)
+	template <typename RetType, u64 R1, u64 C1, u64 C2>
+	matrix<RetType, R1, C2>
+	operator*(const matrix<RetType, R1, C1>& A,
+	          const matrix<RetType, C1, C2>& B)
 	{
-		matrix<Ty, R1, C2> res(0);
+		matrix<RetType, R1, C2> res(0);
 		for (u64 i = 0; i < A.row(); ++i)
 			for (u64 j = 0; j < B.col(); ++j)
 				for (u64 c = 0; c < A.col(); ++c)

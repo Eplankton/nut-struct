@@ -172,6 +172,7 @@ namespace nuts
 			T* operator->() const { return (T*) &_ptr->data; }
 		};
 
+		static constexpr iterator npos {};
 		iterator begin() const { return iterator(const_cast<node_ptr>(head)); }
 		iterator end() const { return iterator(const_cast<node_ptr>(tail)); }
 
@@ -360,7 +361,7 @@ namespace nuts
 	list<T>& list<T>::push_back(T&& obj)
 	{
 		emplace_back();
-		back() = static_cast<T&&>(obj);
+		back() = nuts::move(obj);
 		return *this;
 	}
 
@@ -400,7 +401,7 @@ namespace nuts
 	list<T>& list<T>::push_front(T&& obj)
 	{
 		emplace_front();
-		front() = static_cast<T&&>(obj);
+		front() = nuts::move(obj);
 		return *this;
 	}
 

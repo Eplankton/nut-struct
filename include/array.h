@@ -20,9 +20,6 @@ namespace nuts
 		using pointer = T*;
 		using const_pointer = const T*;
 
-	protected:
-		value_type impl[N];
-
 	public:
 		array() = default;
 		explicit array(const T& _val);
@@ -41,8 +38,8 @@ namespace nuts
 		const T& front() const { return impl[0]; }
 		const T& back() const { return impl[size() - 1]; }
 
-		T& operator[](u64 _n) { return impl[_n]; }
-		const T& operator[](u64 _n) const { return impl[_n]; }
+		inline T& operator[](u64 _n) { return impl[_n]; }
+		inline const T& operator[](u64 _n) const { return impl[_n]; }
 		T& at(u64 _n);
 		const T& at(u64 _n) const;
 
@@ -133,6 +130,9 @@ namespace nuts
 
 		iterator begin() const { return {data()}; }
 		iterator end() const { return {&impl[size() - 1]}; }
+
+	protected:
+		value_type impl[N];
 	};
 
 	template <typename T, u64 N>

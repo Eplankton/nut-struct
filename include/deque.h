@@ -309,14 +309,14 @@ namespace nuts
 	void deque<T, Buf>::push_back(T&& _val)
 	{
 		emplace_back();
-		back() = static_cast<T&&>(_val);
+		back() = nuts::move(_val);
 	}
 
 	template <typename T, u64 Buf>
 	void deque<T, Buf>::push_front(T&& _val)
 	{
 		emplace_front();
-		front() = static_cast<T&&>(_val);
+		front() = nuts::move(_val);
 	}
 
 	template <typename T, u64 Buf>

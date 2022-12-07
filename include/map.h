@@ -32,12 +32,18 @@ namespace nuts
 
 	public:
 		map() = default;
+		map(map<K, V, Compare>&& src) { base_type::move(src); }
+
 		map(const map<K, V, Compare>& src)
 		{
 			for_each(*this, [this](const auto& x) { insert(x); });
 		}
 
-		map(map<K, V, Compare>&& src) { base_type::move(src); }
+		map(const std::initializer_list<value_type>& ilist)
+		{
+			for (auto& i: ilist) insert(i);
+		}
+
 		~map() = default;
 
 		map<K, V, Compare>& operator=(const map<K, V, Compare>& src);
@@ -61,7 +67,7 @@ namespace nuts
 
 		auto insert(pair<K, V>&& _p)
 		{
-			return base_type::insert(static_cast<pair<K, V>&&>(_p));
+			return base_type::insert(nuts::move(_p));
 		}
 
 		auto erase(const K& _k)

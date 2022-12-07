@@ -26,7 +26,8 @@ namespace nuts
 	{
 	public:
 		using value_type = T;
-		using itr_type = typename C::iterator;
+		using iterator = typename C::iterator;
+		using itr_type = iterator;
 
 		stack() = default;
 		stack(const stack<T, C>& src) = default;
@@ -109,7 +110,7 @@ namespace nuts
 	template <class T, Stack_Base C>
 	stack<T, C>& stack<T, C>::push(T&& obj)
 	{
-		impl.push_back(static_cast<T&&>(obj));
+		impl.push_back(nuts::move(obj));
 		return *this;
 	}
 
