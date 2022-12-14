@@ -8,8 +8,6 @@
 #include "range.h"
 #include "type.h"
 
-#include <cassert>
-
 namespace nuts
 {
 	template <typename... T>
@@ -21,16 +19,18 @@ namespace nuts
 	template <typename Itr, class Func>
 	Func for_each(Itr st, Itr ed, Func fn)
 	{
-		auto _end = ed + 1;
-		for (; st != _end; ++st) fn(*st);
+		if (st != ed)
+		{
+			for (auto _end = ed + 1; st != _end; ++st)
+				fn(*st);
+		}
 		return fn;
 	}
 
 	template <Iterable Box, class Func>
 	Func for_each(const Box& box, Func fn)
 	{
-		for (auto& i: range(box)) fn(i);
-		return fn;
+		return for_each(box.begin(), box.end(), fn);
 	}
 
 	template <Forward_Itr Itr>
@@ -54,7 +54,7 @@ namespace nuts
 	}
 
 	template <Forward_Itr Itr>
-	Itr advance(Itr it, u64 n)
+	Itr advance(Itr it, i64 n)
 	{
 		if (n >= 0)
 			while (n--) ++it;
@@ -71,6 +71,12 @@ namespace nuts
 		return it;
 	}
 
+	template <Random_Itr Itr>
+	inline Itr advance(Itr it, i64 n)
+	{
+		return it + n;
+	}
+
 	template <Forward_Itr Itr>
 	auto next(Itr it)
 	{
@@ -83,20 +89,14 @@ namespace nuts
 		return advance(it, -1);
 	}
 
-	template <Random_Itr Itr>
-	inline Itr advance(Itr it, i64 n)
-	{
-		return it + n;
-	}
-
 	template <typename T>
-	const T& min(const T& a, const T& b)// Return the minimum
+	inline const T& min(const T& a, const T& b)// Return the minimum
 	{
 		return (a < b) ? a : b;
 	}
 
 	template <typename T>
-	const T& max(const T& a, const T& b)// Return the maximum
+	inline const T& max(const T& a, const T& b)// Return the maximum
 	{
 		return (a > b) ? a : b;
 	}
@@ -106,9 +106,13 @@ namespace nuts
 	// Give range by itr: st && ed -> O(n)
 	{
 		Itr tmp = ed;
-		auto _end = ed + 1;
-		for (auto i = st; i != _end; i++)
-			if (cmp(*i, *tmp)) tmp = i;
+		if (st != ed)
+		{
+			auto _end = ed + 1;
+			for (auto i = st; i != _end; i++)
+				if (cmp(*i, *tmp))
+					tmp = i;
+		}
 		return tmp;
 	}
 
@@ -117,10 +121,26 @@ namespace nuts
 	// Give range by itr: st && ed -> O(n)
 	{
 		Itr tmp = ed;
-		auto _end = ed + 1;
-		for (auto i = st; i != _end; i++)
-			if (cmp(*i, *tmp)) tmp = i;
+		if (st != ed)
+		{
+			auto _end = ed + 1;
+			for (auto i = st; i != _end; i++)
+				if (cmp(*i, *tmp))
+					tmp = i;
+		}
 		return tmp;
+	}
+
+	template <Iterable Box, class Compare = less<typename Box::value_type>>
+	auto min_in(const Box& box, Compare cmp = Compare {})
+	{
+		return min_in(box.begin(), box.end(), cmp);
+	}
+
+	template <Iterable Box, class Compare = less<typename Box::value_type>>
+	auto max_in(const Box& box, Compare cmp = Compare {})
+	{
+		return max_in(box.begin(), box.end(), cmp);
 	}
 
 	template <typename T>
@@ -134,6 +154,7 @@ namespace nuts
 	template <Forward_Itr Itr>
 	inline void itr_swap(Itr a, Itr b)// Swap value
 	{
+		if (a == b) return;
 		swap(*a, *b);
 	}
 
@@ -157,9 +178,8 @@ namespace nuts
 	{
 		ed += 1;
 		for (auto it = st + 1; it != ed; it++)
-		{
-			if (cmp(*it, *(it - 1))) return false;
-		}
+			if (cmp(*it, *(it - 1)))
+				return false;
 		return true;
 	}
 
@@ -192,11 +212,26 @@ namespace nuts
 		return find_if(x.begin(), x.end(), fn);
 	}
 
+	template <Forward_Itr Itr, class Func>
+	Itr find_if_not(Itr st, Itr ed, Func fn)
+	// Give range by itr: st && ed -> O(N)
+	{
+		auto inverse_fn = [&](const auto& x) { return !fn(x); };
+		return find_if(st, ed, inverse_fn);
+	}
+
+	template <Iterable Box, class Func>
+	auto find_if_not(const Box& x, Func fn)
+	// Give range by itr: st && ed -> O(N)
+	{
+		return find_if_not(x.begin(), x.end(), fn);
+	}
+
 	template <Forward_Itr Itr, typename T>
 	Itr find(Itr st, Itr ed, const T& val)
 	// Give range by itr: st && ed -> O(N)
 	{
-		return find_if(st, ed, [&](const T& x) { return x == val; });
+		return find_if(st, ed, [&](const T& x) { return equal(x, val); });
 	}
 
 	template <Iterable Box, typename T>
@@ -206,27 +241,12 @@ namespace nuts
 		return find(box.begin(), box.end(), val);
 	}
 
-	template <Forward_Itr Itr, class Func>
-	Itr find_if_not(Itr st, Itr ed, Func fn)
-	// Give range by itr: st && ed -> O(N)
-	{
-		ed = advance(ed, 1);
-		while (st != ed)
-		{
-			if (!fn(*st))
-				break;
-			++st;
-		}
-		return st;
-	}
-
 	template <typename Itr, typename T>
 	Itr lower_bound(Itr st, Itr ed, const T& val)
 	// Return null if not found && must be sorted -> O(logN)
 	{
 		auto cmp = less<T> {};
-		if (!is_sorted(st, ed, cmp))
-			intro_sort(st, ed, cmp);
+		assert(!is_sorted(st, ed, cmp));
 		Itr it, cpy = st;
 		i64 count = distance(st, ed), step = 0;
 		while (count > 0)
@@ -366,14 +386,14 @@ namespace nuts
 
 	template <Iterable Box, class Compare = less<typename Box::value_type>>
 	requires Bidirectional_Itr<typename Box::iterator>
-	// Average case -> O(nlogn)
+	// Default intro_sort() && Average case -> O(nlogn)
 	void sort(Box& box, Compare cmp = Compare {})
 	{
 		sort(box.begin(), box.end(), cmp);
 	}
 
-	template <Bidirectional_Itr Itr, class Compare = less<decltype(*Itr())>>
-	// Average case -> O(nlogn)
+	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
+	// Default intro_sort() && Average case -> O(nlogn)
 	void sort(Itr st, Itr ed, Compare cmp = Compare {})
 	{
 		intro_sort(st, ed, cmp);
@@ -387,7 +407,7 @@ namespace nuts
 		insertion_sort(box.begin(), box.end(), cmp);
 	}
 
-	template <Bidirectional_Itr Itr, class Compare = less<decltype(*Itr())>>
+	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
 	// Stable && Average case -> O(n^2)
 	void insertion_sort(Itr st, Itr ed, Compare cmp = Compare {})
 	{
@@ -406,7 +426,7 @@ namespace nuts
 		selection_sort(box.begin(), box.end(), cmp);
 	}
 
-	template <Forward_Itr Itr, class Compare = less<decltype(*Itr())>>
+	template <Forward_Itr Itr, class Compare = less<typename Itr::value_type>>
 	// Average case -> O(n^2)
 	void selection_sort(Itr begin, Itr end, Compare cmp = Compare {})
 	{
@@ -428,13 +448,17 @@ namespace nuts
 	void quick_sort(Itr first, Itr last, Compare cmp = Compare {})
 	{
 		if (first == last) return;
+
+		//necessary copy
 		const auto pivot = *advance(first, distance(next(first), last) / 2);
-		auto mid_a = partition(first, last,
+
+		auto l_end = partition(first, last,
 		                       [&](const auto&elem) { return cmp(elem, pivot); }),
-		     mid_b = partition(mid_a, last,
-		                       [&](const auto&elem) { return !cmp(pivot, elem); });
-		quick_sort(first, mid_a);
-		quick_sort(mid_b, last);
+		     r_begin = partition(l_end, last,
+		                         [&](const auto&elem) { return !cmp(pivot, elem); });
+
+		quick_sort(first, l_end, cmp);
+		quick_sort(r_begin, last, cmp);
 	}
 
 	template <Iterable Box, class Compare = less<typename Box::value_type>>
@@ -452,8 +476,10 @@ namespace nuts
 		auto ed = next(last);
 		auto numElements = distance(first, last);
 		if (numElements <= 1) return;
-		static const i64 OptimalIncrements[] = {68491, 27396, 10958, 4383,
-		                                        1750, 701, 301, 132, 57, 23, 10, 4, 1, 0};
+
+		static const i64 OptimalIncrements[] = {
+		        68491, 27396, 10958, 4383, 1750, 701, 301, 132, 57, 23, 10, 4, 1, 0};
+
 		i64 increment = OptimalIncrements[0],
 		    incrementIndex = 0;
 		while (increment >= numElements)
@@ -515,6 +541,18 @@ namespace nuts
 		if (size <= 1)
 			return;
 
+		if (size <= 16)
+		{
+			if (size == 2)
+			{
+				if (cmp(*last, *first))
+					itr_swap(first, last);
+				return;
+			}
+			insertion_sort(first, last, cmp);
+			return;
+		}
+
 		auto left_half = size / 2,
 		     right_half = size - left_half;
 		auto mid = advance(first, left_half);
@@ -523,6 +561,7 @@ namespace nuts
 		merge_sort_in_place(mid, last, cmp, right_half);
 
 		auto right = mid;
+
 		while (first != mid)
 		{
 			if (cmp(*right, *first))
@@ -555,10 +594,10 @@ namespace nuts
 	{
 		auto n = distance(first, last);
 
+		if (n <= 1) return;
+
 		if (n <= 16)
 		{
-			if (n <= 1)
-				return;
 			if (n == 2)
 			{
 				if (cmp(*last, *first))
@@ -569,13 +608,16 @@ namespace nuts
 			return;
 		}
 
+		//necessary copy
 		const auto pivot = *advance(first, distance(next(first), last) / 2);
-		auto mid_a = partition(first, last,
+
+		auto l_end = partition(first, last,
 		                       [&](const auto&elem) { return cmp(elem, pivot); }),
-		     mid_b = partition(mid_a, last,
-		                       [&](const auto&elem) { return !cmp(pivot, elem); });
-		intro_sort(first, mid_a);
-		intro_sort(mid_b, last);
+		     r_begin = partition(l_end, last,
+		                         [&](const auto&elem) { return !cmp(pivot, elem); });
+
+		intro_sort(first, l_end, cmp);
+		intro_sort(r_begin, last, cmp);
 	}
 
 	template <u64 Width = 8, Iterable Box,
@@ -598,38 +640,37 @@ namespace nuts
 			return;
 		}
 
-		auto numElements = distance(first, last);
-		if (numElements < 2) return;
+		auto n = distance(first, last);
+		if (n < 2) return;
 
 		auto heapify = [](Itr first, u64 pos, u64 stop, Compare cmp = Compare {}) {
 			first = advance(first, pos);
-
 			auto parent = first, child = first;
 			auto value = move(*parent);
 
 			while (pos * Width + 1 < stop)
 			{
-				auto increment = pos * (Width - 1) + 1;
-				pos += increment;
-				child = advance(child, increment);
+				auto inc = pos * (Width - 1) + 1;
+				pos += inc;
+				child = advance(child, inc);
 
-				auto numChildren = Width;
-				if (numChildren + pos > stop)
-					numChildren = stop - pos;
-				if (numChildren > 1)
+				auto c = Width;
+				if (c + pos > stop)
+					c = stop - pos;
+				if (c > 1)
 				{
 					auto scan = child;
 					++scan;
-					u64 maxPos = 0;
-					for (u64 i = 1; i < numChildren; i++, scan++)
+					u64 max = 0;
+					for (u64 i = 1; i < c; i++, scan++)
 					{
 						if (cmp(*child, *scan))
 						{
-							maxPos = i;
+							max = i;
 							child = scan;
 						}
 					}
-					pos += maxPos;
+					pos += max;
 				}
 				if (!cmp(value, *child))
 				{
@@ -642,11 +683,11 @@ namespace nuts
 			*child = move(value);
 		};
 
-		u64 firstLeaf = (numElements + Width - 2) / Width;
+		u64 firstLeaf = (n + Width - 2) / Width;
 
 		for (u64 i = firstLeaf; i > 0; i--)
-			heapify(first, i - 1, numElements, cmp);
-		for (auto i = numElements - 1; i > 0; i--)
+			heapify(first, i - 1, n, cmp);
+		for (auto i = n - 1; i > 0; i--)
 		{
 			itr_swap(first, last);
 			--last;

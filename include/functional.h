@@ -1,5 +1,5 @@
 #ifndef _NUTS_FUNC_
-#define _NUTS_FUNC_ 1
+#define _NUTS_FUNC_
 
 #include "type.h"
 
@@ -23,6 +23,12 @@ namespace nuts
 
 		template <typename... _ArgTypes>
 		auto operator()(_ArgTypes&&... args)
+		{
+			return fn(args...);
+		}
+
+		template <typename... _ArgTypes>
+		auto operator()(_ArgTypes&&... args) const
 		{
 			return fn(args...);
 		}
@@ -55,7 +61,7 @@ namespace nuts
 		        const { return a == b; }
 	};
 
-	/* HASHER */
+	/* Hasher */
 
 	template <typename x>// Abstract hash function
 	struct hash;

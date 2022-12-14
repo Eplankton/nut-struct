@@ -1,5 +1,5 @@
 #ifndef _NUTS_BIN_TREE_
-#define _NUTS_BIN_TREE_ 1
+#define _NUTS_BIN_TREE_
 
 #include "algorithm.h"
 #include "functional.h"
@@ -7,7 +7,6 @@
 #include "memory.h"
 #include "queue.h"
 #include "type.h"
-#include <cassert>
 
 namespace nuts
 {
@@ -276,7 +275,7 @@ namespace nuts
 	template <typename T, class Compare>
 	binary_tree<T, Compare>::binary_tree(const binary_tree<T, Compare>& src)
 	{
-		for_each(src, [this](const auto& x) { insert(x); });
+		for_each(src, [&](const auto& x) { insert(x); });
 	}
 
 	template <typename T, class Compare>
@@ -679,7 +678,7 @@ namespace nuts
 	template <typename T, class Compare>
 	AVL<T, Compare>::AVL(const self_type& src)
 	{
-		for_each(src, [this](const T& x) { this->insert(x); });
+		for_each(src, [&](const T& x) { insert(x); });
 	}
 
 	template <typename T, class Compare>

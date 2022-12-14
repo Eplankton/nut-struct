@@ -36,7 +36,7 @@ void xxsort_test(Box& x, Compare cmp = Compare {})
 	array<Box, 7> m(x);
 	vector<pair<double, string>> rank;
 
-	for (auto i: range(0, 7))
+	for (u64 i: range(0, 7))
 	{
 		print('\n', index_map[i]);
 		auto& fn = fst.front();
@@ -58,6 +58,41 @@ void xxsort_test(Box& x, Compare cmp = Compare {})
 	println("\n::::::::::::::::::::::::::::::::::::::::::");
 }
 
+template <Iterable Box_Type, class Compare = less<typename Box_Type::value_type>>
+void visual()
+{
+	queue<function<void(Box_Type&, less<i32>)>> fst {
+	        insertion_sort,
+	        selection_sort,
+	        quick_sort,
+	        shell_sort,
+	        merge_sort,
+	        intro_sort,
+	        heap_sort,
+	};
+
+	auto cmp = Compare {};
+
+	std::random_device rd;
+	Box_Type v;
+
+	u64 base, len;
+	std::cin >> base >> len;
+	for (const auto& fn: range(fst))
+	{
+		for (i32 n: range(base, base + len))
+		{
+			for (u64 i: range(0, n))
+				v.push_back(rd() % INT32_MAX);
+			Timer c;
+			fn(v, cmp);
+			auto cst = 1 / c.elapsed();
+			println(n, '\n', cst);
+			v.clear();
+		}
+	}
+}
+
 int main()
 {
 	deque<string> a {"human", "dog", "cat", "cow",
@@ -65,12 +100,13 @@ int main()
 	// xxsort_test(a);
 
 	vector<i32> v;
-	auto n = 1e4;
+	auto n = 1e5;
 	std::random_device rd;
 	for (int i = 0; i < n; ++i)
 		v.push_back(rd() % (u64) n);
 
 	xxsort_test(v);
+	// visual<vector<i32>>();
 
 	return 0;
 }

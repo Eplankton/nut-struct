@@ -1,5 +1,5 @@
 #ifndef _NUTS_HASH_SET_
-#define _NUTS_HASH_SET_ 1
+#define _NUTS_HASH_SET_
 
 #include "functional.h"
 #include "list.h"
@@ -254,7 +254,7 @@ namespace nuts
 		if (it == bucket_type::npos)
 			return npos;
 		else
-			return {bucket.begin() + i, bucket.end(), it};
+			return {advance(bucket.begin(), i), bucket.end(), it};
 	}
 
 	template <class K, class Hasher>

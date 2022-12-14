@@ -1,5 +1,5 @@
 #ifndef _NUTS_MAP_
-#define _NUTS_MAP_ 1
+#define _NUTS_MAP_
 
 #include "set.h"
 #include "type.h"
@@ -36,7 +36,7 @@ namespace nuts
 
 		map(const map<K, V, Compare>& src)
 		{
-			for_each(*this, [this](const auto& x) { insert(x); });
+			for_each(*this, [&](const auto& x) { insert(x); });
 		}
 
 		map(const std::initializer_list<value_type>& ilist)
@@ -123,14 +123,14 @@ namespace nuts
 	operator=(const map<K, V, Compare>& src)
 	{
 		base_type::clear();
-		for_each(*this, [this](const auto& x) { insert(x); });
+		for_each(*this, [&](const auto& x) { insert(x); });
 		return *this;
 	}
 
 	template <typename K, typename V, class Compare>
 	void map<K, V, Compare>::print() const
 	{
-		auto printer = [this](const auto& x) {
+		auto printer = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &this->back()) printf(", ");
 		};

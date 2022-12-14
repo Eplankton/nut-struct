@@ -1,5 +1,5 @@
 #ifndef _NUTS_ITER_
-#define _NUTS_ITER_ 1
+#define _NUTS_ITER_
 
 #include "type.h"
 

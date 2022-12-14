@@ -1,5 +1,5 @@
 #ifndef _NUTS_HASH_MAP_
-#define _NUTS_HASH_MAP_ 1
+#define _NUTS_HASH_MAP_
 
 #include "unordered_set.h"
 #include "utility.h"
@@ -106,7 +106,7 @@ namespace nuts
 		if (it == bucket_type::npos)
 			return npos;
 		else
-			return {bucket.begin() + i, bucket.end(), it};
+			return {advance(bucket.begin(), i), bucket.end(), it};
 	}
 
 	template <class K, class V, class Hasher>

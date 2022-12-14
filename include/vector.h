@@ -1,5 +1,5 @@
 #ifndef _NUTS_VECTOR_
-#define _NUTS_VECTOR_ 1
+#define _NUTS_VECTOR_
 
 #include <cassert>
 #include <cstddef>
@@ -146,13 +146,17 @@ namespace nuts
 		vector<T>& operator=(vector<T>&& src) { return move(src); }
 
 		iterator begin() const { return {const_cast<T*>(data())}; }
-		iterator end() const { return {const_cast<T*>(&data_ptr[size() - 1])}; }
+		iterator end() const
+		{
+			return size() == 0 ? begin()
+			                   : iterator {const_cast<T*>(&data_ptr[size() - 1])};
+		}
 
-		T& front() { return data_ptr[0]; }
-		T& back() { return data_ptr[size() - 1]; }
+		T& front() { return *begin(); }
+		T& back() { return *end(); }
 
-		const T& front() const { return data_ptr[0]; }
-		const T& back() const { return data_ptr[size() - 1]; }
+		const T& front() const { return *begin(); }
+		const T& back() const { return *end(); }
 
 		template <Forward_Itr Itr>
 		void assign(Itr st, Itr ed);
@@ -273,10 +277,10 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T>& vector<T>::push_back(const T& obj)
+	vector<T>& vector<T>::push_back(const T& src)
 	{
 		emplace_back();
-		back() = obj;
+		back() = src;
 		return *this;
 	}
 
@@ -335,7 +339,7 @@ namespace nuts
 	template <class T>
 	void vector<T>::print() const
 	{
-		auto print = [this](const auto& x) {
+		auto print = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &back()) printf(", ");
 		};
@@ -349,7 +353,7 @@ namespace nuts
 	template <Forward_Itr Itr>
 	void vector<T>::assign(Itr st, Itr ed)
 	{
-		for_each(st, ed, [this](const auto& x) { push_back(x); });
+		for_each(st, ed, [&](const auto& x) { push_back(x); });
 	}
 }
 

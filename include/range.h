@@ -1,5 +1,5 @@
 #ifndef _NUTS_RANGE_
-#define _NUTS_RANGE_ 1
+#define _NUTS_RANGE_
 
 #include "type.h"
 #include "iterator.h"
@@ -14,8 +14,19 @@ namespace nuts
 
 	public:
 		Range() = default;
-		explicit Range(const C& x) : st(x.begin()), ed(x.end() + 1) {}
 		~Range() = default;
+		explicit Range(const C& x)
+		{
+			if (x.begin() == x.end())
+			{
+				ed = st = x.begin();
+			}
+			else
+			{
+				st = x.begin();
+				ed = next(x.end());
+			}
+		}
 
 		itr_type& begin() { return st; }
 		itr_type& end() { return ed; }
@@ -38,7 +49,7 @@ namespace nuts
 	{
 	public:
 		class iterator
-				: public bidirectional_iterator
+		    : public bidirectional_iterator
 		{
 
 		public:
@@ -51,7 +62,7 @@ namespace nuts
 
 			inline bool operator==(const iterator& obj) const { return curr == obj.curr; }
 			inline bool operator!=(const iterator& obj)
-			const
+			        const
 			{
 				return step > 0 ? (curr <= obj.curr &&
 				                   curr != obj.curr)

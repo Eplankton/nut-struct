@@ -1,5 +1,5 @@
 #ifndef _NUTS_OPTION_
-#define _NUTS_OPTION_ 1
+#define _NUTS_OPTION_
 
 /** @file Option
      *  Experimental

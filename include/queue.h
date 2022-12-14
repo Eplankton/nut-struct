@@ -1,5 +1,5 @@
 #ifndef _NUTS_QUEUE_
-#define _NUTS_QUEUE_ 1
+#define _NUTS_QUEUE_
 
 #include "concept.h"
 #include "deque.h"
@@ -127,7 +127,7 @@ namespace nuts
 	template <class T, Queue_Base C>
 	void queue<T, C>::print() const
 	{
-		auto print = [this](const auto& x) {
+		auto print = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &back()) printf(", ");
 		};

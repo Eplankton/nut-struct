@@ -1,5 +1,5 @@
 #ifndef _NUTS_MOVE_
-#define _NUTS_MOVE_ 1
+#define _NUTS_MOVE_
 
 namespace nuts
 {

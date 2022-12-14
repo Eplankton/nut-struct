@@ -1,5 +1,5 @@
 #ifndef _NUTS_CONCEPT_
-#define _NUTS_CONCEPT_ 1
+#define _NUTS_CONCEPT_
 
 // Since C++20.
 
@@ -7,11 +7,11 @@
 
 namespace nuts
 {
-	// template <typename Func, typename... T>
-	// concept Callable = requires(Func &&fn, T&&... args)
-	// {
-	// 	fn(args...);
-	// };
+	template <typename Fn, typename... T>
+	concept Callable = requires(Fn&& fn, T&&... args)
+	{
+		fn(args...);
+	};
 
 	template <typename Box>
 	concept Iterable = requires(Box x)

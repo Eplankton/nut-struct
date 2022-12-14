@@ -1,5 +1,5 @@
 #ifndef _NUTS_TUPLE_
-#define _NUTS_TUPLE_ 1
+#define _NUTS_TUPLE_
 
 namespace nuts
 {

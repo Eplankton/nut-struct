@@ -1,5 +1,5 @@
 #ifndef _NUTS_STACK_
-#define _NUTS_STACK_ 1
+#define _NUTS_STACK_
 
 #include "concept.h"
 #include "deque.h"
@@ -145,7 +145,7 @@ namespace nuts
 	template <class T, Stack_Base C>
 	void stack<T, C>::print() const
 	{
-		auto print = [this](const auto& x) {
+		auto print = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &back()) printf(", ");
 		};

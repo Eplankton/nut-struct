@@ -1,5 +1,5 @@
 #ifndef _NUTS_MATRIX_
-#define _NUTS_MATRIX_ 1
+#define _NUTS_MATRIX_
 
 #include "algorithm.h"
 #include "array.h"

@@ -1,5 +1,5 @@
 #ifndef _NUTS_UTILI_
-#define _NUTS_UTILI_ 1
+#define _NUTS_UTILI_
 
 #include "algorithm.h"
 #include "move.h"
@@ -29,7 +29,7 @@ namespace nuts
 		T2& _1() { return second; }
 		const T1& _0() const { return first; }
 		const T2& _1() const { return second; }
-		
+
 		pair<T1, T2>& move(pair<T1, T2>& src)
 		{
 			first = nuts::move(src.first);

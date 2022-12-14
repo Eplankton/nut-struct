@@ -1,7 +1,6 @@
 #ifndef _NUTS_BITS_
-#define _NUTS_BITS_ 1
+#define _NUTS_BITS_
 
-#include <cmath>
 #include <iostream>
 
 #include "algorithm.h"

@@ -1,8 +1,8 @@
 #ifndef _NUTS_MEMO_
-#define _NUTS_MEMO_ 1
+#define _NUTS_MEMO_
 
-#include "type.h"
 #include <cassert>
+#include "type.h"
 
 namespace nuts
 {
@@ -40,7 +40,7 @@ namespace nuts
 		unique_ptr() = default;
 		unique_ptr(pointer obj) : _ptr(obj) {}
 		unique_ptr(const_pointer obj) : _ptr(const_cast<pointer>(obj)) {}
-		unique_ptr(std::nullptr_t _p) : _ptr(_p) {}
+		unique_ptr(nuts::nullptr_t _p) : _ptr(_p) {}
 		unique_ptr(unique_ptr<T, Dx>&& src) { move(src); }
 		unique_ptr(unique_ptr<T, Dx>& src)
 		{
@@ -78,8 +78,8 @@ namespace nuts
 			return _ptr;
 		}
 
-		inline pointer
-		get() const { return const_cast<pointer>(_ptr); }
+		inline pointer get()
+		        const { return const_cast<pointer>(_ptr); }
 
 		pointer release()
 		{
@@ -248,7 +248,7 @@ namespace nuts
 			(*_cnt)++;
 		}
 
-		shared_ptr(std::nullptr_t _p) : _ptr(_p)
+		shared_ptr(nuts::nullptr_t _p) : _ptr(_p)
 		{
 			_cnt = new u64(0);
 			(*_cnt)++;

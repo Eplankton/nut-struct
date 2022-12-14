@@ -1,5 +1,5 @@
 #ifndef _NUTS_SET_
-#define _NUTS_SET_ 1
+#define _NUTS_SET_
 
 #include "binary_tree.h"
 
@@ -62,7 +62,7 @@ namespace nuts
 	template <typename T, class Compare>
 	void set<T, Compare>::print() const
 	{
-		auto pr = [this](const auto& x) {
+		auto pr = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &this->back())
 				printf(", ");

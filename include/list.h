@@ -1,9 +1,5 @@
 #ifndef _NUTS_LIST_
-#define _NUTS_LIST_ 1
-
-#include <cassert>
-#include <cstddef>
-#include <iostream>
+#define _NUTS_LIST_
 
 #include "algorithm.h"
 #include "iterator.h"
@@ -515,13 +511,13 @@ namespace nuts
 	template <Forward_Itr Itr>
 	void list<T>::assign(Itr st, Itr ed)
 	{
-		for_each(st, ed, [this](const auto& x) { push_back(x); });
+		for_each(st, ed, [&](const auto& x) { push_back(x); });
 	}
 
 	template <class T>
 	void list<T>::print() const
 	{
-		auto print = [this](const auto& x) {
+		auto print = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &back()) printf(", ");
 		};

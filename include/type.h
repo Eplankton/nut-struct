@@ -1,5 +1,5 @@
 #ifndef _NUTS_TYPE_
-#define _NUTS_TYPE_ 1
+#define _NUTS_TYPE_
 
 // Primitive data types
 
@@ -17,6 +17,8 @@ namespace nuts
 
 	using f32 = float;
 	using f64 = double;
+
+	using nullptr_t = decltype(nullptr);
 }
 
 #endif

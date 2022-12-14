@@ -1,5 +1,5 @@
 #ifndef _NUTS_BASIC_STRING_
-#define _NUTS_BASIC_STRING_ 1
+#define _NUTS_BASIC_STRING_
 
 #include <cassert>
 #include <cstddef>

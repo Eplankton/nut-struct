@@ -1,5 +1,5 @@
 #ifndef _NUTS_DEQUE_
-#define _NUTS_DEQUE_ 1
+#define _NUTS_DEQUE_
 
 #include "array.h"
 #include "iterator.h"
@@ -287,7 +287,7 @@ namespace nuts
 	deque<T, Buf>& deque<T, Buf>::operator=(const deque<T, Buf>& src)
 	{
 		clear();
-		for_each(src, [this](const T& x) { push_back(x); });
+		for_each(src, [&](const T& x) { push_back(x); });
 		return *this;
 	}
 
@@ -486,7 +486,7 @@ namespace nuts
 	template <typename T, u64 Buf>
 	void deque<T, Buf>::print() const
 	{
-		auto print = [this](const auto& x) {
+		auto print = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != last) printf(", ");
 		};
@@ -499,7 +499,7 @@ namespace nuts
 	template <typename T, u64 Buf>
 	void deque<T, Buf>::print_detail() const
 	{
-		auto array_print = [this](const buf_type& arr) {
+		auto array_print = [&](const buf_type& arr) {
 			printf("[");
 			for_each(arr, [&arr, this](const T& x) { 
 					if (&x == first || &x == last)

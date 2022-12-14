@@ -1,5 +1,5 @@
 #ifndef _NUTS_BITSET_
-#define _NUTS_BITSET_ 1
+#define _NUTS_BITSET_
 
 #include "array.h"
 #include "basic_string.h"

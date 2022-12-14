@@ -1,10 +1,7 @@
 #ifndef _NUTS_ARRAY_
-#define _NUTS_ARRAY_ 1
+#define _NUTS_ARRAY_
 
 #include <cassert>
-#include <initializer_list>
-#include <iostream>
-
 #include "algorithm.h"
 #include "iterator.h"
 #include "range.h"
@@ -32,14 +29,15 @@ namespace nuts
 		static constexpr u64 size() { return N; }
 		static constexpr bool empty() { return size() == 0; }
 
-		T& front() { return impl[0]; }
-		T& back() { return impl[size() - 1]; }
+		T& front() { return *begin(); }
+		T& back() { return *end(); }
 
-		const T& front() const { return impl[0]; }
-		const T& back() const { return impl[size() - 1]; }
+		const T& front() const { return *begin(); }
+		const T& back() const { return *end(); }
 
 		inline T& operator[](u64 _n) { return impl[_n]; }
 		inline const T& operator[](u64 _n) const { return impl[_n]; }
+
 		T& at(u64 _n);
 		const T& at(u64 _n) const;
 
@@ -129,7 +127,11 @@ namespace nuts
 		};
 
 		iterator begin() const { return {data()}; }
-		iterator end() const { return {&impl[size() - 1]}; }
+		iterator end() const
+		{
+			return size() == 0 ? begin()
+			                   : iterator {const_cast<T*>(&impl[size() - 1])};
+		}
 
 	protected:
 		value_type impl[N];
@@ -172,7 +174,7 @@ namespace nuts
 	template <typename T, u64 N>
 	void array<T, N>::print() const
 	{
-		auto print = [this](const auto& x) {
+		auto print = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &back()) printf(", ");
 		};
