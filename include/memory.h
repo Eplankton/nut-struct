@@ -2,6 +2,7 @@
 #define _NUTS_MEMO_
 
 #include <cassert>
+#include <atomic>
 #include "type.h"
 
 namespace nuts
@@ -37,18 +38,18 @@ namespace nuts
 		using const_pointer = const T*;
 
 	public:
-		unique_ptr() = default;
-		unique_ptr(pointer obj) : _ptr(obj) {}
-		unique_ptr(const_pointer obj) : _ptr(const_cast<pointer>(obj)) {}
-		unique_ptr(nuts::nullptr_t _p) : _ptr(_p) {}
-		unique_ptr(unique_ptr<T, Dx>&& src) { move(src); }
+		unique_ptr() noexcept = default;
+		unique_ptr(pointer obj) noexcept : _ptr(obj) {}
+		unique_ptr(const_pointer obj) noexcept : _ptr(const_cast<pointer>(obj)) {}
+		unique_ptr(nuts::nullptr_t _p) noexcept : _ptr(_p) {}
+		unique_ptr(unique_ptr<T, Dx>&& src) noexcept { move(src); }
 		unique_ptr(unique_ptr<T, Dx>& src)
 		{
 			_ptr = src._ptr;
 			src._ptr = nullptr;
 		}
 
-		~unique_ptr()
+		~unique_ptr() noexcept
 		{
 			deleter(_ptr);
 			_ptr = nullptr;
@@ -78,17 +79,17 @@ namespace nuts
 			return _ptr;
 		}
 
-		inline pointer get()
-		        const { return const_cast<pointer>(_ptr); }
+		inline pointer get() const
+		        noexcept { return const_cast<pointer>(_ptr); }
 
-		pointer release()
+		inline pointer release() noexcept
 		{
 			auto tmp = _ptr;
 			_ptr = nullptr;
 			return tmp;
 		}
 
-		unique_ptr& operator=(unique_ptr<T, Dx>&& src)
+		inline unique_ptr& operator=(unique_ptr<T, Dx>&& src) noexcept
 		// Only allow moveable rvalue
 		{
 			_ptr = src._ptr;
@@ -96,13 +97,13 @@ namespace nuts
 			return *this;
 		}
 
-		unique_ptr& operator=(T* src)
+		inline unique_ptr& operator=(T* src) noexcept
 		{
 			_ptr = src;
 			return *this;
 		}
 
-		unique_ptr<T>& move(unique_ptr<T, Dx>& src)
+		unique_ptr<T>& move(unique_ptr<T, Dx>& src) noexcept
 		{
 			_ptr = src._ptr;
 			src._ptr = nullptr;
@@ -110,16 +111,16 @@ namespace nuts
 		}
 
 		inline bool operator==(unique_ptr<T, Dx>& obj)
-		        const { return _ptr == obj._ptr; }
+		        const noexcept { return _ptr == obj._ptr; }
 
 		inline bool operator==(const T* obj)
-		        const { return _ptr == obj; }
+		        const noexcept { return _ptr == obj; }
 
 		inline bool operator!=(unique_ptr<T, Dx>& obj)
-		        const { return _ptr != obj._ptr; }
+		        const noexcept { return _ptr != obj._ptr; }
 
 		inline bool operator!=(const_pointer obj)
-		        const { return _ptr != obj; }
+		        const noexcept { return _ptr != obj; }
 
 	protected:
 		pointer _ptr = nullptr;
@@ -134,16 +135,16 @@ namespace nuts
 		using pointer = T*;
 		using const_pointer = const T*;
 
-		unique_ptr() = default;
-		unique_ptr(pointer src) : _ptr(src) {}
-		unique_ptr(const_pointer src) : _ptr(const_cast<pointer>(src)) {}
-		unique_ptr(unique_ptr<T, Dx>& src)
+		unique_ptr() noexcept = default;
+		unique_ptr(pointer src) noexcept : _ptr(src) {}
+		unique_ptr(const_pointer src) noexcept : _ptr(const_cast<pointer>(src)) {}
+		unique_ptr(unique_ptr<T, Dx>& src) noexcept
 		{
 			_ptr = src._ptr;
 			src._ptr = nullptr;
 		}
 
-		~unique_ptr()
+		~unique_ptr() noexcept
 		{
 			deleter(_ptr);
 			_ptr = nullptr;
@@ -181,27 +182,27 @@ namespace nuts
 
 		inline pointer get() const { return const_cast<pointer>(_ptr); }
 
-		pointer release()
+		inline pointer release() noexcept
 		{
 			auto tmp = _ptr;
 			_ptr = nullptr;
 			return tmp;
 		}
 
-		unique_ptr& operator=(unique_ptr<T, Dx>& src)
+		inline unique_ptr& operator=(unique_ptr<T, Dx>& src) noexcept
 		{
 			_ptr = src._ptr;
 			src._ptr = nullptr;
 			return *this;
 		}
 
-		unique_ptr& operator=(T* src)
+		inline unique_ptr& operator=(T* src) noexcept
 		{
 			_ptr = src;
 			return *this;
 		}
 
-		unique_ptr<T>& move(unique_ptr<T, Dx>& src)
+		inline unique_ptr<T>& move(unique_ptr<T, Dx>& src) noexcept
 		{
 			_ptr = src._ptr;
 			src._ptr = nullptr;
@@ -209,16 +210,16 @@ namespace nuts
 		}
 
 		bool operator==(unique_ptr<T, Dx>& obj)
-		        const { return _ptr == obj._ptr; }
+		        const noexcept { return _ptr == obj._ptr; }
 
 		bool operator==(const T* obj)
-		        const { return _ptr == obj; }
+		        const noexcept { return _ptr == obj; }
 
 		bool operator!=(unique_ptr<T, Dx>& obj)
-		        const { return _ptr != obj._ptr; }
+		        const noexcept { return _ptr != obj._ptr; }
 
 		bool operator!=(const_pointer obj)
-		        const { return _ptr != obj; }
+		        const noexcept { return _ptr != obj; }
 
 	protected:
 		pointer _ptr = nullptr;
@@ -232,7 +233,15 @@ namespace nuts
 		using value_type = T;
 		using pointer = T*;
 		using const_pointer = const T*;
-		using u64_ptr = u64*;
+		using cnt_type = std::atomic<u64*>;
+
+		template <class... Args>
+		struct merge_type
+		{
+			T obj;
+			cnt_type cnt;
+			merge_type(const Args&... pkg) : obj(pkg...) {}
+		};
 
 	public:
 		shared_ptr() = default;
@@ -248,13 +257,8 @@ namespace nuts
 			(*_cnt)++;
 		}
 
-		shared_ptr(nuts::nullptr_t _p) : _ptr(_p)
-		{
-			_cnt = new u64(0);
-			(*_cnt)++;
-		}
-
-		shared_ptr(const shared_ptr<T, Dx>& src) : _ptr(src._ptr), _cnt(src._cnt)
+		shared_ptr(const shared_ptr<T, Dx>& src)
+		    : _ptr(src._ptr), _cnt(src._cnt._M_b)
 		{
 			if (_cnt != nullptr)
 				(*_cnt)++;
@@ -290,25 +294,25 @@ namespace nuts
 			return *_ptr;
 		}
 
-		T* operator->() const
+		inline T* operator->() const
 		{
 			assert(_ptr != nullptr);
 			return _ptr;
 		}
 
-		inline T* get() const { return _ptr; }
+		inline T* get() const noexcept { return _ptr; }
 
-		bool operator==(shared_ptr<T, Dx>& obj)
-		        const { return _ptr == obj._ptr; }
+		inline bool operator==(shared_ptr<T, Dx>& obj)
+		        const noexcept { return _ptr == obj._ptr; }
 
-		bool operator==(const T* obj)
-		        const { return _ptr == obj; }
+		inline bool operator==(const T* obj)
+		        const noexcept { return _ptr == obj; }
 
-		bool operator!=(shared_ptr<T, Dx>& obj)
-		        const { return _ptr != obj._ptr; }
+		inline bool operator!=(shared_ptr<T, Dx>& obj)
+		        const noexcept { return _ptr != obj._ptr; }
 
-		bool operator!=(const T* obj)
-		        const { return _ptr != obj; }
+		inline bool operator!=(const T* obj)
+		        const noexcept { return _ptr != obj; }
 
 		shared_ptr<T, Dx>& operator=(shared_ptr<T, Dx>& src)
 		{
@@ -320,7 +324,7 @@ namespace nuts
 
 	protected:
 		pointer _ptr = nullptr;
-		u64_ptr _cnt = nullptr;
+		cnt_type _cnt = nullptr;
 		static constexpr Dx deleter {};
 	};
 

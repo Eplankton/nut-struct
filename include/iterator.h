@@ -1,8 +1,6 @@
 #ifndef _NUTS_ITER_
 #define _NUTS_ITER_
 
-#include "type.h"
-
 namespace nuts
 {
 	struct forward_iterator_tag
@@ -81,49 +79,6 @@ namespace nuts
 		using itr_type = typename Itr::Category;
 		return itr_type();
 	}
-
-	// Since C++20:
-	
-	template <typename Itr>
-	concept Forward_Itr = requires(Itr it)
-	{
-		typename Itr::value_type;
-		*it;
-		++it;
-		it++;
-	};
-
-	template <typename Itr>
-	concept Bidirectional_Itr =
-	        Forward_Itr<Itr> && requires(Itr it)
-	{
-		--it;
-		it--;
-	};
-
-	template <typename Itr>
-	concept Random_Itr =
-	        Bidirectional_Itr<Itr> && requires(Itr x, Itr y, i64 n)
-	{
-		x + n;
-		x - n;
-		x[n];
-		x - y;
-		y - x;
-	};
-
-	template <typename T>
-	concept Pointer = requires(T x, T y, i64 n)
-	{
-		requires requires { !Forward_Itr<T>; };
-		*x;
-		++x;
-		--x;
-		x + n;
-		x - n;
-		x - y;
-		x[n];
-	};
 }
 
 #endif

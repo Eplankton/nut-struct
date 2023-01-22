@@ -201,6 +201,10 @@ namespace nuts
 		u64 length = 0;
 	};
 
+	// Deduction Guide
+	template <class T>
+	list(const std::initializer_list<T>&) -> list<T>;
+
 	template <class T>
 	list<T>::list(const T& userInputData, u64 userInputlength)
 	{

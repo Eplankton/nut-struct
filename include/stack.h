@@ -63,6 +63,10 @@ namespace nuts
 		C impl;
 	};
 
+	// Deduction Guide
+	template <class T>
+	stack(const std::initializer_list<T>&) -> stack<T>;
+
 	template <class T, Stack_Base C>
 	stack<T, C>::stack(const std::initializer_list<T>& ilist)
 	{

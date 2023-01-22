@@ -11,7 +11,9 @@
 #include "iterator.h"
 #include "type.h"
 
-#define STD_EXPAN 5
+#ifndef STD_EXPAN
+#define STD_EXPAN 5U
+#endif
 
 namespace nuts
 {

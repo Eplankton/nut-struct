@@ -16,21 +16,21 @@ namespace nuts
 		return (... + s);
 	}
 
+	template <Iterable Box, class Func>
+	Func for_each(const Box& box, Func fn)
+	{
+		return for_each(box.begin(), box.end(), fn);
+	}
+
 	template <typename Itr, class Func>
 	Func for_each(Itr st, Itr ed, Func fn)
 	{
 		if (st != ed)
 		{
-			for (auto _end = ed + 1; st != _end; ++st)
+			for (auto _end = next(ed); st != _end; ++st)
 				fn(*st);
 		}
 		return fn;
-	}
-
-	template <Iterable Box, class Func>
-	Func for_each(const Box& box, Func fn)
-	{
-		return for_each(box.begin(), box.end(), fn);
 	}
 
 	template <Forward_Itr Itr>
@@ -105,10 +105,10 @@ namespace nuts
 	Itr min_in(Itr st, Itr ed, Compare cmp = Compare {})
 	// Give range by itr: st && ed -> O(n)
 	{
-		Itr tmp = ed;
+		Itr tmp = st;
 		if (st != ed)
 		{
-			auto _end = ed + 1;
+			auto _end = next(ed);
 			for (auto i = st; i != _end; i++)
 				if (cmp(*i, *tmp))
 					tmp = i;
@@ -120,10 +120,10 @@ namespace nuts
 	Itr max_in(Itr st, Itr ed, Compare cmp = Compare {})
 	// Give range by itr: st && ed -> O(n)
 	{
-		Itr tmp = ed;
+		Itr tmp = st;
 		if (st != ed)
 		{
-			auto _end = ed + 1;
+			auto _end = next(ed);
 			for (auto i = st; i != _end; i++)
 				if (cmp(*i, *tmp))
 					tmp = i;
@@ -227,11 +227,11 @@ namespace nuts
 		return find_if_not(x.begin(), x.end(), fn);
 	}
 
-	template <Forward_Itr Itr, typename T>
-	Itr find(Itr st, Itr ed, const T& val)
+	template <Forward_Itr Itr, typename T, class Func = equal<T>>
+	Itr find(Itr st, Itr ed, const T& val, Func cmp = Func {})
 	// Give range by itr: st && ed -> O(N)
 	{
-		return find_if(st, ed, [&](const T& x) { return equal(x, val); });
+		return find_if(st, ed, [&](const T& x) { return cmp(x, val); });
 	}
 
 	template <Iterable Box, typename T>
@@ -372,7 +372,7 @@ namespace nuts
 		}
 
 		auto nt = st;
-		ed = nuts::next(ed);
+		ed = next(ed);
 
 		while (++nt != ed) {
 			if (fn(*nt)) {
@@ -449,7 +449,7 @@ namespace nuts
 	{
 		if (first == last) return;
 
-		//necessary copy
+		// necessary copy
 		const auto pivot = *advance(first, distance(next(first), last) / 2);
 
 		auto l_end = partition(first, last,
@@ -608,7 +608,7 @@ namespace nuts
 			return;
 		}
 
-		//necessary copy
+		// necessary copy
 		const auto pivot = *advance(first, distance(next(first), last) / 2);
 
 		auto l_end = partition(first, last,

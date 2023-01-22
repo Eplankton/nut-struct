@@ -20,15 +20,15 @@ namespace nuts
 
 		pair(pair<T1, T2>&& src) { move(src); }
 
-		T1& get_first() { return first; }
-		T2& get_second() { return second; }
-		const T1& get_first() const { return first; }
-		const T2& get_second() const { return second; }
+		inline T1& get_first() { return first; }
+		inline T2& get_second() { return second; }
+		inline const T1& get_first() const { return first; }
+		inline const T2& get_second() const { return second; }
 
-		T1& _0() { return first; }
-		T2& _1() { return second; }
-		const T1& _0() const { return first; }
-		const T2& _1() const { return second; }
+		inline T1& _0() { return first; }
+		inline T2& _1() { return second; }
+		inline const T1& _0() const { return first; }
+		inline const T2& _1() const { return second; }
 
 		pair<T1, T2>& move(pair<T1, T2>& src)
 		{
@@ -65,13 +65,13 @@ namespace nuts
 			return res;
 		}
 
-		pair<T1, T2>& operator=(const pair<T1, T2>& obj)
+		inline pair<T1, T2>& operator=(const pair<T1, T2>& obj)
 		{
 			first = obj.first, second = obj.second;
 			return *this;
 		}
 
-		pair<T1, T2>& operator=(pair<T1, T2>&& src)
+		inline pair<T1, T2>& operator=(pair<T1, T2>&& src)
 		{
 			return this->move(src);
 		}
@@ -79,16 +79,20 @@ namespace nuts
 		friend std::ostream&
 		operator<<(std::ostream& output, const pair<T1, T2>& obj)
 		{
-			nuts::print('(', obj.first, ", ", obj.second, ')');
+			nuts::print('(', obj.first, ": ", obj.second, ')');
 			return output;
 		}
 	};
 
+	// Deduction Guide
 	template <class T1, class T2>
-	pair<T1, T2> make_pair(const T1& _first, const T2& _second)
+	pair(T1, T2) -> pair<T1, T2>;
+
+	template <class T1, class T2>
+	inline pair<T1, T2> make_pair(const T1& _first, const T2& _second)
 	// Generate a pair<T1, T2>
 	{
-		return pair<T1, T2>(_first, _second);
+		return pair {_first, _second};
 	}
 }
 

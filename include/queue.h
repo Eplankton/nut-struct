@@ -58,6 +58,10 @@ namespace nuts
 		C impl;
 	};
 
+	// Deduction Guide
+	template <class T>
+	queue(const std::initializer_list<T>&) -> queue<T>;
+
 	template <class T, Queue_Base C>
 	queue<T, C>::queue(const std::initializer_list<T>& ilist)
 	{

@@ -118,6 +118,10 @@ namespace nuts
 		const V& operator[](const K& _k) const { return at(_k); }
 	};
 
+	// Deduction Guide
+	template <class K, class V>
+	map(const std::initializer_list<pair<K, V>>&) -> map<K, V>;
+
 	template <typename K, typename V, class Compare>
 	map<K, V, Compare>& map<K, V, Compare>::
 	operator=(const map<K, V, Compare>& src)
@@ -132,12 +136,12 @@ namespace nuts
 	{
 		auto printer = [&](const auto& x) {
 			nuts::print(x);
-			if (&x != &this->back()) printf(", ");
+			if (&x != &this->back()) nuts::print(", ");
 		};
 
 		printf("map @%#llx = {", (u64) this->root.get());
 		if (!this->empty()) for_each(*this, printer);
-		printf("}\n");
+		nuts::print("}\n");
 	}
 }
 

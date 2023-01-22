@@ -2,6 +2,9 @@
 #define _NUTS_FUNC_
 
 #include "type.h"
+#include <cstring>
+
+using std::strlen;
 
 namespace nuts
 {
@@ -122,6 +125,29 @@ namespace nuts
 			x = (x ^ (x >> 27)) * static_cast<u64>(0x94d049bb133111eb);
 			x = x ^ (x >> 31);
 			return x;
+		}
+	};
+
+	template <>
+	struct hash<const char*>
+	{
+		u64 operator()(const char* s) const
+		{
+			auto len = strlen(s);
+			u64 cnt = 0;
+
+			for (u64 i = 0; i < len; i++) {
+				cnt += (u64) s[i] & 0xbf5847;
+			}
+
+			auto hasher = [](u64 x) -> u64 {
+				x = (x ^ (x >> 30)) * u64(0xbf58476d1ce4e5b9);
+				x = (x ^ (x >> 27)) * u64(0x94d049bb133112eb);
+				x = x ^ (x >> 31);
+				return x;
+			};
+
+			return hasher(cnt);
 		}
 	};
 }

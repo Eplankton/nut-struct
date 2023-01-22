@@ -56,6 +56,11 @@ namespace nuts
 		void print() const;
 	};
 
+	// Deduction Guide
+	template <class K, class V>
+	unordered_map(const std::initializer_list<pair<K, V>>&)
+	        -> unordered_map<K, V>;
+
 	template <class K, class V, class Hasher = nuts::hash<K>>
 	using hash_map = unordered_map<K, V, Hasher>;
 

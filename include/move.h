@@ -4,7 +4,7 @@
 namespace nuts
 {
 	template <typename T>
-	inline T&& move(T& x)
+	inline T&& move(T& x) noexcept
 	{
 		return static_cast<T&&>(x);
 	}

@@ -10,7 +10,7 @@
 namespace nuts
 {
 	// Capacity of the bucket
-	static const u64 PRIME_LIST[] = {
+	static constexpr u64 PRIME_LIST[] = {
 	        /* 0     */ 5ul,
 	        /* 1     */ 11ul,
 	        /* 2     */ 23ul,
@@ -184,8 +184,8 @@ namespace nuts
 		const K& front() const { return *begin(); }
 		const K& back() const { return *end(); }
 
-		u64 size() const { return _size; }
-		bool empty() const { return _size == 0; };
+		inline u64 size() const { return _size; }
+		inline bool empty() const { return _size == 0; };
 		self_type& move(self_type& src);
 
 		inline u64 get_index(const K& _k)
@@ -214,6 +214,10 @@ namespace nuts
 		static constexpr Hasher hash_fn {};
 		static constexpr iterator npos {};
 	};
+
+	// Deduction Guide
+	template <class K>
+	unordered_set(const std::initializer_list<K>&) -> unordered_set<K>;
 
 	template <class K, class Hasher = nuts::hash<K>>
 	using hash_set = unordered_set<K, Hasher>;
@@ -289,14 +293,8 @@ namespace nuts
 	template <class K, class Hasher>
 	void unordered_set<K, Hasher>::insert(const K& _k)
 	{
-		auto it = find(_k);
-		if (it == npos)
-		{
-			if (_size == *bucket_size - 1) rehash();
-			u64 index = get_index(_k);
-			bucket[index].push_back(_k);
-			++_size;
-		}
+		K tmp = _k;
+		insert(nuts::move(tmp));
 	}
 
 	template <class K, class Hasher>

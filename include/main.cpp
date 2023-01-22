@@ -1,6 +1,5 @@
 #include "bits.h"
 #include "timer.h"
-
 #include <random>
 
 using namespace nuts;
@@ -36,8 +35,7 @@ void xxsort_test(Box& x, Compare cmp = Compare {})
 	array<Box, 7> m(x);
 	vector<pair<double, string>> rank;
 
-	for (u64 i: range(0, 7))
-	{
+	for (u64 i: range(0, 7)) {
 		print('\n', index_map[i]);
 		auto& fn = fst.front();
 
@@ -78,10 +76,8 @@ void visual()
 
 	u64 base, len;
 	std::cin >> base >> len;
-	for (const auto& fn: range(fst))
-	{
-		for (i32 n: range(base, base + len))
-		{
+	for (const auto& fn: range(fst)) {
+		for (i32 n: range(base, base + len)) {
 			for (u64 i: range(0, n))
 				v.push_back(rd() % INT32_MAX);
 			Timer c;
@@ -93,20 +89,54 @@ void visual()
 	}
 }
 
+template <Container SrcA, Container SrcB>
+auto generate(const SrcA& a, const SrcB& b)
+{
+	hash_set<pair<typename SrcA::value_type,
+	              typename SrcB::value_type>>
+	        ret;
+	for (const auto& i: range(a)) {
+		for (const auto& j: range(b)) {
+			ret.insert({i, j});
+		}
+	}
+	return ret;
+}
+
+void deduction_guide_test()
+{
+	array a {1, 2, 3, 4, 5};
+	vector v {1, 2, 3, 4, 5};
+	list l {1, 2, 3, 4, 5};
+	deque d {1, 2, 3, 4, 5};
+	set s {1, 2, 3, 4, 5};
+	unordered_set hs {1, 2, 3, 4, 5};
+
+	array as {"human", "dog", "cat", "cow",
+	          "sheep", "monkey", "turtle", "elephant"};
+
+	map m {pair {as[0], 0}, {as[1], 1}, {as[2], 2}};
+	unordered_map hm {pair {as[0], 0}, {as[1], 1}, {as[2], 2}};
+	println(a, v, l, d, s, hs, m, hm);
+}
+
 int main()
 {
-	deque<string> a {"human", "dog", "cat", "cow",
-	                 "sheep", "monkey", "turtle", "elephant"};
-	// xxsort_test(a);
+	// deque dq {"human", "dog", "cat", "cow",
+	//           "sheep", "monkey", "turtle", "elephant"};
+	// xxsort_test(dq);
 
-	vector<i32> v;
-	auto n = 1e5;
-	std::random_device rd;
-	for (int i = 0; i < n; ++i)
-		v.push_back(rd() % (u64) n);
+	// vector<i32> v;
+	// auto n = 1e3;
+	// std::random_device rd;
+	// for (int i = 0; i < n; ++i)
+	// 	v.push_back(rd() % (u64) n);
 
-	xxsort_test(v);
+	// xxsort_test(v);
 	// visual<vector<i32>>();
+	// generate(v, a).print();
+
+	deduction_guide_test();
 
 	return 0;
 }

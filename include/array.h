@@ -25,7 +25,7 @@ namespace nuts
 		~array() = default;
 
 		void fill(const T& _val);
-		pointer data() const { return const_cast<pointer>(impl); }
+		pointer data() const { return const_cast<pointer>(raw); }
 		static constexpr u64 size() { return N; }
 		static constexpr bool empty() { return size() == 0; }
 
@@ -35,8 +35,8 @@ namespace nuts
 		const T& front() const { return *begin(); }
 		const T& back() const { return *end(); }
 
-		inline T& operator[](u64 _n) { return impl[_n]; }
-		inline const T& operator[](u64 _n) const { return impl[_n]; }
+		inline T& operator[](u64 _n) { return raw[_n]; }
+		inline const T& operator[](u64 _n) const { return raw[_n]; }
 
 		T& at(u64 _n);
 		const T& at(u64 _n) const;
@@ -130,45 +130,54 @@ namespace nuts
 		iterator end() const
 		{
 			return size() == 0 ? begin()
-			                   : iterator {const_cast<T*>(&impl[size() - 1])};
+			                   : iterator {const_cast<T*>(&raw[size() - 1])};
 		}
 
 	protected:
-		value_type impl[N];
+		value_type raw[N];
 	};
+
+	// Deduction Guide
+	template <typename T, Same<T>... U> // what the fuck?
+	array(T, U...) -> array<T, 1 + sizeof...(U)>;
 
 	template <typename T, u64 N>
 	array<T, N>::array(const T& val)
 	{
-		nuts::fill_n(impl, N, val);
+		nuts::fill_n(raw, N, val);
 	}
 
 	template <typename T, u64 N>
 	array<T, N>::array(const std::initializer_list<T>& ilist)
 	{
-		auto st = ilist.begin();
-		for (u64 i: range(0, N < ilist.size() ? N : ilist.size()))
-			impl[i] = *(st++);
+		auto st = ilist.begin(), ed = ilist.end();
+		for (auto& x: raw)
+		{
+			if (st != ed)
+				x = *(st++);
+			else
+				break;
+		}
 	}
 
 	template <typename T, u64 N>
 	T& array<T, N>::at(u64 _n)
 	{
 		assert(_n < size() && "Index_Bound");
-		return impl[_n];
+		return raw[_n];
 	}
 
 	template <typename T, u64 N>
 	const T& array<T, N>::at(u64 _n) const
 	{
 		assert(_n < size() && "Index_Bound");
-		return impl[_n];
+		return raw[_n];
 	}
 
 	template <typename T, u64 N>
 	void array<T, N>::fill(const T& _val)
 	{
-		nuts::fill_n(impl, N, _val);
+		nuts::fill_n(raw, N, _val);
 	}
 
 	template <typename T, u64 N>

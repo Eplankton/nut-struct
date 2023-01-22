@@ -3,7 +3,6 @@
 
 #include "algorithm.h"
 #include "array.h"
-#include "concept.h"
 
 namespace nuts
 {
@@ -11,49 +10,49 @@ namespace nuts
      *  Create small matrix on stack.
      */
 
-	template <typename T, u64 Row, u64 Col>
+	template <typename T, u64 R, u64 C>
 	class matrix
 	{
 	public:
 		using value_type = T;
-		using self_type = matrix<T, Row, Col>;
-		using base_type = array<array<T, Col>, Row>;
+		using self_type = matrix<T, R, C>;
+		using raw_type = array<array<T, C>, R>;
 
 	protected:
-		base_type impl;
+		raw_type raw;
 
 	public:
 		matrix() = default;
 		matrix(const T& _val);
 		matrix(const self_type& src) = default;
-		matrix(const std::initializer_list<array<T, Col>>& ilist);
+		matrix(const std::initializer_list<array<T, C>>& ilist);
 		matrix(const std::initializer_list<T>& ilist);
 		~matrix() = default;
 
-		static constexpr u64 row() { return Row; }
-		static constexpr u64 col() { return Col; }
+		static constexpr u64 row() { return R; }
+		static constexpr u64 col() { return C; }
 		void print() const;
 
-		inline array<T, Col>& operator[](u64 _r) { return impl[_r]; }
-		inline const array<T, Col>& operator[](u64 _r) const { return impl[_r]; }
+		inline array<T, C>& operator[](u64 _r) { return raw[_r]; }
+		inline const array<T, C>& operator[](u64 _r) const { return raw[_r]; }
 
 		T& at(u64 _r, u64 _c)
 		{
 			assert(_r < row() && _c < col());
-			return impl[_r][_c];
+			return raw[_r][_c];
 		}
 
 		const T& at(u64 _r, u64 _c) const
 		{
 			assert(_r < row() && _c < col());
-			return impl[_r][_c];
+			return raw[_r][_c];
 		}
 
-		template <typename RetType, u64 R, u64 C>
+		template <typename RetType>
 		friend matrix<RetType, R, C> operator+(const matrix<RetType, R, C>& A,
 		                                       const matrix<RetType, R, C>& B);
 
-		template <typename RetType, u64 R, u64 C>
+		template <typename RetType>
 		friend matrix<RetType, R, C> operator-(const matrix<RetType, R, C>& A,
 		                                       const matrix<RetType, R, C>& B);
 
@@ -64,40 +63,40 @@ namespace nuts
 		self_type& operator=(const self_type& src);
 	};
 
-	template <typename T, u64 Row, u64 Col>
-	matrix<T, Row, Col>::
+	template <typename T, u64 R, u64 C>
+	matrix<T, R, C>::
 	        matrix(const T& _val)
 	{
 		for (u64 i = 0; i < row(); ++i)
 			for (u64 j = 0; j < col(); ++j)
-				impl[i][j] = _val;
+				raw[i][j] = _val;
 	}
 
-	template <typename T, u64 Row, u64 Col>
-	matrix<T, Row, Col>::
-	        matrix(const std::initializer_list<array<T, Col>>& ilist)
+	template <typename T, u64 R, u64 C>
+	matrix<T, R, C>::
+	        matrix(const std::initializer_list<array<T, C>>& ilist)
 	{
 		auto st = ilist.begin();
 		for (u64 i = 0; i < row(); ++i)
-			impl[i] = *(st++);
+			raw[i] = *(st++);
 	}
 
-	template <typename T, u64 Row, u64 Col>
-	matrix<T, Row, Col>::
+	template <typename T, u64 R, u64 C>
+	matrix<T, R, C>::
 	        matrix(const std::initializer_list<T>& ilist)
 	{
 		auto st = ilist.begin();
 		for (u64 i = 0; i < row(); ++i)
 			for (u64 j = 0; j < col(); ++j)
-				impl[i][j] = *(st++);
+				raw[i][j] = *(st++);
 	}
 
-	template <typename T, u64 Row, u64 Col>
-	matrix<T, Row, Col>& matrix<T, Row, Col>::operator=(const self_type& src)
+	template <typename T, u64 R, u64 C>
+	matrix<T, R, C>& matrix<T, R, C>::operator=(const self_type& src)
 	{
 		for (u64 i = 0; i < row(); ++i)
 			for (u64 j = 0; j < col(); ++j)
-				impl[i][j] = src[i][j];
+				raw[i][j] = src[i][j];
 		return *this;
 	}
 
@@ -136,8 +135,8 @@ namespace nuts
 		return res;
 	}
 
-	template <typename T, u64 Row, u64 Col>
-	void matrix<T, Row, Col>::print() const
+	template <typename T, u64 R, u64 C>
+	void matrix<T, R, C>::print() const
 	{
 		auto row_array_print = [](const auto& r) {
 			auto trav_in_col = [&r](const auto& c) {
@@ -150,7 +149,7 @@ namespace nuts
 		};
 
 		for (u64 i = 0; i < row(); ++i)
-			row_array_print(impl[i]);
+			row_array_print(raw[i]);
 		printf("\n");
 	}
 }

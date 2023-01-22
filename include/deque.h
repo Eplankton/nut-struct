@@ -208,6 +208,10 @@ namespace nuts
 		pointer first = nullptr, last = nullptr;
 	};
 
+	// Deduction Guide
+	template <class T>
+	deque(const std::initializer_list<T>&) -> deque<T>;
+
 	template <typename T, u64 Buf>
 	deque<T, Buf>::deque(const std::initializer_list<T>& ilist)
 	{

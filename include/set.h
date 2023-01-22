@@ -26,6 +26,10 @@ namespace nuts
 		void print() const;
 	};
 
+	// Deduction Guide
+	template <class K>
+	set(const std::initializer_list<K>&) -> set<K>;
+
 	template <typename T, class Compare>
 	set<T, Compare>& set<T, Compare>::operator=(self_type&& src)
 	{

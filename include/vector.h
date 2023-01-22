@@ -9,8 +9,13 @@
 #include "iterator.h"
 #include "type.h"
 
-#define STD_CAPACITY 5U
+#ifndef STD_EXPAN
+#define STD_EXPAN 5U
+#endif
+
+#ifndef EXPAN_COEF
 #define EXPAN_COEF 2U
+#endif
 
 namespace nuts
 {
@@ -169,36 +174,40 @@ namespace nuts
 		u64 v_size = 0, v_capacity = 0;
 	};
 
+	// Deduction Guide
+	template <class T>
+	vector(const std::initializer_list<T>&) -> vector<T>;
+
 	template <class T>
 	vector<T>::vector(u64 userInputSize)
 	{
-		data_ptr = new T[userInputSize + STD_CAPACITY];
+		data_ptr = new T[userInputSize + STD_EXPAN];
 		v_size = userInputSize;
-		v_capacity = v_size + STD_CAPACITY;
+		v_capacity = v_size + STD_EXPAN;
 	}
 
 	template <class T>
 	vector<T>::vector(u64 userInputSize, const T& userInputData)
 	{
-		data_ptr = new T[userInputSize + STD_CAPACITY];
+		data_ptr = new T[userInputSize + STD_EXPAN];
 		nuts::fill_n(data_ptr, userInputSize, userInputData);
 		v_size = userInputSize;
-		v_capacity = v_size + STD_CAPACITY;
+		v_capacity = v_size + STD_EXPAN;
 	}
 
 	template <class T>
 	vector<T>::vector(const vector<T>& obj)
 	{
-		data_ptr = new T[obj.size() + STD_CAPACITY];
+		data_ptr = new T[obj.size() + STD_EXPAN];
 		v_size = obj.size();
-		v_capacity = v_size + STD_CAPACITY;
+		v_capacity = v_size + STD_EXPAN;
 		memcpy(data_ptr, obj.data(), sizeof(T) * obj.size());
 	}
 
 	template <class T>
 	vector<T>::vector(const std::initializer_list<T>& ilist)
 	{
-		reserve(ilist.size() + STD_CAPACITY);
+		reserve(ilist.size() + STD_EXPAN);
 		for (const T& x: ilist) push_back(x);
 	}
 
@@ -270,7 +279,7 @@ namespace nuts
 			if (v_size != 0)
 				reserve(v_size * EXPAN_COEF);
 			else
-				reserve(STD_CAPACITY);
+				reserve(STD_EXPAN);
 		}
 		++v_size;
 		return *this;
