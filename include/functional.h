@@ -4,8 +4,6 @@
 #include "type.h"
 #include <cstring>
 
-using std::strlen;
-
 namespace nuts
 {
 	template <typename FuncType>
@@ -46,21 +44,21 @@ namespace nuts
 	template <typename T>
 	struct less
 	{
-		bool operator()(const T& a, const T& b)
+		inline bool operator()(const T& a, const T& b)
 		        const { return a < b; }
 	};
 
 	template <typename T>
 	struct greater
 	{
-		bool operator()(const T& a, const T& b)
+		inline bool operator()(const T& a, const T& b)
 		        const { return a > b; }
 	};
 
 	template <typename T>
 	struct equal
 	{
-		bool operator()(const T& a, const T& b)
+		inline bool operator()(const T& a, const T& b)
 		        const { return a == b; }
 	};
 
@@ -73,7 +71,7 @@ namespace nuts
 	template <>
 	struct hash<u32>
 	{
-		u64 operator()(u32 x) const
+		inline u64 operator()(u32 x) const noexcept
 		{
 			x = ((x >> 16) ^ x) * 0x45d9f3b;
 			x = ((x >> 16) ^ x) * 0x45d9f3b;
@@ -85,7 +83,7 @@ namespace nuts
 	template <>
 	struct hash<u64>
 	{
-		u64 operator()(u64 x) const
+		inline u64 operator()(u64 x) const noexcept
 		{
 			x = (x ^ (x >> 30)) * static_cast<u64>(0xbf58476d1ce4e5b9);
 			x = (x ^ (x >> 27)) * static_cast<u64>(0x94d049bb133111eb);
@@ -97,7 +95,7 @@ namespace nuts
 	template <>
 	struct hash<i32>
 	{
-		u64 operator()(i32 x) const
+		inline u64 operator()(i32 x) const noexcept
 		{
 			// x = x & 0x7fffffff;
 			// // x = ((x >> 15) ^ x) * 0x45d9f3b;
@@ -118,7 +116,7 @@ namespace nuts
 	template <>
 	struct hash<i64>
 	{
-		u64 operator()(i64 x) const
+		u64 operator()(i64 x) const noexcept
 		{
 			x = x & 0x7fffffffffffffff;
 			x = (x ^ (x >> 30)) * static_cast<u64>(0xbf58476d1ce4e5b9);

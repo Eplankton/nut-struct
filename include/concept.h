@@ -22,7 +22,7 @@ namespace nuts
 
 	template <typename T, typename U>
 	concept Same = is_same<T, U>::value;
-	
+
 	template <typename Fn, typename... T>
 	concept Callable = requires(Fn&& fn, T&&... args)
 	{
@@ -44,8 +44,6 @@ namespace nuts
 	        requires(Box x)
 	{
 		x.size();
-		x.clear();
-		x.empty();
 		x.front();
 		x.back();
 	};

@@ -243,7 +243,7 @@ namespace nuts
 	        unordered_set(const std::initializer_list<K>& ilist)
 	{
 		while (ilist.size() > *bucket_size &&
-		       *bucket_size != PRIME_LIST[31]) ++bucket_size;
+		       *bucket_size != PRIME_LIST[61]) ++bucket_size;
 		vector<bucket_type> tmp(*bucket_size);
 		bucket.move(tmp);
 		for (const auto& x: ilist) insert(x);

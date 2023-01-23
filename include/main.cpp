@@ -56,7 +56,8 @@ void xxsort_test(Box& x, Compare cmp = Compare {})
 	println("\n::::::::::::::::::::::::::::::::::::::::::");
 }
 
-template <Iterable Box_Type, class Compare = less<typename Box_Type::value_type>>
+template <Iterable Box_Type,
+          class Compare = less<typename Box_Type::value_type>>
 void visual()
 {
 	queue<function<void(Box_Type&, less<i32>)>> fst {
@@ -92,12 +93,12 @@ void visual()
 template <Container SrcA, Container SrcB>
 auto generate(const SrcA& a, const SrcB& b)
 {
-	hash_set<pair<typename SrcA::value_type,
-	              typename SrcB::value_type>>
+	vector<pair<typename SrcA::value_type,
+	            typename SrcB::value_type>>
 	        ret;
 	for (const auto& i: range(a)) {
 		for (const auto& j: range(b)) {
-			ret.insert({i, j});
+			ret.push_back({i, j});
 		}
 	}
 	return ret;
@@ -112,31 +113,73 @@ void deduction_guide_test()
 	set s {1, 2, 3, 4, 5};
 	unordered_set hs {1, 2, 3, 4, 5};
 
-	array as {"human", "dog", "cat", "cow",
-	          "sheep", "monkey", "turtle", "elephant"};
+	array as {
+	        "human",
+	        "dog",
+	        "cat",
+	        "cow",
+	        "sheep",
+	        "monkey",
+	        "turtle",
+	        "elephant",
+	};
 
-	map m {pair {as[0], 0}, {as[1], 1}, {as[2], 2}};
-	unordered_map hm {pair {as[0], 0}, {as[1], 1}, {as[2], 2}};
+	map m {
+	        pair {as[0], 0},
+	        {as[1], 1},
+	        {as[2], 2},
+	};
+
+	unordered_map hm {
+	        pair {as[0], 0},
+	        {as[1], 1},
+	        {as[2], 2},
+	};
+
 	println(a, v, l, d, s, hs, m, hm);
 }
 
 int main()
 {
-	// deque dq {"human", "dog", "cat", "cow",
-	//           "sheep", "monkey", "turtle", "elephant"};
+	deque dq {
+	        "human",
+	        "dog",
+	        "cat",
+	        "cow",
+	        "sheep",
+	        "monkey",
+	        "turtle",
+	        "elephant",
+	};
+
 	// xxsort_test(dq);
 
-	// vector<i32> v;
-	// auto n = 1e3;
-	// std::random_device rd;
-	// for (int i = 0; i < n; ++i)
-	// 	v.push_back(rd() % (u64) n);
+	vector<i32> v;
+	auto n = 3e4;
+	std::random_device rd;
+	for (int i = 0; i < n; ++i)
+		v.push_back(rd() % (u64) n);
 
-	// xxsort_test(v);
+	xxsort_test(v);
 	// visual<vector<i32>>();
-	// generate(v, a).print();
 
 	deduction_guide_test();
+
+	// deque ass {
+	//         array {
+	//                 vector {
+	//                         list {
+	//                                 tuple {
+	//                                         pair {
+	//                                                 dq,
+	//                                                 array {1, 2, 3},
+	//                                         },
+	//                                         114514,
+	//                                 },
+	//                         },
+	//                 },
+	//         },
+	// };
 
 	return 0;
 }

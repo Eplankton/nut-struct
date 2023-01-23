@@ -16,21 +16,22 @@ namespace nuts
 		return (... + s);
 	}
 
+	template <typename Itr, class Func>
+	Func for_each(Itr st, Itr ed, Func fn)
+	{
+		auto _end = next(ed);
+		if (st != _end)
+		{
+			for (; st != _end; ++st)
+				fn(*st);
+		}
+		return fn;
+	}
+
 	template <Iterable Box, class Func>
 	Func for_each(const Box& box, Func fn)
 	{
 		return for_each(box.begin(), box.end(), fn);
-	}
-
-	template <typename Itr, class Func>
-	Func for_each(Itr st, Itr ed, Func fn)
-	{
-		if (st != ed)
-		{
-			for (auto _end = next(ed); st != _end; ++st)
-				fn(*st);
-		}
-		return fn;
 	}
 
 	template <Forward_Itr Itr>
@@ -309,48 +310,48 @@ namespace nuts
 	}
 
 	template <typename... T>
-	void print(T&&... args)
+	void print(const T&... args)
 	{
-		(..., [](const Display auto& x) { print(x); }(args));
+		(..., [](const Display auto& x) { nuts::print(x); }(args));
 	}
 
 	template <Forward_Itr Itr>
 	void print(Itr st, Itr ed)
 	{
-		for_each(st, ed, [](const Display auto& x) { print(x, ' '); });
+		for_each(st, ed, [](const Display auto& x) { nuts::print(x, ' '); });
 	}
 
 	template <StreamOutput T>
 	void println(const T& fmt)
 	{
-		print(fmt, '\n');
+		nuts::print(fmt, '\n');
 	}
 
 	template <HasPrintMethod T>
 	void println(const T& Box)
 	{
-		print(Box);
+		nuts::print(Box);
 	}
 
 	template <typename T>
 	requires StreamOutput<T> && HasPrintMethod<T>
 	void println(const T& x)
 	{
-		print(x, '\n');
+		nuts::print(x, '\n');
 	}
 
 	template <typename... T>
-	void println(T&&... args)
+	void println(const T&... args)
 	{
-		(..., [](const Display auto& x) { print(x); }(args));
-		print('\n');
+		(..., [](const Display auto& x) { nuts::print(x); }(args));
+		nuts::print('\n');
 	}
 
 	template <Forward_Itr Itr>
 	void println(Itr st, Itr ed)
 	{
-		for_each(st, ed, [](const Display auto& x) { print(x, ' '); });
-		print('\n');
+		for_each(st, ed, [](const Display auto& x) { nuts::print(x, ' '); });
+		nuts::print('\n');
 	}
 
 	template <Iterable Box, class Func>
@@ -477,7 +478,7 @@ namespace nuts
 		auto numElements = distance(first, last);
 		if (numElements <= 1) return;
 
-		static const i64 OptimalIncrements[] = {
+		static constexpr i64 OptimalIncrements[] = {
 		        68491, 27396, 10958, 4383, 1750, 701, 301, 132, 57, 23, 10, 4, 1, 0};
 
 		i64 increment = OptimalIncrements[0],
@@ -533,7 +534,8 @@ namespace nuts
 
 	template <Forward_Itr Itr, class Compare = less<typename Itr::value_type>>
 	// Stable && Average case -> O(nlogn)
-	void merge_sort_in_place(Itr first, Itr last, Compare cmp = Compare {}, i64 size = 0)
+	void merge_sort_in_place(Itr first, Itr last,
+	                         Compare cmp = Compare {}, i64 size = 0)
 	{
 		if (size == 0 && first != last)
 			size = distance(first, last);
@@ -595,15 +597,8 @@ namespace nuts
 		auto n = distance(first, last);
 
 		if (n <= 1) return;
-
 		if (n <= 16)
 		{
-			if (n == 2)
-			{
-				if (cmp(*last, *first))
-					itr_swap(first, last);
-				return;
-			}
 			insertion_sort(first, last, cmp);
 			return;
 		}
@@ -615,6 +610,40 @@ namespace nuts
 		                       [&](const auto&elem) { return cmp(elem, pivot); }),
 		     r_begin = partition(l_end, last,
 		                         [&](const auto&elem) { return !cmp(pivot, elem); });
+
+		intro_sort(first, l_end, cmp);
+		intro_sort(r_begin, last, cmp);
+	}
+
+	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
+	// Average case -> O(nlogn)
+	void intro_sort_v2(Itr first, Itr last, Compare cmp = Compare {})
+	{
+		auto n = distance(first, last);
+		static i64 lp = std::log2(n);
+
+		if (n <= 1) return;
+		if (lp == 0)
+		{
+			// if (n == 2)
+			// {
+			// 	if (cmp(*last, *first))
+			// 		itr_swap(first, last);
+			// 	return;
+			// }
+
+			insertion_sort(first, last, cmp);
+			return;
+		}
+
+		// necessary copy
+		const auto pivot = *advance(first, distance(next(first), last) / 2);
+
+		auto l_end = partition(first, last,
+		                       [&](const auto&elem) { return cmp(elem, pivot); }),
+		     r_begin = partition(l_end, last,
+		                         [&](const auto&elem) { return !cmp(pivot, elem); });
+		lp--;
 
 		intro_sort(first, l_end, cmp);
 		intro_sort(r_begin, last, cmp);
@@ -643,7 +672,8 @@ namespace nuts
 		auto n = distance(first, last);
 		if (n < 2) return;
 
-		auto heapify = [](Itr first, u64 pos, u64 stop, Compare cmp = Compare {}) {
+		auto heapify = [](Itr first, i64 pos, i64 stop,
+		                  Compare cmp = Compare {}) {
 			first = advance(first, pos);
 			auto parent = first, child = first;
 			auto value = move(*parent);
@@ -661,8 +691,8 @@ namespace nuts
 				{
 					auto scan = child;
 					++scan;
-					u64 max = 0;
-					for (u64 i = 1; i < c; i++, scan++)
+					i64 max = 0;
+					for (i64 i = 1; i < c; i++, scan++)
 					{
 						if (cmp(*child, *scan))
 						{
@@ -683,9 +713,9 @@ namespace nuts
 			*child = move(value);
 		};
 
-		u64 firstLeaf = (n + Width - 2) / Width;
+		i64 firstLeaf = (n + Width - 2) / Width;
 
-		for (u64 i = firstLeaf; i > 0; i--)
+		for (i64 i = firstLeaf; i > 0; i--)
 			heapify(first, i - 1, n, cmp);
 		for (auto i = n - 1; i > 0; i--)
 		{
@@ -694,63 +724,6 @@ namespace nuts
 			heapify(first, 0, i, cmp);
 		}
 	}
-
-	// template <typename Seq>
-	// // General seq version
-	// void binary_insertion_sort(Seq& a)
-	// {
-	// 	int left, right, middle;
-	// 	for (int i = 1; i < a.size(); i++)
-	// 	{
-	// 		auto key = a[i];
-	// 		left = 0, right = i - 1;
-	// 		while (left <= right)
-	// 		{
-	// 			middle = (left + right) / 2;
-	// 			if (a[middle] > key)
-	// 				right = middle - 1;
-	// 			else
-	// 				left = middle + 1;
-	// 		}
-	// 		for (int j = i - 1; j >= left; j--)
-	// 			a[j + 1] = a[j];
-	// 		a[left] = key;
-	// 	}
-	// }
-
-	// template <typename Seq>
-	// void max_heapify(Seq& arr, int start, int end)
-	// {
-	// 	int dad = start, son = dad * 2 + 1;
-	// 	while (son <= end)
-	// 	{
-	// 		if (son + 1 <= end && arr[son] < arr[son + 1])
-	// 			son++;
-	// 		if (arr[dad] > arr[son])
-	// 			return;
-	// 		else
-	// 		{
-	// 			swap(arr[dad], arr[son]);
-	// 			dad = son;
-	// 			son = dad * 2 + 1;
-	// 		}
-	// 	}
-	// }
-
-	// template <typename Seq>
-	// void heap_sort(Seq& arr)// General seq version
-	// {
-	// 	int len = arr.size();
-	// 	for (int i = len / 2 - 1; i >= 0; i--)
-	// 	{
-	// 		max_heapify(arr, i, len - 1);
-	// 	}
-	// 	for (int i = len - 1; i > 0; i--)
-	// 	{
-	// 		swap(arr[0], arr[i]);
-	// 		max_heapify(arr, 0, i - 1);
-	// 	}
-	// }
 }
 
 #endif

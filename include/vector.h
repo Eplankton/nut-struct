@@ -34,44 +34,44 @@ namespace nuts
 			using value_type = T;
 
 		protected:
-			value_type* _ptr = nullptr;
+			pointer _ptr = nullptr;
 
 		public:
 			iterator() = default;
-			iterator(value_type* obj) { _ptr = obj; }
-			iterator(std::nullptr_t obj) : _ptr(obj) {}
-			iterator(const iterator& obj) : _ptr(obj._ptr) {}
+			iterator(pointer obj) noexcept { _ptr = obj; }
+			iterator(std::nullptr_t obj) noexcept : _ptr(obj) {}
+			iterator(const iterator& obj) noexcept : _ptr(obj._ptr) {}
 
-			pointer get() const { return _ptr; }
+			pointer get() const noexcept { return _ptr; }
 
 			value_type& operator*() { return *_ptr; }
 			const value_type& operator*() const { return *_ptr; }
 
-			pointer operator->() const { return _ptr; }
+			pointer operator->() const noexcept { return _ptr; }
 
-			iterator& operator=(value_type* obj)
+			iterator& operator=(value_type* obj) noexcept
 			{
 				_ptr = obj;
 				return *this;
 			}
 
-			iterator& operator=(const iterator& obj)
+			iterator& operator=(const iterator& obj) noexcept
 			{
 				_ptr = obj._ptr;
 				return *this;
 			}
 
-			inline bool operator==(T* obj) const { return _ptr == obj; }
-			inline bool operator!=(T* obj) const { return _ptr != obj; }
+			inline bool operator==(T* obj) const noexcept { return _ptr == obj; }
+			inline bool operator!=(T* obj) const noexcept { return _ptr != obj; }
 
-			inline bool operator==(const iterator& obj) const { return _ptr == obj._ptr; }
-			inline bool operator!=(const iterator& obj) const { return _ptr != obj._ptr; }
+			inline bool operator==(const iterator& obj) const noexcept { return _ptr == obj._ptr; }
+			inline bool operator!=(const iterator& obj) const noexcept { return _ptr != obj._ptr; }
 
-			inline bool operator<(const iterator& obj) const { return _ptr < obj._ptr; }
-			inline bool operator<=(const iterator& obj) const { return _ptr <= obj._ptr; }
+			inline bool operator<(const iterator& obj) const noexcept { return _ptr < obj._ptr; }
+			inline bool operator<=(const iterator& obj) const noexcept { return _ptr <= obj._ptr; }
 
-			inline bool operator>(const iterator& obj) const { return _ptr > obj._ptr; }
-			inline bool operator>=(const iterator& obj) const { return _ptr >= obj._ptr; }
+			inline bool operator>(const iterator& obj) const noexcept { return _ptr > obj._ptr; }
+			inline bool operator>=(const iterator& obj) const noexcept { return _ptr >= obj._ptr; }
 
 			iterator& operator++()
 			{
@@ -100,17 +100,17 @@ namespace nuts
 			}
 
 			iterator operator+(i64 bias)
-			        const { return iterator(_ptr + bias); }
+			        const noexcept { return iterator(_ptr + bias); }
 
-			void operator+=(i64 bias) { _ptr += bias; }
+			void operator+=(i64 bias) noexcept { _ptr += bias; }
 
 			iterator operator-(i64 bias)
-			        const { return iterator(_ptr - bias); }
+			        const noexcept { return iterator(_ptr - bias); }
 
-			void operator-=(i64 bias) { _ptr -= bias; }
+			void operator-=(i64 bias) noexcept { _ptr -= bias; }
 
-			value_type& operator[](u64 _n) { return *((*this) + _n); }
-			const T& operator[](u64 _n) const { return *((*this) + _n); }
+			value_type& operator[](u64 _n) noexcept { return *((*this) + _n); }
+			const T& operator[](u64 _n) const noexcept { return *((*this) + _n); }
 
 			friend i64
 			operator-(const iterator& a, const iterator& b) { return a.get() - b.get(); }
@@ -120,15 +120,15 @@ namespace nuts
 		explicit vector(u64 userInputSize);                        // Init by size
 		explicit vector(u64 userInputSize, const T& userInputData);// Init by size and value
 		vector(const vector<T>& obj);                              // Copy constructor
-		vector(vector<T>&& src) { move(src); }                     // Move constructor
+		vector(vector<T>&& src) noexcept { move(src); }            // Move constructor
 		vector(const std::initializer_list<T>& ilist);             // Init by a {ilist}
-		~vector() { destroy(); }
+		~vector() noexcept { destroy(); }
 
-		T* data() const { return const_cast<T*>(data_ptr); }
-		u64 size() const { return v_size; }               // Return the number of elements
-		u64 capacity() const { return v_capacity; }       // Return the current capacity
-		bool empty() const { return v_size == 0; }        // Check whether the vector is empty
-		bool exist() const { return data_ptr != nullptr; }// Check whether the vector is existed
+		T* data() const noexcept { return const_cast<T*>(data_ptr); }
+		u64 size() const noexcept { return v_size; }               // Return the number of elements
+		u64 capacity() const noexcept { return v_capacity; }       // Return the current capacity
+		bool empty() const noexcept { return v_size == 0; }        // Check whether the vector is empty
+		bool exist() const noexcept { return data_ptr != nullptr; }// Check whether the vector is existed
 
 		vector<T>& shrink_to_fit();// Reduce memory usage by freeing unused memory
 		vector<T>& resize(u64 N);  // Reduce or expand size
@@ -140,12 +140,15 @@ namespace nuts
 
 		vector<T>& push_back(const T& obj);// Add an element to the end
 		vector<T>& push_back(T&& src);
-		vector<T>& emplace_back();        // Add an element to the end
-		vector<T>& pop_back();            // Remove the last element
-		vector<T>& move(vector<T>& after);// Deprive other's ownership
+		vector<T>& emplace_back();                 // Add an element to the end
+		vector<T>& pop_back();                     // Remove the last element
+		vector<T>& move(vector<T>& after) noexcept;// Deprive other's ownership
 
-		inline T& operator[](u64 N);// Access specified element
-		inline const T& operator[](u64 N) const;
+		inline T& operator[](u64 N) noexcept;// Access specified element
+		inline const T& operator[](u64 N) const noexcept;
+
+		inline T& at(u64 N) noexcept;
+		inline const T& at(u64 N) const noexcept;
 
 		vector<T>& operator=(const vector<T>& obj);// Deep copy operator
 		vector<T>& operator=(vector<T>&& src) { return move(src); }
@@ -309,7 +312,7 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T>& vector<T>::move(vector<T>& src)
+	vector<T>& vector<T>::move(vector<T>& src) noexcept
 	{
 		destroy();// Self destroy
 
@@ -324,16 +327,30 @@ namespace nuts
 	}
 
 	template <class T>
-	inline T& vector<T>::operator[](const u64 N)
+	inline T& vector<T>::operator[](const u64 N) noexcept
+	{
+		// assert(N < v_capacity);
+		return data_ptr[N];
+	}
+
+	template <class T>
+	inline const T& vector<T>::operator[](const u64 N) const noexcept
+	{
+		assert(N < v_size);
+		return data_ptr[N];
+	}
+
+	template <class T>
+	inline T& vector<T>::at(const u64 N) noexcept
 	{
 		assert(N < v_capacity);
 		return data_ptr[N];
 	}
 
 	template <class T>
-	inline const T& vector<T>::operator[](const u64 N) const
+	inline const T& vector<T>::at(const u64 N) const noexcept
 	{
-		assert(N < v_size);
+		// assert(N < v_size);
 		return data_ptr[N];
 	}
 
@@ -354,7 +371,8 @@ namespace nuts
 		};
 
 		printf("vector @%#llx = [", (u64) data());
-		for_each(*this, print);
+		auto st = begin(), ed = end();
+		for_each(st, ed, print);
 		printf("]\n");
 	}
 

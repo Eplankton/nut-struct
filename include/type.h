@@ -4,6 +4,7 @@
 // Primitive data types
 
 #include <cstdint>
+#include <cmath>
 
 namespace nuts
 {

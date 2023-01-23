@@ -25,9 +25,9 @@ namespace nuts
 		~array() = default;
 
 		void fill(const T& _val);
-		pointer data() const { return const_cast<pointer>(raw); }
-		static constexpr u64 size() { return N; }
-		static constexpr bool empty() { return size() == 0; }
+		pointer data() const noexcept { return const_cast<pointer>(raw); }
+		static constexpr u64 size() noexcept { return N; }
+		static constexpr bool empty() noexcept { return size() == 0; }
 
 		T& front() { return *begin(); }
 		T& back() { return *end(); }
@@ -35,8 +35,8 @@ namespace nuts
 		const T& front() const { return *begin(); }
 		const T& back() const { return *end(); }
 
-		inline T& operator[](u64 _n) { return raw[_n]; }
-		inline const T& operator[](u64 _n) const { return raw[_n]; }
+		inline T& operator[](u64 _n) noexcept { return raw[_n]; }
+		inline const T& operator[](u64 _n) const noexcept { return raw[_n]; }
 
 		T& at(u64 _n);
 		const T& at(u64 _n) const;
@@ -60,8 +60,8 @@ namespace nuts
 			iterator(pointer obj) { _ptr = obj; }
 			iterator(const iterator& obj) { _ptr = obj._ptr; }
 
-			pointer get() const { return const_cast<pointer>(_ptr); }
-			pointer operator->() const { return const_cast<pointer>(_ptr); }
+			pointer get() const noexcept { return const_cast<pointer>(_ptr); }
+			pointer operator->() const noexcept { return const_cast<pointer>(_ptr); }
 			T& operator*() { return *_ptr; }
 			const T& operator*() const { return *_ptr; }
 
@@ -110,14 +110,14 @@ namespace nuts
 			}
 
 			iterator operator+(i64 bias)
-			        const { return iterator(_ptr + bias); }
+			        const noexcept { return iterator(_ptr + bias); }
 
-			void operator+=(i64 bias) { _ptr += bias; }
+			void operator+=(i64 bias) noexcept { _ptr += bias; }
 
 			iterator operator-(i64 bias)
-			        const { return iterator(_ptr - bias); }
+			        const noexcept { return iterator(_ptr - bias); }
 
-			void operator-=(i64 bias) { _ptr -= bias; }
+			void operator-=(i64 bias) noexcept { _ptr -= bias; }
 
 			friend i64 operator-(const iterator& a,
 			                     const iterator& b) { return a.get() - b.get(); }
@@ -138,7 +138,8 @@ namespace nuts
 	};
 
 	// Deduction Guide
-	template <typename T, Same<T>... U> // what the fuck?
+	// what the fuck?
+	template <typename T, Same<T>... U>
 	array(T, U...) -> array<T, 1 + sizeof...(U)>;
 
 	template <typename T, u64 N>
