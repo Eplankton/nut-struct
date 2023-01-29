@@ -49,7 +49,7 @@ namespace nuts
 		list(const std::initializer_list<T>& ilist);// Init by a {ilist}
 		~list() { clear(); }                        // Clear and gain back memory
 
-		bool empty() const// Whether the list is empty
+		inline bool empty() const// Whether the list is empty
 		{
 			return size() == 0 &&
 			       head == nullptr &&
@@ -58,10 +58,10 @@ namespace nuts
 
 		node_ptr data() const { return head; }
 
-		bool exist() const { return empty(); }// Whether the list exists
-		u64 size() const { return length; }   // Get the length of the whole list
-		void print() const;                   // Print a list in console
-		list<T>& clear();                     // Clear the whole list, release all nodes
+		inline bool exist() const { return empty(); }// Whether the list exists
+		inline u64 size() const { return length; }   // Get the length of the whole list
+		void print() const;                          // Print a list in console
+		list<T>& clear();                            // Clear the whole list, release all nodes
 
 		list<T>& operator=(const list<T>& obj);// Copy
 		list<T>& operator=(list<T>&& src) { return move(src); }
@@ -169,14 +169,15 @@ namespace nuts
 		};
 
 		static constexpr iterator npos {};
-		iterator begin() const { return iterator(const_cast<node_ptr>(head)); }
-		iterator end() const { return iterator(const_cast<node_ptr>(tail)); }
 
-		T& front() { return head->data; }
-		T& back() { return tail->data; }
+		inline iterator begin() const { return iterator(const_cast<node_ptr>(head)); }
+		inline iterator end() const { return iterator(const_cast<node_ptr>(tail)); }
 
-		const T& front() const { return head->data; }
-		const T& back() const { return tail->data; }
+		inline T& front() { return head->data; }
+		inline T& back() { return tail->data; }
+
+		inline const T& front() const { return head->data; }
+		inline const T& back() const { return tail->data; }
 
 		list<T>& insert(const iterator& pos,
 		                const T& obj, u64 num = 1);// Insert several node at position

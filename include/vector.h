@@ -26,7 +26,6 @@ namespace nuts
 		using value_type = T;
 		using pointer = T*;
 
-	public:
 		class iterator
 		    : public random_access_iterator
 		{
@@ -42,20 +41,20 @@ namespace nuts
 			iterator(std::nullptr_t obj) noexcept : _ptr(obj) {}
 			iterator(const iterator& obj) noexcept : _ptr(obj._ptr) {}
 
-			pointer get() const noexcept { return _ptr; }
+			inline pointer get() const noexcept { return _ptr; }
 
-			value_type& operator*() { return *_ptr; }
-			const value_type& operator*() const { return *_ptr; }
+			inline value_type& operator*() { return *_ptr; }
+			inline const value_type& operator*() const { return *_ptr; }
 
-			pointer operator->() const noexcept { return _ptr; }
+			inline pointer operator->() const noexcept { return _ptr; }
 
-			iterator& operator=(value_type* obj) noexcept
+			inline iterator& operator=(value_type* obj) noexcept
 			{
 				_ptr = obj;
 				return *this;
 			}
 
-			iterator& operator=(const iterator& obj) noexcept
+			inline iterator& operator=(const iterator& obj) noexcept
 			{
 				_ptr = obj._ptr;
 				return *this;
@@ -73,44 +72,44 @@ namespace nuts
 			inline bool operator>(const iterator& obj) const noexcept { return _ptr > obj._ptr; }
 			inline bool operator>=(const iterator& obj) const noexcept { return _ptr >= obj._ptr; }
 
-			iterator& operator++()
+			inline iterator& operator++()
 			{
 				_ptr++;
 				return *this;
 			}
 
-			iterator operator++(int)// postposition
+			inline iterator operator++(int)// postposition
 			{
 				iterator res = *this;
 				++(*this);
 				return res;
 			}
 
-			iterator& operator--()
+			inline iterator& operator--()
 			{
 				_ptr--;
 				return *this;
 			}
 
-			iterator operator--(int)// postposition
+			inline iterator operator--(int)// postposition
 			{
 				iterator res = *this;
 				--(*this);
 				return res;
 			}
 
-			iterator operator+(i64 bias)
+			inline iterator operator+(i64 bias)
 			        const noexcept { return iterator(_ptr + bias); }
 
-			void operator+=(i64 bias) noexcept { _ptr += bias; }
+			inline void operator+=(i64 bias) noexcept { _ptr += bias; }
 
-			iterator operator-(i64 bias)
+			inline iterator operator-(i64 bias)
 			        const noexcept { return iterator(_ptr - bias); }
 
-			void operator-=(i64 bias) noexcept { _ptr -= bias; }
+			inline void operator-=(i64 bias) noexcept { _ptr -= bias; }
 
-			value_type& operator[](u64 _n) noexcept { return *((*this) + _n); }
-			const T& operator[](u64 _n) const noexcept { return *((*this) + _n); }
+			inline value_type& operator[](u64 _n) noexcept { return *((*this) + _n); }
+			inline const T& operator[](u64 _n) const noexcept { return *((*this) + _n); }
 
 			friend i64
 			operator-(const iterator& a, const iterator& b) { return a.get() - b.get(); }
@@ -124,24 +123,24 @@ namespace nuts
 		vector(const std::initializer_list<T>& ilist);             // Init by a {ilist}
 		~vector() noexcept { destroy(); }
 
-		T* data() const noexcept { return const_cast<T*>(data_ptr); }
-		u64 size() const noexcept { return v_size; }               // Return the number of elements
-		u64 capacity() const noexcept { return v_capacity; }       // Return the current capacity
-		bool empty() const noexcept { return v_size == 0; }        // Check whether the vector is empty
-		bool exist() const noexcept { return data_ptr != nullptr; }// Check whether the vector is existed
+		inline T* data() const noexcept { return const_cast<T*>(data_ptr); }
+		inline u64 size() const noexcept { return v_size; }               // Return the number of elements
+		inline u64 capacity() const noexcept { return v_capacity; }       // Return the current capacity
+		inline bool empty() const noexcept { return v_size == 0; }        // Check whether the vector is empty
+		inline bool exist() const noexcept { return data_ptr != nullptr; }// Check whether the vector is existed
 
 		vector<T>& shrink_to_fit();// Reduce memory usage by freeing unused memory
 		vector<T>& resize(u64 N);  // Reduce or expand size
 		vector<T>& reserve(u64 N) { return (N <= v_capacity) ? *this : resize(N); }
 
-		void clear();  // Clear all values, but don't destroy
-		void destroy();// Clear the contents and release memory, contain exist()
+		inline void clear();// Clear all values, but don't destroy
+		void destroy();     // Clear the contents and release memory, contain exist()
 		void print() const;
 
 		vector<T>& push_back(const T& obj);// Add an element to the end
 		vector<T>& push_back(T&& src);
 		vector<T>& emplace_back();                 // Add an element to the end
-		vector<T>& pop_back();                     // Remove the last element
+		inline vector<T>& pop_back();              // Remove the last element
 		vector<T>& move(vector<T>& after) noexcept;// Deprive other's ownership
 
 		inline T& operator[](u64 N) noexcept;// Access specified element
@@ -151,20 +150,20 @@ namespace nuts
 		inline const T& at(u64 N) const noexcept;
 
 		vector<T>& operator=(const vector<T>& obj);// Deep copy operator
-		vector<T>& operator=(vector<T>&& src) { return move(src); }
+		inline vector<T>& operator=(vector<T>&& src) { return move(src); }
 
-		iterator begin() const { return {const_cast<T*>(data())}; }
-		iterator end() const
+		inline iterator begin() const { return {const_cast<T*>(data())}; }
+		inline iterator end() const
 		{
 			return size() == 0 ? begin()
 			                   : iterator {const_cast<T*>(&data_ptr[size() - 1])};
 		}
 
-		T& front() { return *begin(); }
-		T& back() { return *end(); }
+		inline T& front() { return *begin(); }
+		inline T& back() { return *end(); }
 
-		const T& front() const { return *begin(); }
-		const T& back() const { return *end(); }
+		inline const T& front() const { return *begin(); }
+		inline const T& back() const { return *end(); }
 
 		template <Forward_Itr Itr>
 		void assign(Itr st, Itr ed);
@@ -180,6 +179,9 @@ namespace nuts
 	// Deduction Guide
 	template <class T>
 	vector(const std::initializer_list<T>&) -> vector<T>;
+
+	template <Forward_Itr Itr>
+	vector(Itr st, Itr ed) -> vector<typename Itr::value_type>;
 
 	template <class T>
 	vector<T>::vector(u64 userInputSize)
@@ -222,7 +224,7 @@ namespace nuts
 	}
 
 	template <class T>
-	void vector<T>::clear()
+	inline void vector<T>::clear()
 	{
 		if (!empty()) v_size = 0;
 	}
@@ -305,7 +307,7 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T>& vector<T>::pop_back()
+	inline vector<T>& vector<T>::pop_back()
 	{
 		if (!empty()) --v_size;
 		return *this;

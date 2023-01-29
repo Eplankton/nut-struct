@@ -21,7 +21,10 @@ namespace nuts
 	};
 
 	template <typename T, typename U>
-	concept Same = is_same<T, U>::value;
+	constexpr bool is_same_v = is_same<T, U>::value;
+
+	template <typename T, typename U>
+	concept Same = is_same_v<T, U>;
 
 	template <typename Fn, typename... T>
 	concept Callable = requires(Fn&& fn, T&&... args)
@@ -66,19 +69,19 @@ namespace nuts
 	template <typename T>
 	concept Add = requires(T a)
 	{
-		{a + a} -> Same<T>;
+		a + a;
 	};
 
 	template <typename T>
 	concept Minus = requires(T a)
 	{
-		{a - a} -> Same<T>;
+		a - a;
 	};
 
 	template <typename T>
 	concept Multi = requires(T a)
 	{
-		a * a;
+		a* a;
 	};
 
 	template <typename T>
@@ -96,8 +99,24 @@ namespace nuts
 	template <typename T>
 	concept Arithmetic = Add<T> && Minus<T> && Multi<T> && Div<T>;
 
+	template <typename>
+	struct is_pointer
+	{
+		static constexpr bool value = false;
+	};
+
+	template <typename T>
+	struct is_pointer<T*>
+	{
+		static constexpr bool value = true;
+	};
+
+	template <typename Ptr>
+	concept Raw_Ptr = is_pointer<Ptr>::value;
+
 	template <typename Itr>
-	concept Forward_Itr = requires(Itr it)
+	concept Forward_Itr =
+	        Raw_Ptr<Itr> || requires(Itr it)
 	{
 		typename Itr::value_type;
 		*it;
@@ -121,19 +140,6 @@ namespace nuts
 		x - n;
 		x[n];
 		x - x;
-	};
-
-	template <typename T>
-	concept NonNullPtr = requires(T x, u64 n)
-	{
-		requires requires { !Forward_Itr<T>; };
-		*x;
-		++x;
-		--x;
-		x + n;
-		x - n;
-		x - x;
-		x[n];
 	};
 }
 

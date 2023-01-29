@@ -10,7 +10,7 @@ namespace nuts
 	template <class T>
 	struct default_delete
 	{
-		void operator()(T* _ptr) const
+		constexpr void operator()(T* _ptr) const
 		{
 			static_assert(sizeof(T),
 			              "Can't delete an incomplete type!");
@@ -21,7 +21,7 @@ namespace nuts
 	template <class T>
 	struct default_delete<T[]>
 	{
-		void operator()(T* _ptr) const
+		constexpr void operator()(T* _ptr) const
 		{
 			static_assert(sizeof(T),
 			              "Can't delete an incomplete type!");
@@ -55,31 +55,31 @@ namespace nuts
 			_ptr = nullptr;
 		}
 
-		inline T& operator*()
+		T& operator*()
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
 		}
 
-		inline const T& operator*() const
+		T& operator*() const
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
 		}
 
-		inline pointer operator->()
+		constexpr pointer operator->()
 		{
 			assert(_ptr != nullptr);
 			return _ptr;
 		}
 
-		inline const_pointer operator->() const
+		constexpr const_pointer operator->() const
 		{
 			assert(_ptr != nullptr);
 			return _ptr;
 		}
 
-		inline pointer get() const
+		constexpr pointer get() const
 		        noexcept { return const_cast<pointer>(_ptr); }
 
 		inline pointer release() noexcept
@@ -137,7 +137,8 @@ namespace nuts
 
 		unique_ptr() noexcept = default;
 		unique_ptr(pointer src) noexcept : _ptr(src) {}
-		unique_ptr(const_pointer src) noexcept : _ptr(const_cast<pointer>(src)) {}
+		unique_ptr(const_pointer src) noexcept
+		    : _ptr(const_cast<pointer>(src)) {}
 		unique_ptr(unique_ptr<T, Dx>& src) noexcept
 		{
 			_ptr = src._ptr;
@@ -168,19 +169,20 @@ namespace nuts
 			return *_ptr;
 		}
 
-		inline const T& operator*() const
+		const T& operator*() const
 		{
 			assert(_ptr != nullptr);
 			return *_ptr;
 		}
 
-		inline const_pointer operator->() const
+		constexpr const_pointer operator->() const
 		{
 			assert(_ptr != nullptr);
 			return _ptr;
 		}
 
-		inline pointer get() const { return const_cast<pointer>(_ptr); }
+		constexpr pointer get()
+		        const { return const_cast<pointer>(_ptr); }
 
 		inline pointer release() noexcept
 		{
@@ -294,7 +296,7 @@ namespace nuts
 			return *_ptr;
 		}
 
-		inline T* operator->() const
+		constexpr T* operator->() const
 		{
 			assert(_ptr != nullptr);
 			return _ptr;
@@ -329,13 +331,13 @@ namespace nuts
 	};
 
 	template <class T, class Dx>
-	T* get_raw(const unique_ptr<T, Dx>& src)
+	inline T* get_raw(const unique_ptr<T, Dx>& src)
 	{
 		return const_cast<T*>(src.get());
 	}
 
 	template <class T, class Dx>
-	T* get_raw(const shared_ptr<T, Dx>& src)
+	inline T* get_raw(const shared_ptr<T, Dx>& src)
 	{
 		return const_cast<T*>(src.get());
 	}
@@ -343,13 +345,13 @@ namespace nuts
 	template <class T, class... Args, class Dx = default_delete<T>>
 	unique_ptr<T, Dx> make_unique(const Args&... pac)
 	{
-		return unique_ptr<T, Dx> {new T(pac...)};
+		return {new T(pac...)};
 	}
 
 	template <class T, class... Args, class Dx = default_delete<T>>
 	shared_ptr<T, Dx> make_shared(const Args&... pac)
 	{
-		return shared_ptr<T, Dx> {new T(pac...)};
+		return {new T(pac...)};
 	}
 }
 

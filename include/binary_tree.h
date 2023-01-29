@@ -13,12 +13,14 @@ namespace nuts
 	template <typename T>
 	struct binary_tree_node
 	{
-		using tree_node = nuts::binary_tree_node<T>;
-		using node_ptr = nuts::unique_ptr<tree_node>;
+		using tree_node = binary_tree_node<T>;
+		using node_ptr = unique_ptr<tree_node>;
 
 		T data;
 		i8 bf = 0;
-		node_ptr prev = nullptr, lc = nullptr, rc = nullptr;
+		node_ptr prev = nullptr,
+		         lc = nullptr,
+		         rc = nullptr;
 
 		binary_tree_node() : prev(nullptr), lc(nullptr), rc(nullptr) {}
 		explicit binary_tree_node(const T& _val) : data(_val),
@@ -30,7 +32,7 @@ namespace nuts
 		binary_tree_node(const tree_node& obj) : data(obj.data),
 		                                         prev(obj.prev),
 		                                         lc(obj.lc), rc(obj.rc) {}
-		~binary_tree_node() { prev = nullptr; }
+		~binary_tree_node() noexcept { prev = nullptr; }
 	};
 
 	template <typename T>
@@ -66,8 +68,8 @@ namespace nuts
 	{
 	public:
 		using value_type = T;
-		using tree_node = nuts::binary_tree_node<T>;
-		using node_ptr = nuts::unique_ptr<tree_node>;
+		using tree_node = binary_tree_node<T>;
+		using node_ptr = unique_ptr<tree_node>;
 		using node_raw_ptr = binary_tree_node<T>*;
 
 	private:
@@ -421,20 +423,14 @@ namespace nuts
 	auto binary_tree<T, Compare>::lower_bound(const T& _val) const
 	        -> itr_type
 	{
-		nuts::equal<T> eqr;
-		for (auto it = begin(); it != npos; ++it)
-			if (eqr(_val, *it)) return it;
-		return npos;
+		return find_if(begin(), end(), equal<T>());
 	}
 
 	template <typename T, class Compare>
 	auto binary_tree<T, Compare>::upper_bound(const T& _val) const
 	        -> itr_type
 	{
-		nuts::greater<T> gtr;
-		for (auto it = begin(); it != npos; ++it)
-			if (gtr(_val, *it)) return it;
-		return npos;
+		return find_if(begin(), end(), greater<T>());
 	}
 
 	template <typename T, class Compare>

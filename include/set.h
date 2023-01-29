@@ -52,14 +52,14 @@ namespace nuts
 	template <typename T, class Compare>
 	set<T, Compare>::set(const self_type& src)
 	{
-		for_each(src, [](const T& x) { base_type::insert(x); });
+		for_each(src, [&](const T& x) { base_type::insert(x); });
 	}
 
 	template <typename T, class Compare>
 	set<T, Compare>& set<T, Compare>::operator=(const self_type& src)
 	{
 		base_type::clear();
-		for_each(src, [](const T& x) { base_type::insert(x); });
+		for_each(src, [&](const T& x) { base_type::insert(x); });
 		return *this;
 	}
 

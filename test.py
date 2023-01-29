@@ -11,7 +11,7 @@ plt.figure(figsize=(40, 20))
 plt.locator_params('x', nbins=20)
 plt.locator_params('y', nbins=5)
 plt.xlabel("X = N")  # 横轴的标签F
-plt.ylabel("Y = (ms)")  # 纵轴的标签
+plt.ylabel("Y = (ms)^-1")  # 纵轴的标签
 plt.title("C++ sort")  # 图像标头
 
 

@@ -156,7 +156,11 @@ namespace nuts
 		deque(const std::initializer_list<T>& ilist);
 		deque(const deque<T, Buf>& src);
 		deque(deque<T, Buf>&& src) { move(src); }
-		~deque() { clear(); }
+		~deque() = default;
+		// {
+		// 	_size = 0;
+		// 	first = last = nullptr;
+		// }
 
 		T* data() const { return (pointer) impl.data(); }
 		u64 size() const { return _size; }
@@ -195,8 +199,8 @@ namespace nuts
 		void print_detail() const;
 
 	private:
-		bool is_front_full() const;
-		bool is_back_full() const;
+		inline bool is_front_full() const;
+		inline bool is_back_full() const;
 		void allocate_front();
 		void allocate_back();
 		void free_front();
@@ -246,14 +250,14 @@ namespace nuts
 	}
 
 	template <typename T, u64 Buf>
-	bool deque<T, Buf>::is_back_full() const
+	inline bool deque<T, Buf>::is_back_full() const
 	{
 		return last == &impl.back()[Buf - 1] ||
 		       last == (&impl.back()[0]) - 1;
 	}
 
 	template <typename T, u64 Buf>
-	bool deque<T, Buf>::is_front_full() const
+	inline bool deque<T, Buf>::is_front_full() const
 	{
 		return first == &impl.front()[0] ||
 		       first == (&impl.front()[Buf - 1]) + 1;

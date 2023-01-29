@@ -83,7 +83,7 @@ void visual()
 				v.push_back(rd() % INT32_MAX);
 			Timer c;
 			fn(v, cmp);
-			auto cst = 1 / c.elapsed();
+			f64 cst = 1 / c.elapsed();
 			println(n, '\n', cst);
 			v.clear();
 		}
@@ -104,7 +104,8 @@ auto generate(const SrcA& a, const SrcB& b)
 	return ret;
 }
 
-void deduction_guide_test()
+template <bool T>
+requires T void deduction_guide_test()
 {
 	array a {1, 2, 3, 4, 5};
 	vector v {1, 2, 3, 4, 5};
@@ -113,16 +114,9 @@ void deduction_guide_test()
 	set s {1, 2, 3, 4, 5};
 	unordered_set hs {1, 2, 3, 4, 5};
 
-	array as {
-	        "human",
-	        "dog",
-	        "cat",
-	        "cow",
-	        "sheep",
-	        "monkey",
-	        "turtle",
-	        "elephant",
-	};
+	static constexpr array
+	        as {"human", "dog", "cat", "cow",
+	            "sheep", "monkey", "turtle", "elephant"};
 
 	map m {
 	        pair {as[0], 0},
@@ -141,45 +135,18 @@ void deduction_guide_test()
 
 int main()
 {
-	deque dq {
-	        "human",
-	        "dog",
-	        "cat",
-	        "cow",
-	        "sheep",
-	        "monkey",
-	        "turtle",
-	        "elephant",
-	};
+	// vector<i32> v;
+	// auto n = 1e4;
+	// std::random_device rd;
+	// for (int i = 0; i < n; ++i)
+	// 	v.push_back(rd() % (u64) n);
 
-	// xxsort_test(dq);
-
-	vector<i32> v;
-	auto n = 3e4;
-	std::random_device rd;
-	for (int i = 0; i < n; ++i)
-		v.push_back(rd() % (u64) n);
-
-	xxsort_test(v);
+	// xxsort_test(v);
 	// visual<vector<i32>>();
+	// deduction_guide_test<true>();
 
-	deduction_guide_test();
-
-	// deque ass {
-	//         array {
-	//                 vector {
-	//                         list {
-	//                                 tuple {
-	//                                         pair {
-	//                                                 dq,
-	//                                                 array {1, 2, 3},
-	//                                         },
-	//                                         114514,
-	//                                 },
-	//                         },
-	//                 },
-	//         },
-	// };
-
+	vector v {1, 2, 3, 4, 5};
+	v.print();
+	
 	return 0;
 }

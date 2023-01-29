@@ -17,120 +17,43 @@ namespace nuts
 		using pointer = T*;
 		using const_pointer = const T*;
 
-	public:
 		array() = default;
 		explicit array(const T& _val);
 		array(const array<T, N>& src) = default;
-		array(const std::initializer_list<T>& ilist);
+		constexpr array(const std::initializer_list<T>& ilist);
 		~array() = default;
 
-		void fill(const T& _val);
-		pointer data() const noexcept { return const_cast<pointer>(raw); }
+		constexpr pointer data() const noexcept { return const_cast<pointer>(raw); }
 		static constexpr u64 size() noexcept { return N; }
 		static constexpr bool empty() noexcept { return size() == 0; }
 
-		T& front() { return *begin(); }
-		T& back() { return *end(); }
+		inline T& front() { return *begin(); }
+		inline T& back() { return *end(); }
 
-		const T& front() const { return *begin(); }
-		const T& back() const { return *end(); }
+		inline const T& front() const { return *begin(); }
+		inline const T& back() const { return *end(); }
 
 		inline T& operator[](u64 _n) noexcept { return raw[_n]; }
 		inline const T& operator[](u64 _n) const noexcept { return raw[_n]; }
 
-		T& at(u64 _n);
-		const T& at(u64 _n) const;
+		inline T& at(u64 _n);
+		inline const T& at(u64 _n) const;
 
 		void print() const;
+		void fill(const T& _val);
 
-		class iterator
-		    : public random_access_iterator
+		// Just for category
+		class iterator : public random_access_iterator
 		{
 		public:
 			using value_type = T;
-			using pointer = T*;
-			using const_pointer = const T*;
-
-		protected:
-			pointer _ptr = nullptr;
-
-		public:
-			iterator() = default;
-			iterator(const_pointer obj) { _ptr = const_cast<pointer>(obj); }
-			iterator(pointer obj) { _ptr = obj; }
-			iterator(const iterator& obj) { _ptr = obj._ptr; }
-
-			pointer get() const noexcept { return const_cast<pointer>(_ptr); }
-			pointer operator->() const noexcept { return const_cast<pointer>(_ptr); }
-			T& operator*() { return *_ptr; }
-			const T& operator*() const { return *_ptr; }
-
-			iterator& operator=(pointer obj)
-			{
-				_ptr = obj;
-				return *this;
-			}
-
-			iterator& operator=(const iterator& obj)
-			{
-				_ptr = obj._ptr;
-				return *this;
-			}
-
-			inline bool operator==(pointer obj) const { return _ptr == obj; }
-			inline bool operator!=(pointer obj) const { return _ptr != obj; }
-
-			inline bool operator==(const iterator& obj) const { return _ptr == obj._ptr; }
-			inline bool operator!=(const iterator& obj) const { return _ptr != obj._ptr; }
-
-			iterator& operator++()
-			{
-				_ptr++;
-				return *this;
-			}
-
-			iterator operator++(int)
-			{
-				iterator res = *this;
-				++(*this);
-				return res;
-			}
-
-			iterator& operator--()
-			{
-				_ptr--;
-				return *this;
-			}
-
-			iterator operator--(int)
-			{
-				iterator res = *this;
-				--(*this);
-				return res;
-			}
-
-			iterator operator+(i64 bias)
-			        const noexcept { return iterator(_ptr + bias); }
-
-			void operator+=(i64 bias) noexcept { _ptr += bias; }
-
-			iterator operator-(i64 bias)
-			        const noexcept { return iterator(_ptr - bias); }
-
-			void operator-=(i64 bias) noexcept { _ptr -= bias; }
-
-			friend i64 operator-(const iterator& a,
-			                     const iterator& b) { return a.get() - b.get(); }
-
-			T& operator[](u64 _n) { return *((*this) + _n); }
-			const T& operator[](u64 _n) const { return *((*this) + _n); }
 		};
 
-		iterator begin() const { return {data()}; }
-		iterator end() const
+		constexpr pointer begin() const { return data(); }
+		constexpr pointer end() const
 		{
 			return size() == 0 ? begin()
-			                   : iterator {const_cast<T*>(&raw[size() - 1])};
+			                   : begin() + size() - 1;
 		}
 
 	protected:
@@ -149,7 +72,7 @@ namespace nuts
 	}
 
 	template <typename T, u64 N>
-	array<T, N>::array(const std::initializer_list<T>& ilist)
+	constexpr array<T, N>::array(const std::initializer_list<T>& ilist)
 	{
 		auto st = ilist.begin(), ed = ilist.end();
 		for (auto& x: raw)
