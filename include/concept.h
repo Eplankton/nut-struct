@@ -81,7 +81,7 @@ namespace nuts
 	template <typename T>
 	concept Multi = requires(T a)
 	{
-		a* a;
+		a * a;
 	};
 
 	template <typename T>
@@ -91,13 +91,22 @@ namespace nuts
 	};
 
 	template <typename T>
-	concept PartialOrder = requires(T x)
+	concept Partial_Order = requires(T x)
 	{
 		x < x;
+		x > x;
 	};
 
 	template <typename T>
-	concept Arithmetic = Add<T> && Minus<T> && Multi<T> && Div<T>;
+	concept Order =
+	        Partial_Order<T> && requires(T x)
+	{
+		x == x;
+	};
+
+	template <typename T>
+	concept Numeric_Arithmetic
+	        = Add<T> && Minus<T> && Multi<T> && Div<T>;
 
 	template <typename>
 	struct is_pointer
@@ -112,11 +121,11 @@ namespace nuts
 	};
 
 	template <typename Ptr>
-	concept Raw_Ptr = is_pointer<Ptr>::value;
+	concept Pointer = is_pointer<Ptr>::value;
 
 	template <typename Itr>
 	concept Forward_Itr =
-	        Raw_Ptr<Itr> || requires(Itr it)
+	        Pointer<Itr> || requires(Itr it)
 	{
 		typename Itr::value_type;
 		*it;
@@ -141,6 +150,22 @@ namespace nuts
 		x[n];
 		x - x;
 	};
+
+	template <Forward_Itr Itr>
+	struct deref
+	{
+		using type = typename Itr::value_type;
+	};
+
+	template <typename T>
+	requires Pointer<T*>
+	struct deref<T*>
+	{
+		using type = T;
+	};
+
+	template <typename Ref>
+	using deref_t = typename deref<Ref>::type;
 }
 
 #endif

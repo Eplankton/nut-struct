@@ -2,6 +2,7 @@
 #define _NUTS_FUNC_
 
 #include "type.h"
+#include "concept.h"
 #include <cstring>
 
 namespace nuts
@@ -41,21 +42,21 @@ namespace nuts
 		return function<FuncType>(F);
 	}
 
-	template <typename T>
+	template <Partial_Order T>
 	struct less
 	{
 		inline bool operator()(const T& a, const T& b)
 		        const { return a < b; }
 	};
 
-	template <typename T>
+	template <Partial_Order T>
 	struct greater
 	{
 		inline bool operator()(const T& a, const T& b)
 		        const { return a > b; }
 	};
 
-	template <typename T>
+	template <Order T>
 	struct equal
 	{
 		inline bool operator()(const T& a, const T& b)

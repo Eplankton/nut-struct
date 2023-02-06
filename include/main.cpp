@@ -1,6 +1,7 @@
 #include "bits.h"
 #include "timer.h"
 #include <random>
+#include <bits/stdc++.h>
 
 using namespace nuts;
 
@@ -90,18 +91,16 @@ void visual()
 	}
 }
 
-template <Container SrcA, Container SrcB>
-auto generate(const SrcA& a, const SrcB& b)
+template <class Fn_A, class Fn_B>
+void test_fn(Fn_A&& f1, Fn_B&& f2)
 {
-	vector<pair<typename SrcA::value_type,
-	            typename SrcB::value_type>>
-	        ret;
-	for (const auto& i: range(a)) {
-		for (const auto& j: range(b)) {
-			ret.push_back({i, j});
-		}
-	}
-	return ret;
+	Timer c1;
+	f1();
+	c1.print();
+
+	Timer c2;
+	f2();
+	c2.print();
 }
 
 template <bool T>
@@ -114,7 +113,7 @@ requires T void deduction_guide_test()
 	set s {1, 2, 3, 4, 5};
 	unordered_set hs {1, 2, 3, 4, 5};
 
-	static constexpr array
+	static const array
 	        as {"human", "dog", "cat", "cow",
 	            "sheep", "monkey", "turtle", "elephant"};
 
@@ -135,9 +134,10 @@ requires T void deduction_guide_test()
 
 int main()
 {
+	auto n = 1e4;
+	std::random_device rd;
 	// vector<i32> v;
-	// auto n = 1e4;
-	// std::random_device rd;
+
 	// for (int i = 0; i < n; ++i)
 	// 	v.push_back(rd() % (u64) n);
 
@@ -145,8 +145,26 @@ int main()
 	// visual<vector<i32>>();
 	// deduction_guide_test<true>();
 
-	vector v {1, 2, 3, 4, 5};
-	v.print();
-	
+	// vector v {1, 2, 3, 4, 5};
+	// sort(v);
+
+	std::vector<i32> a;
+	nuts::vector<i32> b;
+
+	for (i32 i = 0; i < n; ++i) {
+		auto tmp = rd() % (i32) n;
+		a.push_back(tmp);
+		b.push_back(tmp);
+	}
+
+	test_fn([&] { std::sort(a.begin(), a.end()); },
+	        [&] { nuts::sort(b.begin(), b.end()); });
+
+	// struct Foo
+	//     : public tuple<string, i32>
+	// {
+	// 	using tuple::tuple;
+	// };
+
 	return 0;
 }

@@ -33,7 +33,7 @@ namespace nuts
 		basic_string(const basic_string<T>& src);                   // Copy constructor
 		basic_string(basic_string<T>&& src) { move(src); }          // Move constructor
 		basic_string(const basic_string<T>& obj, T* start, T* stop);// Copy part of string range in [start, stop]
-		basic_string(const T* obj);                       // Init by a cstring with '\0'
+		basic_string(const T* obj);                                 // Init by a cstring with '\0'
 		basic_string(const std::initializer_list<T>& ilist);        // Init by a {ilist}
 		basic_string(u64 init_size);
 		~basic_string() { destroy(); }
@@ -194,6 +194,8 @@ namespace nuts
 	};
 
 	using string = basic_string<char>;// Default in char_8bit type
+
+	basic_string(const char*) -> basic_string<char>;
 
 	template <class T>
 	bool operator==(const basic_string<T>& a, const basic_string<T>& b)

@@ -16,11 +16,12 @@ namespace nuts
 		using value_type = T;
 		using pointer = T*;
 		using const_pointer = const T*;
+		using iterator = pointer;
 
 		array() = default;
 		explicit array(const T& _val);
 		array(const array<T, N>& src) = default;
-		constexpr array(const std::initializer_list<T>& ilist);
+		array(const std::initializer_list<T>& ilist);
 		~array() = default;
 
 		constexpr pointer data() const noexcept { return const_cast<pointer>(raw); }
@@ -42,15 +43,8 @@ namespace nuts
 		void print() const;
 		void fill(const T& _val);
 
-		// Just for category
-		class iterator : public random_access_iterator
-		{
-		public:
-			using value_type = T;
-		};
-
-		constexpr pointer begin() const { return data(); }
-		constexpr pointer end() const
+		constexpr iterator begin() const { return data(); }
+		constexpr iterator end() const
 		{
 			return size() == 0 ? begin()
 			                   : begin() + size() - 1;
@@ -72,16 +66,10 @@ namespace nuts
 	}
 
 	template <typename T, u64 N>
-	constexpr array<T, N>::array(const std::initializer_list<T>& ilist)
+	array<T, N>::array(const std::initializer_list<T>& ilist)
 	{
-		auto st = ilist.begin(), ed = ilist.end();
-		for (auto& x: raw)
-		{
-			if (st != ed)
-				x = *(st++);
-			else
-				break;
-		}
+		auto len = N < ilist.size() ? N : ilist.size();
+		memcpy(raw, ilist.begin(), sizeof(T) * len);
 	}
 
 	template <typename T, u64 N>

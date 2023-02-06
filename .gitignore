@@ -38,5 +38,6 @@ tags
 CMakeLists.txt
 /.cache
 /cmake-build-debug/
+/cmake-build-release/
 /.idea/
 *.swp

@@ -11,36 +11,36 @@ namespace nuts
 {
 	// Capacity of the bucket
 	static constexpr u64 PRIME_LIST[] = {
-	        /* 0     */ 5ul,
-	        /* 1     */ 11ul,
-	        /* 2     */ 23ul,
-	        /* 3     */ 47ul,
-	        /* 4     */ 97ul,
-	        /* 5     */ 199ul,
-	        /* 6     */ 409ul,
-	        /* 7     */ 823ul,
-	        /* 8     */ 1741ul,
-	        /* 9     */ 3469ul,
-	        /* 10    */ 6949ul,
-	        /* 11    */ 14033ul,
-	        /* 12    */ 28411ul,
-	        /* 13    */ 57557ul,
-	        /* 14    */ 116731ul,
-	        /* 15    */ 236897ul,
-	        /* 16    */ 480881ul,
-	        /* 17    */ 976369ul,
-	        /* 18    */ 1982627ul,
-	        /* 19    */ 4026031ul,
-	        /* 20    */ 8175383ul,
-	        /* 21    */ 16601593ul,
-	        /* 22    */ 33712729ul,
-	        /* 23    */ 68460391ul,
-	        /* 24    */ 139022417ul,
-	        /* 25    */ 282312799ul,
-	        /* 26    */ 573292817ul,
-	        /* 27    */ 1164186217ul,
-	        /* 28    */ 2364114217ul,
-	        /* 29    */ 4294967291ul,
+	        /* 0     */ 5ULL,
+	        /* 1     */ 11ULL,
+	        /* 2     */ 23ULL,
+	        /* 3     */ 47ULL,
+	        /* 4     */ 97ULL,
+	        /* 5     */ 199ULL,
+	        /* 6     */ 409ULL,
+	        /* 7     */ 823ULL,
+	        /* 8     */ 1741ULL,
+	        /* 9     */ 3469ULL,
+	        /* 10    */ 6949ULL,
+	        /* 11    */ 14033ULL,
+	        /* 12    */ 28411ULL,
+	        /* 13    */ 57557ULL,
+	        /* 14    */ 116731ULL,
+	        /* 15    */ 236897ULL,
+	        /* 16    */ 480881ULL,
+	        /* 17    */ 976369ULL,
+	        /* 18    */ 1982627ULL,
+	        /* 19    */ 4026031ULL,
+	        /* 20    */ 8175383ULL,
+	        /* 21    */ 16601593ULL,
+	        /* 22    */ 33712729ULL,
+	        /* 23    */ 68460391ULL,
+	        /* 24    */ 139022417ULL,
+	        /* 25    */ 282312799ULL,
+	        /* 26    */ 573292817ULL,
+	        /* 27    */ 1164186217ULL,
+	        /* 28    */ 2364114217ULL,
+	        /* 29    */ 4294967291ULL,
 	        /* 30    */ 8589934583ULL,
 	        /* 31    */ 17179869143ULL,
 	        /* 32    */ 34359738337ULL,
@@ -232,10 +232,10 @@ namespace nuts
 	template <class K, class Hasher>
 	unordered_set<K, Hasher>::
 	        unordered_set(const self_type& src)
+	    : bucket_size(src.bucket_size),
+	      bucket(src.bucket),
+	      _size(src._size)
 	{
-		bucket_size = src.bucket_size;
-		bucket = src.bucket;
-		_size = src._size;
 	}
 
 	template <class K, class Hasher>
@@ -339,7 +339,8 @@ namespace nuts
 	template <class K, class Hasher>
 	void unordered_set<K, Hasher>::rehash()
 	{
-		bucket_size++;
+		if (bucket_size != PRIME_LIST + 61)
+			bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
 
 		auto opr = [&](K& x) {

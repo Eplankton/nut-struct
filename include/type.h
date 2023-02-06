@@ -24,9 +24,6 @@ namespace nuts
 	using usize = uintptr_t;
 	using isize = intptr_t;
 
-	using f32 = float;
-	using f64 = double;
-
 	using nullptr_t = decltype(nullptr);
 }
 

@@ -183,7 +183,8 @@ namespace nuts
 	template <class K, class V, class Hasher>
 	void unordered_map<K, V, Hasher>::rehash()
 	{
-		bucket_size++;
+		if (bucket_size != PRIME_LIST + 61)
+			bucket_size++;
 		vector<bucket_type> tmp(*bucket_size);
 
 		auto opr = [&](pair<K, V>& x) {

@@ -66,14 +66,14 @@ namespace nuts
 	template <typename T, class Compare>
 	void set<T, Compare>::print() const
 	{
-		auto pr = [&](const auto& x) {
+		auto p = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &this->back())
 				printf(", ");
 		};
 
 		printf("set @%#llx = {", (u64) this->root.get());
-		if (!this->empty()) for_each(*this, pr);
+		if (!this->empty()) for_each(*this, p);
 		printf("}\n");
 	}
 }

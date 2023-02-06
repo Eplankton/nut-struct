@@ -15,7 +15,8 @@ namespace nuts
 		T2 second;
 
 		pair() = default;
-		pair(const pair<T1, T2>& obj) = default;
+		pair(const pair<T1, T2>& obj)
+		    : first(obj.first), second(obj.second) {}
 		pair(const T1& _first, const T2& _last)
 		    : first(_first), second(_last) {}
 

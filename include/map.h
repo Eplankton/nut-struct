@@ -11,11 +11,10 @@ namespace nuts
 	template <typename K, typename V>
 	struct default_key_compare
 	{
-		default_key_compare() = default;
-		bool
-		operator()(const pair<K, V>& a, const pair<K, V>& b) const
+		inline bool
+		operator()(const auto& a, const auto& b) const
 		{
-			return a.get_first() < b.get_first();
+			return a._0() < b._0();
 		}
 	};
 
@@ -36,7 +35,7 @@ namespace nuts
 
 		map(const map<K, V, Compare>& src)
 		{
-			for_each(*this, [&](const auto& x) { insert(x); });
+			for_each(src, [&](const auto& x) { insert(x); });
 		}
 
 		map(const std::initializer_list<value_type>& ilist)
@@ -134,13 +133,13 @@ namespace nuts
 	template <typename K, typename V, class Compare>
 	void map<K, V, Compare>::print() const
 	{
-		auto printer = [&](const auto& x) {
+		auto p = [&](const auto& x) {
 			nuts::print(x);
 			if (&x != &this->back()) nuts::print(", ");
 		};
 
 		printf("map @%#llx = {", (u64) this->root.get());
-		if (!this->empty()) for_each(*this, printer);
+		if (!this->empty()) for_each(*this, p);
 		nuts::print("}\n");
 	}
 }

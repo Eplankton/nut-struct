@@ -32,7 +32,8 @@ namespace nuts
 	template <Random_Itr Itr>
 	inline i64 distance(Itr st, Itr ed)
 	{
-		return (st == ed) ? 0 : ed - st + 1;
+		return st == ed ? 0
+		                : (ed - st + 1);
 	}
 
 	template <Forward_Itr Itr>
@@ -71,19 +72,24 @@ namespace nuts
 		return advance(itr, -1);
 	}
 
-	template <typename Itr, class Func>
-	Func for_each(Itr st, Itr ed, Func fn)
+	template <Random_Itr Itr>
+	inline Itr prev(Itr itr, i64 n)
 	{
-		auto _end = next(ed);
-		if (st != _end) {
-			for (; st != _end; ++st)
-				fn(*st);
+		return itr - n;
+	}
+
+	template <typename Itr, class Func>
+	auto for_each(Itr st, Itr ed, Func fn)
+	{
+		ed = next(ed);
+		while (st != ed) {
+			fn(*st++);
 		}
-		return fn;
+		return move(fn);
 	}
 
 	template <Container Box, class Func>
-	Func for_each(const Box& box, Func fn)
+	auto for_each(const Box& box, Func fn)
 	{
 		return for_each(box.begin(),
 		                box.end(), fn);
@@ -101,7 +107,7 @@ namespace nuts
 		return (a > b) ? a : b;
 	}
 
-	template <Forward_Itr Itr, class Compare = less<typename Itr::value_type>>
+	template <Forward_Itr Itr, class Compare = less<deref_t<Itr>>>
 	Itr min_in(Itr st, Itr ed, Compare cmp = Compare())
 	// Give range by itr: st && ed -> O(n)
 	{
@@ -115,7 +121,7 @@ namespace nuts
 		return tmp;
 	}
 
-	template <Forward_Itr Itr, class Compare = greater<typename Itr::value_type>>
+	template <Forward_Itr Itr, class Compare = greater<deref_t<Itr>>>
 	Itr max_in(Itr st, Itr ed, Compare cmp = Compare())
 	// Give range by itr: st && ed -> O(n)
 	{
@@ -142,7 +148,7 @@ namespace nuts
 	}
 
 	template <typename T>
-	inline void swap(T& a, T& b)// Swap value
+	inline void swap(T& a, T& b)
 	{
 		auto tmp = nuts::move(b);
 		b = nuts::move(a);
@@ -150,7 +156,7 @@ namespace nuts
 	}
 
 	template <Forward_Itr Itr>
-	inline void itr_swap(Itr a, Itr b)// Swap value
+	inline void itr_swap(Itr a, Itr b)
 	{
 		if (a == b) return;
 		swap(*a, *b);
@@ -169,18 +175,18 @@ namespace nuts
 			itr_swap(st, ed);
 	}
 
-	template <Bidirectional_Itr Itr, class Compare = nuts::less<typename Itr::value_type>>
+	template <Bidirectional_Itr Itr, class Compare = less<deref_t<Itr>>>
 	bool is_sorted(Itr st, Itr ed, Compare cmp = Compare())
 	// Give range by itr: st && ed -> O(N)
 	{
-		ed += 1;
+		ed = next(ed);
 		for (auto it = st + 1; it != ed; it++)
 			if (cmp(*it, *(it - 1)))
 				return false;
 		return true;
 	}
 
-	template <Container Box, class Compare = nuts::less<typename Box::value_type>>
+	template <Container Box, class Compare = less<typename Box::value_type>>
 	requires Bidirectional_Itr<typename Box::iterator>
 	bool is_sorted(const Box& box, Compare cmp = Compare())
 	// Give range by itr: st && ed -> O(N)
@@ -192,7 +198,7 @@ namespace nuts
 	Itr find_if(Itr st, Itr ed, Func fn)
 	// Give range by itr: st && ed -> O(N)
 	{
-		ed = advance(ed, 1);
+		ed = next(ed);
 		while (st != ed) {
 			if (fn(*st))
 				break;
@@ -238,31 +244,41 @@ namespace nuts
 		return find(box.begin(), box.end(), val);
 	}
 
-	template <typename Itr, typename T>
-	Itr lower_bound(Itr st, Itr ed, const T& val)
-	// Return null if not found && must be sorted -> O(logN)
+	template <Forward_Itr Itr>
+	// Must be sorted, Return null if not found -> O(logN)
+	Itr binary_search(Itr st, Itr ed,
+	                  const deref_t<Itr>& val)
 	{
-		auto cmp = less<T> {};
-		assert(!is_sorted(st, ed, cmp));
-		Itr it, cpy = st;
-		i64 count = distance(st, ed), step = 0;
-		while (count > 0) {
-			it = st, step = count / 2, it += step;
-			if (cmp(*it, val))
-			{
-				st = ++it;
-				count -= step + 1;
-			}
+		i64 size = distance(st, ed),
+		    left = 0,
+		    right = size;
+
+		while (left < right) {
+			i64 mid = left + size / 2;
+			const auto& tmp = *advance(st, mid);
+
+			if (tmp > val)
+				left = mid + 1;
+			else if (tmp < val)
+				right = mid;
 			else
-				count = step;
+				return advance(st, mid);
+			size = right - left;
 		}
-		if (cmp(*it, val) && !cmp(*it, val)) return st;
-		else
-			return Itr {};
+
+		return Itr {};
+	}
+
+	template <Container Box>
+	// Must be sorted, Return null if not found -> O(logN)
+	auto binary_search(const Box& box,
+	                   const typename Box::value_type& val)
+	{
+		return binary_search(box.begin(), box.end(), val);
 	}
 
 	template <Forward_Itr Itr>
-	Itr fill_n(Itr st, u64 n, const typename Itr::value_type& val)
+	Itr fill_n(Itr st, u64 n, const deref_t<Itr>& val)
 	{
 		auto res = st;
 		while (n--) {
@@ -349,7 +365,7 @@ namespace nuts
 
 	template <Container Box, class Func>
 	requires Forward_Itr<typename Box::iterator>
-	auto partition(Box& box, Func fn)
+	inline auto partition(Box& box, Func fn)
 	{
 		return partition(box.begin(), box.end(), fn);
 	}
@@ -378,19 +394,45 @@ namespace nuts
 		return st;
 	}
 
-	template <Container Box, class Compare = less<typename Box::value_type>>
-	requires Bidirectional_Itr<typename Box::iterator>
-	// Default intro_sort() && Average case -> O(nlogn)
-	void sort(Box& box, Compare cmp = Compare())
+	template <Bidirectional_Itr Itr, class Compare = less<deref_t<Itr>>>
+	// Stable && Average case -> O(n^2)
+	void insertion_sort(Itr st, Itr ed, Compare cmp = Compare())
 	{
-		sort(box.begin(), box.end(), cmp);
-	}
+		if (st != ed) {
 
-	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
-	// Default intro_sort() && Average case -> O(nlogn)
-	void sort(Itr st, Itr ed, Compare cmp = Compare())
-	{
-		intro_sort(st, ed, cmp);
+			// Make a hole by removing the element you are checking,
+			// and move elements up to that hole until you find the correct position of the element removed.
+			// ++cur: Assume the first element is sorted.
+
+			auto end = next(ed);
+			for (auto cur = st; ++cur != end;) {
+				auto val = nuts::move(*cur);
+				auto next = cur, prev = nuts::prev(next);
+				while (cmp(val, *prev)) {
+					*next = nuts::move(*prev);
+					next = prev;
+					if (prev != st)
+						--prev;
+					else
+						break;
+				}
+				// insert value in its sorted hole.
+				*next = nuts::move(val);
+			}
+		}
+
+		// itr_swap(st, min_in(st, ed, cmp));
+		// ed = next(ed);
+		// for (auto it = st; ++it != ed; st = it)
+		// 	for (auto c = it; cmp(*c, *st); --c, --st)
+		// 		itr_swap(st, c);
+
+		// auto end = next(ed);
+		// for (auto front = next(st); front != end; ++front) {
+		// 	auto cur = front, pre = prev(cur);
+		// 	while (cur != st && cmp(*cur, *pre))
+		// 		itr_swap(cur--, pre--);
+		// }
 	}
 
 	template <Container Box, class Compare = less<typename Box::value_type>>
@@ -401,15 +443,13 @@ namespace nuts
 		insertion_sort(box.begin(), box.end(), cmp);
 	}
 
-	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
-	// Stable && Average case -> O(n^2)
-	void insertion_sort(Itr st, Itr ed, Compare cmp = Compare())
+	template <Forward_Itr Itr, class Compare = less<deref_t<Itr>>>
+	// Average case -> O(n^2)
+	void selection_sort(Itr begin, Itr end, Compare cmp = Compare())
 	{
-		itr_swap(st, min_in(st, ed));
-		ed = next(ed);
-		for (auto it = st; ++it != ed; st = it)
-			for (auto c = it; cmp(*c, *st); --c, --st)
-				itr_swap(st, c);
+		auto ed = next(end);
+		for (auto i = begin; i != ed; ++i)
+			itr_swap(i, min_in(i, end, cmp));
 	}
 
 	template <Container Box, class Compare = less<typename Box::value_type>>
@@ -420,13 +460,22 @@ namespace nuts
 		selection_sort(box.begin(), box.end(), cmp);
 	}
 
-	template <Forward_Itr Itr, class Compare = less<typename Itr::value_type>>
-	// Average case -> O(n^2)
-	void selection_sort(Itr begin, Itr end, Compare cmp = Compare())
+	template <Bidirectional_Itr Itr, class Compare = less<deref_t<Itr>>>
+	// Average case -> O(nlogn)
+	void quick_sort(Itr st, Itr ed, Compare cmp = Compare())
 	{
-		auto ed = next(end);
-		for (auto i = begin; i != ed; ++i)
-			itr_swap(i, min_in(i, end, cmp));
+		if (st == ed) return;
+
+		// necessary copy
+		const auto pivot = *advance(st, (distance(st, ed) - 1) / 2);
+
+		auto l_end = partition(st, ed,
+		                       [&](const auto&elem) { return cmp(elem, pivot); }),
+		     r_begin = partition(l_end, ed,
+		                         [&](const auto&elem) { return !cmp(pivot, elem); });
+
+		quick_sort(st, l_end, cmp);
+		quick_sort(r_begin, ed, cmp);
 	}
 
 	template <Container Box, class Compare = less<typename Box::value_type>>
@@ -437,33 +486,7 @@ namespace nuts
 		quick_sort(box.begin(), box.end(), cmp);
 	}
 
-	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
-	// Average case -> O(nlogn)
-	void quick_sort(Itr first, Itr last, Compare cmp = Compare())
-	{
-		if (first == last) return;
-
-		// necessary copy
-		const auto pivot = *advance(first, distance(next(first), last) / 2);
-
-		auto l_end = partition(first, last,
-		                       [&](const auto&elem) { return cmp(elem, pivot); }),
-		     r_begin = partition(l_end, last,
-		                         [&](const auto&elem) { return !cmp(pivot, elem); });
-
-		quick_sort(first, l_end, cmp);
-		quick_sort(r_begin, last, cmp);
-	}
-
-	template <Container Box, class Compare = less<typename Box::value_type>>
-	requires Bidirectional_Itr<typename Box::iterator>
-	// Average case -> O(n^(4/3))
-	void shell_sort(Box& box, Compare cmp = Compare())
-	{
-		shell_sort(box.begin(), box.end(), cmp);
-	}
-
-	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
+	template <Bidirectional_Itr Itr, class Compare = less<deref_t<Itr>>>
 	// Average case -> O(n^(4/3))
 	void shell_sort(Itr first, Itr last, Compare cmp = Compare())
 	{
@@ -522,6 +545,35 @@ namespace nuts
 	}
 
 	template <Container Box, class Compare = less<typename Box::value_type>>
+	requires Bidirectional_Itr<typename Box::iterator>
+	// Average case -> O(n^(4/3))
+	void shell_sort(Box& box, Compare cmp = Compare())
+	{
+		shell_sort(box.begin(), box.end(), cmp);
+	}
+
+	template <Forward_Itr Itr, class Compare = less<deref_t<Itr>>>
+	// Stable && Average case -> O(nlogn)
+	void merge_sort_in_place(Itr first, Itr last,
+	                         Compare cmp = Compare(), i64 size = 0)
+	{
+		if (size == 0 && first != last)
+			size = distance(first, last);
+		if (size <= 1) return;
+		if (size == 2) {
+			if (cmp(*last, *first))
+				itr_swap(first, last);
+			return;
+		}
+		auto firstHalf = size / 2,
+		     secondHalf = size - firstHalf;
+		auto mid = advance(first, firstHalf);
+		merge_sort_in_place(first, mid, cmp, firstHalf);
+		merge_sort_in_place(mid, last, cmp, secondHalf);
+		insertion_sort(first, last, cmp);
+	}
+
+	template <Container Box, class Compare = less<typename Box::value_type>>
 	requires Forward_Itr<typename Box::iterator>
 	// Stable && Average case -> O(nlogn)
 	void merge_sort(Box& box, Compare cmp = Compare())
@@ -529,105 +581,23 @@ namespace nuts
 		merge_sort(box.begin(), box.end(), cmp);
 	}
 
-	template <Forward_Itr Itr, class Compare = less<typename Itr::value_type>>
+	template <Forward_Itr Itr, class Compare = less<deref_t<Itr>>>
 	// Stable && Average case -> O(nlogn)
 	void merge_sort(Itr first, Itr last, Compare cmp = Compare())
 	{
 		merge_sort_in_place(first, last, cmp);
 	}
 
-	template <Forward_Itr Itr, class Compare = less<typename Itr::value_type>>
-	// Stable && Average case -> O(nlogn)
-	void merge_sort_in_place(Itr first, Itr last,
-	                         Compare cmp = Compare(), i64 size = 0)
-	{
-		if (size == 0 && first != last)
-			size = distance(first, last);
 
-		if (size <= 1)
-			return;
-
-		if (size <= 16) {
-			if (size == 2) {
-				if (cmp(*last, *first))
-					itr_swap(first, last);
-				return;
-			}
-			insertion_sort(first, last, cmp);
-			return;
-		}
-
-		auto left_half = size / 2,
-		     right_half = size - left_half;
-		auto mid = advance(first, left_half);
-
-		merge_sort_in_place(first, mid - 1, cmp, left_half);
-		merge_sort_in_place(mid, last, cmp, right_half);
-
-		auto right = mid;
-
-		while (first != mid) {
-			if (cmp(*right, *first)) {
-				auto misplaced = move(*first);
-				*first = move(*right);
-				auto scan = right, next = scan;
-				++next;
-				auto ed = advance(last, 1);
-
-				while (next != ed && cmp(*next, misplaced))
-					*scan++ = move(*next++);
-				*scan = move(misplaced);
-			}
-			++first;
-		}
-	}
-
-	template <Container Box, class Compare = less<typename Box::value_type>>
-	requires Bidirectional_Itr<typename Box::iterator>
+	template <Bidirectional_Itr Itr, class Compare = less<deref_t<Itr>>>
 	// Average case -> O(nlogn)
-	void intro_sort(Box& box, Compare cmp = Compare())
+	void intro_sort_v2(Itr st, Itr ed, Compare cmp = Compare())
 	{
-		intro_sort(box.begin(), box.end(), cmp);
-	}
-
-	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
-	// Average case -> O(nlogn)
-	void intro_sort(Itr first, Itr last, Compare cmp = Compare())
-	{
-		auto n = distance(first, last);
+		auto n = distance(st, ed);
+		static i64 lp = std::__lg(n) * 2;
 
 		if (n < 2) return;
-		if (n == 2) {
-			if (cmp(*last, *first))
-				itr_swap(first, last);
-			return;
-		}
-		if (n <= 16) {
-			insertion_sort(first, last, cmp);
-			return;
-		}
-
-		// necessary copy
-		const auto pivot = *advance(first, distance(next(first), last) / 2);
-
-		auto l_end = partition(first, last,
-		                       [&](const auto&elem) { return cmp(elem, pivot); }),
-		     r_begin = partition(l_end, last,
-		                         [&](const auto&elem) { return !cmp(pivot, elem); });
-
-		intro_sort(first, l_end, cmp);
-		intro_sort(r_begin, last, cmp);
-	}
-
-	template <Bidirectional_Itr Itr, class Compare = less<typename Itr::value_type>>
-	// Average case -> O(nlogn)
-	void intro_sort_v2(Itr first, Itr last, Compare cmp = Compare())
-	{
-		auto n = distance(first, last);
-		static i64 lp = std::log2(n);
-
-		if (n < 2) return;
-		if (lp == 0) {
+		if (lp == 0 || n <= 8 * sizeof(usize)) {
 
 			// if (n == 2)
 			// {
@@ -636,34 +606,63 @@ namespace nuts
 			// 	return;
 			// }
 
-			insertion_sort(first, last, cmp);
+			insertion_sort(st, ed, cmp);
 			return;
 		}
 
 		// necessary copy
-		const auto pivot = *advance(first, distance(next(first), last) / 2);
+		const auto pivot = *advance(st, (distance(st, ed) - 1) / 2);
 
-		auto l_end = partition(first, last,
+		auto l_end = partition(st, ed,
 		                       [&](const auto&elem) { return cmp(elem, pivot); }),
-		     r_begin = partition(l_end, last,
+		     r_begin = partition(l_end, ed,
 		                         [&](const auto&elem) { return !cmp(pivot, elem); });
 		lp--;
 
-		intro_sort(first, l_end, cmp);
-		intro_sort(r_begin, last, cmp);
+		intro_sort(st, l_end, cmp);
+		intro_sort(r_begin, ed, cmp);
 	}
 
-	template <u64 Width = 8, Container Box,
-	          class Compare = less<typename Box::value_type>>
+	template <Bidirectional_Itr Itr, class Compare = less<deref_t<Itr>>>
+	// Average case -> O(nlogn)
+	void intro_sort(Itr st, Itr ed, Compare cmp = Compare())
+	{
+		auto n = distance(st, ed);
+
+		if (n < 2) return;
+		else if (n == 2) {
+			if (cmp(*ed, *st))
+				itr_swap(st, ed);
+			return;
+		}
+		else if (n <= 8 * sizeof(usize)) {
+			insertion_sort(st, ed, cmp);
+			return;
+		}
+
+		// necessary copy
+		const auto pivot = *advance(st, (distance(st, ed) - 1) / 2);
+
+		auto l_end = partition(st, ed,
+		                       [&](const auto&elem) { return cmp(elem, pivot); }),
+		     r_begin = partition(l_end, ed,
+		                         [&](const auto&elem) { return !cmp(pivot, elem); });
+
+		intro_sort(st, l_end, cmp);
+		intro_sort(r_begin, ed, cmp);
+	}
+
+	template <Container Box, class Compare =
+	                                 less<typename Box::value_type>>
 	requires Bidirectional_Itr<typename Box::iterator>
 	// Average case -> O(nlogn)
-	void heap_sort(Box& box, Compare cmp = Compare())
+	void intro_sort(Box& box, Compare cmp = Compare())
 	{
-		heap_sort<Width>(box.begin(), box.end(), cmp);
+		intro_sort(box.begin(), box.end(), cmp);
 	}
 
 	template <u64 Width = 8, Bidirectional_Itr Itr,
-	          class Compare = less<typename Itr::value_type>>
+	          class Compare = less<deref_t<Itr>>>
 	// Average case -> O(nlogn)
 	void heap_sort(Itr first, Itr last, Compare cmp = Compare())
 	{
@@ -720,6 +719,30 @@ namespace nuts
 			--last;
 			heapify(first, 0, i, cmp);
 		}
+	}
+
+	template <u64 Width = 8, Container Box,
+	          class Compare = less<typename Box::value_type>>
+	requires Bidirectional_Itr<typename Box::iterator>
+	// Average case -> O(nlogn)
+	void heap_sort(Box& box, Compare cmp = Compare())
+	{
+		heap_sort<Width>(box.begin(), box.end(), cmp);
+	}
+
+	template <Bidirectional_Itr Itr, class Compare = less<deref_t<Itr>>>
+	// Default intro_sort() && Average case -> O(nlogn)
+	void sort(Itr st, Itr ed, Compare cmp = Compare())
+	{
+		intro_sort(st, ed, cmp);
+	}
+
+	template <Container Box, class Compare = less<typename Box::value_type>>
+	requires Bidirectional_Itr<typename Box::iterator>
+	// Default intro_sort() && Average case -> O(nlogn)
+	void sort(Box& box, Compare cmp = Compare())
+	{
+		sort(box.begin(), box.end(), cmp);
 	}
 }
 

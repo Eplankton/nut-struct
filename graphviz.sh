@@ -19,3 +19,11 @@ rm test.callgraph.dot
 mv test.dot ..
 cd ..
 # dot -Tsvg test.dot > test.svg
+
+# clang++ \
+# -Og \
+# -S \
+# -std=c++20 \
+# -fno-exceptions \
+# -emit-llvm include/*.cpp \
+# -o main.ll

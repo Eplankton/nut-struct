@@ -120,7 +120,7 @@ namespace nuts
 		explicit vector(u64 userInputSize, const T& userInputData);// Init by size and value
 		vector(const vector<T>& obj);                              // Copy constructor
 		vector(vector<T>&& src) noexcept { move(src); }            // Move constructor
-		vector(const std::initializer_list<T>& ilist);             // Init by a {ilist}
+		vector(const std::initializer_list<T>& ilist);   // Init by a {ilist}
 		~vector() noexcept { destroy(); }
 
 		inline T* data() const noexcept { return const_cast<T*>(data_ptr); }
@@ -132,15 +132,19 @@ namespace nuts
 		vector<T>& shrink_to_fit();// Reduce memory usage by freeing unused memory
 		vector<T>& resize(u64 N);  // Reduce or expand size
 		vector<T>& reserve(u64 N) { return (N <= v_capacity) ? *this : resize(N); }
+		vector<T>& expand();
 
 		inline void clear();// Clear all values, but don't destroy
 		void destroy();     // Clear the contents and release memory, contain exist()
 		void print() const;
 
-		vector<T>& push_back(const T& obj);// Add an element to the end
-		vector<T>& push_back(T&& src);
-		vector<T>& emplace_back();                 // Add an element to the end
-		inline vector<T>& pop_back();              // Remove the last element
+		void push_back(const T& obj);// Add an element to the end
+		void push_back(T&& src);
+		void emplace_back();// Add an element to the end
+		void emplace_back(const T& val);
+		void emplace_back(T&& val);
+
+		inline void pop_back();                    // Remove the last element
 		vector<T>& move(vector<T>& after) noexcept;// Deprive other's ownership
 
 		inline T& operator[](u64 N) noexcept;// Access specified element
@@ -277,40 +281,55 @@ namespace nuts
 	}
 
 	template <class T>
-	vector<T>& vector<T>::emplace_back()
+	vector<T>& vector<T>::expand()
+	{
+		if (v_size != 0)
+			reserve(v_size * EXPAN_COEF);
+		else
+			reserve(STD_EXPAN);
+		return *this;
+	}
+
+	template <class T>
+	void vector<T>::emplace_back()
 	{
 		if (v_capacity == v_size)
-		{
-			if (v_size != 0)
-				reserve(v_size * EXPAN_COEF);
-			else
-				reserve(STD_EXPAN);
-		}
+			expand();
 		++v_size;
-		return *this;
 	}
 
 	template <class T>
-	vector<T>& vector<T>::push_back(const T& src)
+	void vector<T>::emplace_back(T&& val)
 	{
-		emplace_back();
-		back() = src;
-		return *this;
+		if (v_capacity == v_size)
+			expand();
+		auto ret = *new (data_ptr + v_size++) T(val);
 	}
 
 	template <class T>
-	vector<T>& vector<T>::push_back(T&& src)
+	void vector<T>::emplace_back(const T& val)
 	{
-		emplace_back();
-		back() = nuts::move(src);
-		return *this;
+		T tmp = val;
+		emplace_back(nuts::move(tmp));
 	}
 
 	template <class T>
-	inline vector<T>& vector<T>::pop_back()
+	void vector<T>::push_back(const T& src)
 	{
-		if (!empty()) --v_size;
-		return *this;
+		emplace_back(src);
+	}
+
+	template <class T>
+	void vector<T>::push_back(T&& src)
+	{
+		emplace_back(src);
+	}
+
+	template <class T>
+	inline void vector<T>::pop_back()
+	{
+		if (!empty())
+			--v_size;
 	}
 
 	template <class T>

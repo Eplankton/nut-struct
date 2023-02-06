@@ -46,11 +46,11 @@ namespace nuts
 			iterator(const iterator& src)
 			    : cur(src.cur), st(src.st), ed(src.ed), itr(src.itr) {}
 
-			pointer get() const { return cur; }
-			pointer operator->() const { return cur; }
+			inline pointer get() const { return cur; }
+			inline pointer operator->() const { return cur; }
 
-			T& operator*() { return *cur; }
-			const T& operator*() const { return *cur; }
+			inline T& operator*() { return *cur; }
+			inline const T& operator*() const { return *cur; }
 
 			iterator& operator++()
 			{
@@ -157,10 +157,6 @@ namespace nuts
 		deque(const deque<T, Buf>& src);
 		deque(deque<T, Buf>&& src) { move(src); }
 		~deque() = default;
-		// {
-		// 	_size = 0;
-		// 	first = last = nullptr;
-		// }
 
 		T* data() const { return (pointer) impl.data(); }
 		u64 size() const { return _size; }
