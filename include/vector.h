@@ -120,7 +120,7 @@ namespace nuts
 		explicit vector(u64 userInputSize, const T& userInputData);// Init by size and value
 		vector(const vector<T>& obj);                              // Copy constructor
 		vector(vector<T>&& src) noexcept { move(src); }            // Move constructor
-		vector(const std::initializer_list<T>& ilist);   // Init by a {ilist}
+		vector(const std::initializer_list<T>& ilist);             // Init by a {ilist}
 		~vector() noexcept { destroy(); }
 
 		inline T* data() const noexcept { return const_cast<T*>(data_ptr); }
@@ -190,18 +190,18 @@ namespace nuts
 	template <class T>
 	vector<T>::vector(u64 userInputSize)
 	{
-		data_ptr = new T[userInputSize + STD_EXPAN];
+		data_ptr = new T[userInputSize];
 		v_size = userInputSize;
-		v_capacity = v_size + STD_EXPAN;
+		v_capacity = v_size;
 	}
 
 	template <class T>
 	vector<T>::vector(u64 userInputSize, const T& userInputData)
 	{
-		data_ptr = new T[userInputSize + STD_EXPAN];
+		data_ptr = new T[userInputSize];
 		nuts::fill_n(data_ptr, userInputSize, userInputData);
 		v_size = userInputSize;
-		v_capacity = v_size + STD_EXPAN;
+		v_capacity = v_size;
 	}
 
 	template <class T>

@@ -91,22 +91,35 @@ namespace nuts
 	};
 
 	template <typename T>
-	concept Partial_Order = requires(T x)
+	concept Less = requires(T x)
 	{
 		x < x;
+	};
+
+	template <typename T>
+	concept Greater = requires(T x)
+	{
 		x > x;
 	};
 
 	template <typename T>
-	concept Order =
-	        Partial_Order<T> && requires(T x)
+	concept Equal = requires(T x)
 	{
 		x == x;
 	};
 
 	template <typename T>
-	concept Numeric_Arithmetic
-	        = Add<T> && Minus<T> && Multi<T> && Div<T>;
+	concept Partial_Order = Less<T> && Greater<T>;
+
+	template <typename T>
+	concept Order = Partial_Order<T> && Equal<T>;
+
+	template <typename T>
+	concept Arithmetic =
+	        Add<T> &&
+	        Minus<T> &&
+	        Multi<T> &&
+	        Div<T>;
 
 	template <typename>
 	struct is_pointer
@@ -123,14 +136,17 @@ namespace nuts
 	template <typename Ptr>
 	concept Pointer = is_pointer<Ptr>::value;
 
+	template <typename Ptr>
+	// Non Void Pointer
+	concept NV_Pointer = !Same<Ptr, void*> && Pointer<Ptr>;
+
 	template <typename Itr>
 	concept Forward_Itr =
-	        Pointer<Itr> || requires(Itr it)
+	        NV_Pointer<Itr> || requires(Itr it)
 	{
 		typename Itr::value_type;
 		*it;
 		++it;
-		it++;
 	};
 
 	template <typename Itr>
@@ -138,7 +154,6 @@ namespace nuts
 	        Forward_Itr<Itr> && requires(Itr it)
 	{
 		--it;
-		it--;
 	};
 
 	template <typename Itr>

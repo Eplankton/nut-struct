@@ -42,21 +42,21 @@ namespace nuts
 		return function<FuncType>(F);
 	}
 
-	template <Partial_Order T>
+	template <Less T>
 	struct less
 	{
 		inline bool operator()(const T& a, const T& b)
 		        const { return a < b; }
 	};
 
-	template <Partial_Order T>
+	template <Greater T>
 	struct greater
 	{
 		inline bool operator()(const T& a, const T& b)
 		        const { return a > b; }
 	};
 
-	template <Order T>
+	template <Equal T>
 	struct equal
 	{
 		inline bool operator()(const T& a, const T& b)

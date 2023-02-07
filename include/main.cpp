@@ -134,7 +134,7 @@ requires T void deduction_guide_test()
 
 int main()
 {
-	auto n = 1e4;
+	u64 n = pow(2, 16);
 	std::random_device rd;
 	// vector<i32> v;
 
@@ -144,9 +144,6 @@ int main()
 	// xxsort_test(v);
 	// visual<vector<i32>>();
 	// deduction_guide_test<true>();
-
-	// vector v {1, 2, 3, 4, 5};
-	// sort(v);
 
 	std::vector<i32> a;
 	nuts::vector<i32> b;

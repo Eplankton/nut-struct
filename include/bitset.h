@@ -128,7 +128,7 @@ namespace nuts
 	bitset<N>::bitset(const char* src)
 	{
 		nuts::fill_n(impl.begin(), impl.size(), (u8) 0);
-		for (u64 i = 0; i < strlen(src) - 1 && i < N; i++)
+		for (u64 i = 0; i < strlen(src) && i < N; i++)
 			(*this)[i] = static_cast<bool>(src[i] - 48);
 	}
 

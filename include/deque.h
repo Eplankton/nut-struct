@@ -6,7 +6,7 @@
 #include "list.h"
 #include "type.h"
 
-#define DEQUE_BUF_SIZE 512ULL
+#define DEQUE_BUF_SIZE 256ULL
 #define GET_BLOCK_CAPACITY(x) (sizeof(x) > DEQUE_BUF_SIZE \
 	                                   ? sizeof(x)        \
 	                                   : DEQUE_BUF_SIZE / sizeof(x))
@@ -136,7 +136,7 @@ namespace nuts
 			}
 		};
 
-		iterator begin() const
+		inline iterator begin() const
 		{
 			const_pointer st = &impl.front()[0],
 			              ed = &impl.front()[Buf - 1],
@@ -144,7 +144,7 @@ namespace nuts
 			return {cur, st, ed, impl.begin()};
 		}
 
-		iterator end() const
+		inline iterator end() const
 		{
 			const_pointer st = &impl.back()[0],
 			              ed = &impl.back()[Buf - 1],

@@ -1,8 +1,8 @@
 echo -e "\n\n\e[36;1m[Demo]\e[0m: Begin..."
 echo -e "\e[36;1m[Demo]\e[0m: Generating binary files..."
 
-time clang++ \
-    -std=c++20 \
+time g++-12 \
+    -std=c++23 \
     include/*.cpp \
     -O2 \
     -Wno-psabi \

@@ -10,7 +10,7 @@ namespace nuts
      *  Create small matrix on stack.
      */
 
-	template <typename T, u64 R, u64 C>
+	template <Arithmetic T, u64 R, u64 C>
 	class matrix
 	{
 	public:
@@ -36,34 +36,34 @@ namespace nuts
 		inline array<T, C>& operator[](u64 _r) { return raw[_r]; }
 		inline const array<T, C>& operator[](u64 _r) const { return raw[_r]; }
 
-		T& at(u64 _r, u64 _c)
+		inline T& at(u64 _r, u64 _c)
 		{
 			assert(_r < row() && _c < col());
 			return raw[_r][_c];
 		}
 
-		const T& at(u64 _r, u64 _c) const
+		inline const T& at(u64 _r, u64 _c) const
 		{
 			assert(_r < row() && _c < col());
 			return raw[_r][_c];
 		}
 
-		template <typename RetType>
+		template <Arithmetic RetType>
 		friend matrix<RetType, R, C> operator+(const matrix<RetType, R, C>& A,
 		                                       const matrix<RetType, R, C>& B);
 
-		template <typename RetType>
+		template <Arithmetic RetType>
 		friend matrix<RetType, R, C> operator-(const matrix<RetType, R, C>& A,
 		                                       const matrix<RetType, R, C>& B);
 
-		template <typename RetType, u64 R1, u64 C1, u64 C2>
+		template <Arithmetic RetType, u64 R1, u64 C1, u64 C2>
 		friend matrix<RetType, R1, C2> operator*(const matrix<RetType, R1, C1>& A,
 		                                         const matrix<RetType, C1, C2>& B);
 
 		self_type& operator=(const self_type& src);
 	};
 
-	template <typename T, u64 R, u64 C>
+	template <Arithmetic T, u64 R, u64 C>
 	matrix<T, R, C>::
 	        matrix(const T& _val)
 	{
@@ -72,7 +72,7 @@ namespace nuts
 				raw[i][j] = _val;
 	}
 
-	template <typename T, u64 R, u64 C>
+	template <Arithmetic T, u64 R, u64 C>
 	matrix<T, R, C>::
 	        matrix(const std::initializer_list<array<T, C>>& ilist)
 	{
@@ -81,7 +81,7 @@ namespace nuts
 			raw[i] = *(st++);
 	}
 
-	template <typename T, u64 R, u64 C>
+	template <Arithmetic T, u64 R, u64 C>
 	matrix<T, R, C>::
 	        matrix(const std::initializer_list<T>& ilist)
 	{
@@ -91,7 +91,7 @@ namespace nuts
 				raw[i][j] = *(st++);
 	}
 
-	template <typename T, u64 R, u64 C>
+	template <Arithmetic T, u64 R, u64 C>
 	matrix<T, R, C>& matrix<T, R, C>::operator=(const self_type& src)
 	{
 		for (u64 i = 0; i < row(); ++i)
@@ -100,7 +100,7 @@ namespace nuts
 		return *this;
 	}
 
-	template <typename T, u64 R, u64 C>
+	template <Arithmetic T, u64 R, u64 C>
 	matrix<T, R, C>
 	operator+(const matrix<T, R, C>& A, const matrix<T, R, C>& B)
 	{
@@ -111,7 +111,7 @@ namespace nuts
 		return res;
 	}
 
-	template <typename T, u64 R, u64 C>
+	template <Arithmetic T, u64 R, u64 C>
 	matrix<T, R, C>
 	operator-(const matrix<T, R, C>& A, const matrix<T, R, C>& B)
 	{
@@ -122,7 +122,7 @@ namespace nuts
 		return res;
 	}
 
-	template <typename RetType, u64 R1, u64 C1, u64 C2>
+	template <Arithmetic RetType, u64 R1, u64 C1, u64 C2>
 	matrix<RetType, R1, C2>
 	operator*(const matrix<RetType, R1, C1>& A,
 	          const matrix<RetType, C1, C2>& B)
@@ -135,7 +135,7 @@ namespace nuts
 		return res;
 	}
 
-	template <typename T, u64 R, u64 C>
+	template <Arithmetic T, u64 R, u64 C>
 	void matrix<T, R, C>::print() const
 	{
 		auto row_array_print = [](const auto& r) {

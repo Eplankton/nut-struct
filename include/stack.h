@@ -8,7 +8,7 @@
 
 /** @file stack
      * push() vector as same as deque 
-	 * pop() vector usually three times faster than deque
+	 * pop() vector usually 3 times faster than deque
      */
 
 namespace nuts

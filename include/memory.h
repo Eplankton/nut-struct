@@ -10,7 +10,7 @@ namespace nuts
 	template <class T>
 	struct default_delete
 	{
-		constexpr void operator()(T* _ptr) const
+		inline void operator()(T* _ptr) const
 		{
 			static_assert(sizeof(T),
 			              "Can't delete an incomplete type!");
@@ -21,7 +21,7 @@ namespace nuts
 	template <class T>
 	struct default_delete<T[]>
 	{
-		constexpr void operator()(T* _ptr) const
+		inline void operator()(T* _ptr) const
 		{
 			static_assert(sizeof(T),
 			              "Can't delete an incomplete type!");
@@ -343,16 +343,26 @@ namespace nuts
 	}
 
 	template <class T, class... Args, class Dx = default_delete<T>>
-	unique_ptr<T, Dx> make_unique(const Args&... pac)
+	unique_ptr<T, Dx> make_unique(Args&&... pac)
 	{
 		return {new T(pac...)};
 	}
 
 	template <class T, class... Args, class Dx = default_delete<T>>
-	shared_ptr<T, Dx> make_shared(const Args&... pac)
+	shared_ptr<T, Dx> make_shared(Args&&... pac)
 	{
 		return {new T(pac...)};
 	}
+
+	template <typename T>
+	struct Box
+	{
+		template <typename... Args>
+		inline static auto make(Args&&... pac)
+		{
+			return make_unique<T>(pac...);
+		}
+	};
 }
 
 #endif

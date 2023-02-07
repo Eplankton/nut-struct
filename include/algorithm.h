@@ -10,7 +10,7 @@
 
 namespace nuts
 {
-	template <typename... T>
+	template <Add... T>
 	auto sum(T... s)
 	{
 		return (... + s);
@@ -78,14 +78,13 @@ namespace nuts
 		return itr - n;
 	}
 
-	template <typename Itr, class Func>
-	auto for_each(Itr st, Itr ed, Func fn)
+	template <Forward_Itr Itr, class Func>
+	auto for_each(Itr st, Itr ed, Func&& fn)
 	{
-		ed = next(ed);
-		while (st != ed) {
-			fn(*st++);
+		for (ed = next(ed); st != ed; ++st) {
+			fn(*st);
 		}
-		return move(fn);
+		return fn;
 	}
 
 	template <Container Box, class Func>
@@ -175,13 +174,15 @@ namespace nuts
 			itr_swap(st, ed);
 	}
 
-	template <Bidirectional_Itr Itr, class Compare = less<deref_t<Itr>>>
+	template <Forward_Itr Itr, class Compare = less<deref_t<Itr>>>
 	bool is_sorted(Itr st, Itr ed, Compare cmp = Compare())
 	// Give range by itr: st && ed -> O(N)
 	{
-		ed = next(ed);
-		for (auto it = st + 1; it != ed; it++)
-			if (cmp(*it, *(it - 1)))
+		if (st == ed)
+			return true;
+		auto it = st;
+		for (++it; it != ed; st = it, (void) ++it)
+			if (cmp(*it, *st))
 				return false;
 		return true;
 	}
@@ -198,11 +199,8 @@ namespace nuts
 	Itr find_if(Itr st, Itr ed, Func fn)
 	// Give range by itr: st && ed -> O(N)
 	{
-		ed = next(ed);
-		while (st != ed) {
-			if (fn(*st))
-				break;
-			++st;
+		for (ed = next(ed); st != ed; ++st) {
+			if (fn(*st)) break;
 		}
 		return st;
 	}
@@ -233,8 +231,7 @@ namespace nuts
 	Itr find(Itr st, Itr ed, const T& val, Func cmp = Func())
 	// Give range by itr: st && ed -> O(N)
 	{
-		return find_if(st, ed,
-		               [&](const T& x) { return cmp(x, val); });
+		return find_if(st, ed, [&](const T& x) { return cmp(x, val); });
 	}
 
 	template <Container Box, typename T>
@@ -245,7 +242,7 @@ namespace nuts
 	}
 
 	template <Forward_Itr Itr>
-	// Must be sorted, Return null if not found -> O(logN)
+	// Must be sorted at first, Return null if not found -> O(logN)
 	Itr binary_search(Itr st, Itr ed,
 	                  const deref_t<Itr>& val)
 	{
@@ -266,11 +263,11 @@ namespace nuts
 			size = right - left;
 		}
 
-		return Itr {};
+		return Itr();
 	}
 
 	template <Container Box>
-	// Must be sorted, Return null if not found -> O(logN)
+	// Must be sorted at first, Return null if not found -> O(logN)
 	auto binary_search(const Box& box,
 	                   const typename Box::value_type& val)
 	{
@@ -406,18 +403,17 @@ namespace nuts
 
 			auto end = next(ed);
 			for (auto cur = st; ++cur != end;) {
-				auto val = nuts::move(*cur);
-				auto next = cur, prev = nuts::prev(next);
-				while (cmp(val, *prev)) {
-					*next = nuts::move(*prev);
-					next = prev;
-					if (prev != st)
-						--prev;
+				auto val = move(*cur);
+				auto it = cur, pre = prev(it);
+				while (cmp(val, *pre)) {
+					*it = move(*pre);
+					it = pre;
+					if (pre != st)
+						--pre;
 					else
 						break;
 				}
-				// insert value in its sorted hole.
-				*next = nuts::move(val);
+				*it = move(val);
 			}
 		}
 
