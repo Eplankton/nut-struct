@@ -158,16 +158,16 @@ namespace nuts
 		deque(deque<T, Buf>&& src) { move(src); }
 		~deque() = default;
 
-		T* data() const { return (pointer) impl.data(); }
-		u64 size() const { return _size; }
-		bool empty() const { return size() == 0; }
+		inline T* data() const { return (pointer) impl.data(); }
+		inline u64 size() const { return _size; }
+		inline bool empty() const { return size() == 0; }
 		void clear();
 		static constexpr u64 block_capacity() { return Buf; }
 
-		T& front() { return *begin(); }
-		T& back() { return *end(); }
-		const T& front() const { return *begin(); }
-		const T& back() const { return *end(); }
+		inline T& front() { return *begin(); }
+		inline T& back() { return *end(); }
+		inline const T& front() const { return *begin(); }
+		inline const T& back() const { return *end(); }
 
 		T& operator[](u64 _n);
 		const T& operator[](u64 _n) const;
@@ -179,14 +179,17 @@ namespace nuts
 		deque<T, Buf>& operator=(deque<T, Buf>&& src) { return move(src); }
 		deque<T, Buf>& move(deque<T, Buf>& src);
 
-		void emplace_back();
-		void emplace_front();
+		void emplace_back(const T& val);
+		void emplace_back(T&& val);
 
-		void push_back(const T& _val);
-		void push_front(const T& _val);
+		void emplace_front(const T& val);
+		void emplace_front(T&& val);
 
-		void push_back(T&& _val);
-		void push_front(T&& _val);
+		void push_back(const T& val);
+		void push_back(T&& val);
+
+		void push_front(const T& val);
+		void push_front(T&& val);
 
 		void pop_back();
 		void pop_front();
@@ -288,73 +291,84 @@ namespace nuts
 	}
 
 	template <class T, u64 Buf>
-	deque<T, Buf>& deque<T, Buf>::operator=(const deque<T, Buf>& src)
+	deque<T, Buf>& deque<T, Buf>::
+	operator=(const deque<T, Buf>& src)
 	{
 		clear();
-		for_each(src, [&](const T& x) { push_back(x); });
+		for_each(src, [&](const T& x) { emplace_back(x); });
 		return *this;
 	}
 
 	template <typename T, u64 Buf>
-	void deque<T, Buf>::push_back(const T& _val)
+	void deque<T, Buf>::emplace_back(T&& val)
 	{
-		emplace_back();
-		back() = _val;
-	}
-
-	template <typename T, u64 Buf>
-	void deque<T, Buf>::push_front(const T& _val)
-	{
-		emplace_front();
-		front() = _val;
-	}
-
-	template <typename T, u64 Buf>
-	void deque<T, Buf>::push_back(T&& _val)
-	{
-		emplace_back();
-		back() = nuts::move(_val);
-	}
-
-	template <typename T, u64 Buf>
-	void deque<T, Buf>::push_front(T&& _val)
-	{
-		emplace_front();
-		front() = nuts::move(_val);
-	}
-
-	template <typename T, u64 Buf>
-	void deque<T, Buf>::emplace_back()
-	{
-		if (empty())
-		{
+		if (empty()) {
 			allocate_back();
 			first = last;
 		}
-		else
-		{
-			if (is_back_full()) allocate_back();
+		else {
+			if (is_back_full())
+				allocate_back();
 			else
 				++last;
 		}
+		(void) *new (last) T(nuts::move(val));
 		++_size;
 	}
 
 	template <typename T, u64 Buf>
-	void deque<T, Buf>::emplace_front()
+	void deque<T, Buf>::emplace_back(const T& val)
 	{
-		if (empty())
-		{
+		T tmp = val;
+		emplace_back(nuts::move(tmp));
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::emplace_front(T&& val)
+	{
+		if (empty()) {
 			allocate_front();
 			last = first;
 		}
-		else
-		{
-			if (is_front_full()) allocate_front();
+		else {
+			if (is_front_full())
+				allocate_front();
 			else
 				--first;
 		}
+		(void) *new (first) T(nuts::move(val));
 		++_size;
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::emplace_front(const T& val)
+	{
+		T tmp = val;
+		emplace_front(nuts::move(tmp));
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::push_back(const T& val)
+	{
+		emplace_back(val);
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::push_front(const T& val)
+	{
+		emplace_front(val);
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::push_back(T&& val)
+	{
+		emplace_back(nuts::move(val));
+	}
+
+	template <typename T, u64 Buf>
+	void deque<T, Buf>::push_front(T&& val)
+	{
+		emplace_front(nuts::move(val));
 	}
 
 	template <typename T, u64 Buf>

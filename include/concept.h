@@ -27,7 +27,7 @@ namespace nuts
 	concept Same = is_same_v<T, U>;
 
 	template <typename Fn, typename... T>
-	concept Callable = requires(Fn&& fn, T&&... args)
+	concept Invocable = requires(Fn&& fn, T&&... args)
 	{
 		fn(args...);
 	};
@@ -137,12 +137,13 @@ namespace nuts
 	concept Pointer = is_pointer<Ptr>::value;
 
 	template <typename Ptr>
-	// Non Void Pointer
-	concept NV_Pointer = !Same<Ptr, void*> && Pointer<Ptr>;
+	concept Valid_Pointer = Pointer<Ptr> &&
+	                        !Same<Ptr, nullptr_t> &&
+	                        !Same<Ptr, void*>;
 
 	template <typename Itr>
 	concept Forward_Itr =
-	        NV_Pointer<Itr> || requires(Itr it)
+	        Valid_Pointer<Itr> || requires(Itr it)
 	{
 		typename Itr::value_type;
 		*it;

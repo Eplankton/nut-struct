@@ -25,95 +25,7 @@ namespace nuts
 	public:
 		using value_type = T;
 		using pointer = T*;
-
-		class iterator
-		    : public random_access_iterator
-		{
-		public:
-			using value_type = T;
-
-		protected:
-			pointer _ptr = nullptr;
-
-		public:
-			iterator() = default;
-			iterator(pointer obj) noexcept { _ptr = obj; }
-			iterator(std::nullptr_t obj) noexcept : _ptr(obj) {}
-			iterator(const iterator& obj) noexcept : _ptr(obj._ptr) {}
-
-			inline pointer get() const noexcept { return _ptr; }
-
-			inline value_type& operator*() { return *_ptr; }
-			inline const value_type& operator*() const { return *_ptr; }
-
-			inline pointer operator->() const noexcept { return _ptr; }
-
-			inline iterator& operator=(value_type* obj) noexcept
-			{
-				_ptr = obj;
-				return *this;
-			}
-
-			inline iterator& operator=(const iterator& obj) noexcept
-			{
-				_ptr = obj._ptr;
-				return *this;
-			}
-
-			inline bool operator==(T* obj) const noexcept { return _ptr == obj; }
-			inline bool operator!=(T* obj) const noexcept { return _ptr != obj; }
-
-			inline bool operator==(const iterator& obj) const noexcept { return _ptr == obj._ptr; }
-			inline bool operator!=(const iterator& obj) const noexcept { return _ptr != obj._ptr; }
-
-			inline bool operator<(const iterator& obj) const noexcept { return _ptr < obj._ptr; }
-			inline bool operator<=(const iterator& obj) const noexcept { return _ptr <= obj._ptr; }
-
-			inline bool operator>(const iterator& obj) const noexcept { return _ptr > obj._ptr; }
-			inline bool operator>=(const iterator& obj) const noexcept { return _ptr >= obj._ptr; }
-
-			inline iterator& operator++()
-			{
-				_ptr++;
-				return *this;
-			}
-
-			inline iterator operator++(int)// postposition
-			{
-				iterator res = *this;
-				++(*this);
-				return res;
-			}
-
-			inline iterator& operator--()
-			{
-				_ptr--;
-				return *this;
-			}
-
-			inline iterator operator--(int)// postposition
-			{
-				iterator res = *this;
-				--(*this);
-				return res;
-			}
-
-			inline iterator operator+(i64 bias)
-			        const noexcept { return iterator(_ptr + bias); }
-
-			inline void operator+=(i64 bias) noexcept { _ptr += bias; }
-
-			inline iterator operator-(i64 bias)
-			        const noexcept { return iterator(_ptr - bias); }
-
-			inline void operator-=(i64 bias) noexcept { _ptr -= bias; }
-
-			inline value_type& operator[](u64 _n) noexcept { return *((*this) + _n); }
-			inline const T& operator[](u64 _n) const noexcept { return *((*this) + _n); }
-
-			friend i64
-			operator-(const iterator& a, const iterator& b) { return a.get() - b.get(); }
-		};
+		using iterator = pointer;
 
 		vector() = default;                                        // Void constructor
 		explicit vector(u64 userInputSize);                        // Init by size
@@ -140,7 +52,6 @@ namespace nuts
 
 		void push_back(const T& obj);// Add an element to the end
 		void push_back(T&& src);
-		void emplace_back();// Add an element to the end
 		void emplace_back(const T& val);
 		void emplace_back(T&& val);
 
@@ -160,7 +71,7 @@ namespace nuts
 		inline iterator end() const
 		{
 			return size() == 0 ? begin()
-			                   : iterator {const_cast<T*>(&data_ptr[size() - 1])};
+			                   : begin() + size() - 1;
 		}
 
 		inline T& front() { return *begin(); }
@@ -291,19 +202,11 @@ namespace nuts
 	}
 
 	template <class T>
-	void vector<T>::emplace_back()
-	{
-		if (v_capacity == v_size)
-			expand();
-		++v_size;
-	}
-
-	template <class T>
 	void vector<T>::emplace_back(T&& val)
 	{
 		if (v_capacity == v_size)
 			expand();
-		auto ret = *new (data_ptr + v_size++) T(val);
+		(void) *new (data_ptr + v_size++) T(val);
 	}
 
 	template <class T>
@@ -322,7 +225,7 @@ namespace nuts
 	template <class T>
 	void vector<T>::push_back(T&& src)
 	{
-		emplace_back(src);
+		emplace_back(nuts::move(src));
 	}
 
 	template <class T>

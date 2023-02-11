@@ -1,13 +1,13 @@
 echo -e "\n\e[31;1m[Debug]\e[0m: Begin..."
 echo -e "\e[31;1m[Debug]\e[0m: Generating binary files..."
 
-time clang++ \
+time clang++-15 \
              -fsanitize=address \
-             -std=c++20 \
+             -std=c++2b \
              -fsanitize=leak \
              -fno-omit-frame-pointer \
              -Og \
-             -g include/*.cpp \
+             -g src/*.cpp \
              -Wno-psabi \
              -o debug
 

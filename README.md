@@ -1,8 +1,9 @@
 # nut-struct
 
 ## **介绍**
-#### 华东师范大学(East China Normal University) 软件工程学院 2022春 数据结构与算法实验课作业 
-#### nut-struct 是简易容器与算法库，使用 RAII 对动态内存进行管理，不保证异常/多线程安全。
+#### 华东师范大学(East China Normal University) 软件工程学院 2022春 数据结构与算法实验课
+#### nut-struct 是简易 STL 库，使用 RAII 对动态内存进行管理，不保证异常/线程安全
+#### [ 主要设计缺陷：尾迭代器位置指向 end()-1 ]
 
 <br>
 
@@ -11,7 +12,7 @@
 | :------: | :------------------------------------------------------------------------------------------: |
 |   数组   |        [array.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/array.h)        |
 |  字符串  | [basic_string.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/basic_string.h) |
-|   向量   |       [vector.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/vector.h)       |
+|   动态数组   |       [vector.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/vector.h)       |
 | 双向链表 |         [list.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/list.h)         |
 | 双端队列 |        [deque.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/deque.h)        |
 |    栈    |        [stack.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/stack.h)        |
@@ -21,8 +22,8 @@
 
 | 关联型容器 |                                              文件                                              |
 | :------: | :--------------------------------------------------------------------------------------------: |
-|   集合   |           [set.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/set.h)           |
-|  映射表  |           [map.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/map.h)           |
+|  有序集合  |           [set.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/set.h)           |
+|  有序表  |           [map.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/map.h)           |
 | 无序集合 | [unordered_set.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/unordered_set.h) |
 |  无序表  | [unordered_map.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/unordered_map.h) |
 
@@ -43,9 +44,36 @@
 | 多用途对象 |    [utility.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/utility.h)    |
 | 位集 |    [bitset.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/bitset.h)    |
 |    矩阵    |     [matrix.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/matrix.h)     |
-|    异常处理    |     [option.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/option.h)     |
+|    异常    |     [option.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/option.h)     |
 |  范围  |     [range.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/range.h)     |
-|  概念约束  |     [concept.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/concept.h)     |
+|  概念  |     [concept.h](https://gitee.com/Eplankton/nut-struct/blob/master/include/concept.h)     |
+
+<br>
+
+## **Benchmark 测试**
+```
+===============================================================================
+| complexityN |               ns/op |                op/s |    err% |     total | benchmark
+|------------:|--------------------:|--------------------:|--------:|----------:|:----------
+|          10 |                8.50 |      117,636,525.52 |    0.4% |      0.01 | `nuts::sort`
+|         100 |              999.04 |        1,000,960.61 |    0.3% |      0.01 | `nuts::sort`
+|       1,000 |           12,777.65 |           78,261.67 |    0.8% |      0.01 | `nuts::sort`
+|      10,000 |          131,387.50 |            7,611.07 |    0.3% |      0.01 | `nuts::sort`
+|     100,000 |        1,625,700.00 |              615.12 |    0.1% |      0.02 | `nuts::sort`
+|   1,000,000 |       19,580,800.00 |               51.07 |    2.1% |      0.27 | `nuts::sort`
+|  10,000,000 |      199,011,500.00 |                5.02 |    2.0% |      2.77 | `nuts::sort`
+| 100,000,000 |    2,318,782,200.00 |                0.43 |    2.0% |     31.36 | `nuts::sort`
+
+|   coefficient |   err% | complexity
+|--------------:|-------:|------------
+| 8.7240808e-10 |   0.5% | O(n log n)
+| 2.3154920e-08 |   3.7% | O(n)
+| 2.3205422e-16 |  19.7% | O(n^2)
+| 2.3189789e-24 |  22.0% | O(n^3)
+| 2.9615327e-02 | 206.7% | O(log n)
+| 3.1739317e-01 | 239.2% | O(1)
+===============================================================================
+```
 
 <br>
 

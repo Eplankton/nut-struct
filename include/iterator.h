@@ -1,6 +1,8 @@
 #ifndef _NUTS_ITER_
 #define _NUTS_ITER_
 
+// C++ Legacy Iterator Type Traits
+
 namespace nuts
 {
 	struct forward_iterator_tag
@@ -17,7 +19,7 @@ namespace nuts
 	struct random_access_iterator_tag
 	    : public bidirectional_iterator_tag
 	{
-		// Allow it+/-_n
+		// Allow it +/- n
 	};
 
 	struct forward_iterator
@@ -40,37 +42,37 @@ namespace nuts
 	template <typename T>
 	struct is_forward_iterator
 	{
-		static const bool value = true;
+		static constexpr bool value = true;
 	};
 
 	template <typename T>
 	struct is_bidirectional_iterator
 	{
-		static const bool value = false;
+		static constexpr bool value = false;
 	};
 
 	template <typename T>
 	struct is_random_access_iterator
 	{
-		static const bool value = false;
+		static constexpr bool value = false;
 	};
 
 	template <>
 	struct is_bidirectional_iterator<bidirectional_iterator_tag>
 	{
-		static const bool value = true;
+		static constexpr bool value = true;
 	};
 
 	template <>
 	struct is_bidirectional_iterator<random_access_iterator_tag>
 	{
-		static const bool value = true;
+		static constexpr bool value = true;
 	};
 
 	template <>
 	struct is_random_access_iterator<random_access_iterator_tag>
 	{
-		static const bool value = true;
+		static constexpr bool value = true;
 	};
 
 	template <typename Itr>

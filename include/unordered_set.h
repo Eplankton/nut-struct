@@ -97,7 +97,7 @@ namespace nuts
 			Inside in_itr;
 
 		public:
-			iterator() = default;
+			iterator() {}
 			iterator(const Outside& o, const Outside& b,
 			         const Inside& i) : out_itr(o), bkt_end(b),
 			                            in_itr(i) {}
@@ -157,19 +157,19 @@ namespace nuts
 
 		iterator begin() const
 		{
-			auto ed = bucket.end() + 1;
-			for (auto o = bucket.begin(); o != ed; ++o)
-				if (!o->empty())
-					return {o, bucket.end(), o->begin()};
+			auto ed = next(bucket.end());
+			for (auto it = bucket.begin(); it != ed; ++it)
+				if (!it->empty())
+					return {it, bucket.end(), it->begin()};
 			return npos;
 		}
 
 		iterator end() const
 		{
-			auto ed = bucket.begin() - 1;
-			for (auto o = bucket.end(); o != ed; --o)
-				if (!o->empty())
-					return {o, bucket.end(), o->begin()};
+			auto ed = prev(bucket.begin());
+			for (auto it = bucket.end(); it != ed; --it)
+				if (!it->empty())
+					return {it, bucket.end(), it->begin()};
 			return npos;
 		}
 
@@ -212,8 +212,12 @@ namespace nuts
 
 	public:
 		static constexpr Hasher hash_fn {};
-		static constexpr iterator npos {};
+		static const iterator npos;
 	};
+
+	template <class K, class Hasher>
+	const typename unordered_set<K, Hasher>::iterator
+	        unordered_set<K, Hasher>::npos;
 
 	// Deduction Guide
 	template <class K>
@@ -235,8 +239,7 @@ namespace nuts
 	    : bucket_size(src.bucket_size),
 	      bucket(src.bucket),
 	      _size(src._size)
-	{
-	}
+	{}
 
 	template <class K, class Hasher>
 	unordered_set<K, Hasher>::

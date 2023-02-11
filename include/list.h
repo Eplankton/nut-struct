@@ -66,11 +66,15 @@ namespace nuts
 		list<T>& operator=(const list<T>& obj);// Copy
 		list<T>& operator=(list<T>&& src) { return move(src); }
 
-		list<T>& emplace_back();                      // Add back an empty node
+		list<T>& emplace_back();// Add back an empty node
+		list<T>& emplace_back(const T& val);
+		list<T>& emplace_back(T&& val);
 		list<T>& push_back(const T& obj, u64 num = 1);// Add back several nodes(add by init calue)
 		list<T>& push_back(T&& obj);
 
-		list<T>& emplace_front();                      // Add front an empty node
+		list<T>& emplace_front();// Add front an empty node
+		list<T>& emplace_front(const T& val);
+		list<T>& emplace_front(T&& val);
 		list<T>& push_front(const T& obj, u64 num = 1);// Add frontseveral nodes(add by init value)
 		list<T>& push_front(T&& obj);
 
@@ -348,21 +352,67 @@ namespace nuts
 	}
 
 	template <class T>
+	list<T>& list<T>::emplace_back(const T& val)
+	{
+		if (!empty())
+		{
+			auto p = tail;
+			p->next = new node(val);
+			p->next->prev = p;
+			p = p->next;
+			p->next = nullptr;
+			tail = p;
+			length++;
+			return *this;
+		}
+		else// If it's an empty list,add a node.
+		{
+			auto p = new node(val);
+			p->prev = p->next = nullptr;
+			head = p;
+			tail = p;
+			length++;
+			return *this;
+		}
+	}
+
+	template <class T>
+	list<T>& list<T>::emplace_back(T&& val)
+	{
+		if (!empty())
+		{
+			auto p = tail;
+			p->next = new node(nuts::move(val));
+			p->next->prev = p;
+			p = p->next;
+			p->next = nullptr;
+			tail = p;
+			length++;
+			return *this;
+		}
+		else// If it's an empty list,add a node.
+		{
+			auto p = new node(nuts::move(val));
+			p->prev = p->next = nullptr;
+			head = p;
+			tail = p;
+			length++;
+			return *this;
+		}
+	}
+
+	template <class T>
 	list<T>& list<T>::push_back(const T& obj, u64 num)
 	{
 		for (auto i: range(0, num))
-		{
-			emplace_back();
-			back() = obj;
-		}
+			emplace_back(obj);
 		return *this;
 	}
 
 	template <class T>
 	list<T>& list<T>::push_back(T&& obj)
 	{
-		emplace_back();
-		back() = nuts::move(obj);
+		emplace_back(nuts::move(obj));
 		return *this;
 	}
 
@@ -388,21 +438,59 @@ namespace nuts
 	}
 
 	template <class T>
+	list<T>& list<T>::emplace_front(const T& val)
+	{
+		if (!empty())
+		{
+			auto tmp = head;
+			head = new node(val);
+			head->next = tmp;
+			tmp->prev = head;
+			length++;
+			return *this;
+		}
+		else
+		{
+			head = new node(val);
+			tail = head;
+			length++;
+			return *this;
+		}
+	}
+
+	template <class T>
+	list<T>& list<T>::emplace_front(T&& val)
+	{
+		if (!empty())
+		{
+			auto tmp = head;
+			head = new node(nuts::move(val));
+			head->next = tmp;
+			tmp->prev = head;
+			length++;
+			return *this;
+		}
+		else
+		{
+			head = new node(nuts::move(val));
+			tail = head;
+			length++;
+			return *this;
+		}
+	}
+
+	template <class T>
 	list<T>& list<T>::push_front(const T& obj, u64 num)
 	{
 		for (auto i: range(0, num))
-		{
-			emplace_front();
-			front() = obj;
-		}
+			emplace_front(obj);
 		return *this;
 	}
 
 	template <class T>
 	list<T>& list<T>::push_front(T&& obj)
 	{
-		emplace_front();
-		front() = nuts::move(obj);
+		emplace_front(nuts::move(obj));
 		return *this;
 	}
 

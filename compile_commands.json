@@ -1,7 +1,0 @@
-[
-  {
-    "directory": "/home/zhao/code/cpp/nut-struct",
-    "command": "/usr/bin/c++  -I/home/zhao/code/cpp/nut-struct/include -std=gnu++20 -o CMakeFiles/nut_struct.dir/main.cpp.o -c /home/zhao/code/cpp/nut-struct/include/main.cpp",
-    "file": "/home/zhao/code/cpp/nut-struct/include/main.cpp"
-  }
-]

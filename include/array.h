@@ -31,20 +31,20 @@ namespace nuts
 		inline T& front() { return *begin(); }
 		inline T& back() { return *end(); }
 
-		inline const T& front() const { return *begin(); }
-		inline const T& back() const { return *end(); }
+		inline constexpr T& front() const { return *begin(); }
+		inline constexpr T& back() const { return *end(); }
 
 		inline T& operator[](u64 _n) noexcept { return raw[_n]; }
 		inline const T& operator[](u64 _n) const noexcept { return raw[_n]; }
 
 		inline T& at(u64 _n);
-		inline const T& at(u64 _n) const;
+		inline constexpr T& at(u64 _n) const;
 
 		void print() const;
 		void fill(const T& _val);
 
-		constexpr iterator begin() const { return data(); }
-		constexpr iterator end() const
+		inline constexpr iterator begin() const { return data(); }
+		inline constexpr iterator end() const
 		{
 			return size() == 0 ? begin()
 			                   : begin() + size() - 1;
@@ -80,7 +80,7 @@ namespace nuts
 	}
 
 	template <typename T, u64 N>
-	const T& array<T, N>::at(u64 _n) const
+	constexpr T& array<T, N>::at(u64 _n) const
 	{
 		assert(_n < size() && "Index_Bound");
 		return raw[_n];

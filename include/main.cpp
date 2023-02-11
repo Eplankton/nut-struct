@@ -61,15 +61,17 @@ template <Iterable Box_Type,
           class Compare = less<typename Box_Type::value_type>>
 void visual()
 {
-	queue<function<void(Box_Type&, less<i32>)>> fst {
-	        insertion_sort,
-	        selection_sort,
-	        quick_sort,
-	        shell_sort,
-	        merge_sort,
-	        intro_sort,
-	        heap_sort,
-	};
+	queue<function<void(Box_Type&,
+	                    less<typename Box_Type::value_type>)>>
+	        fst {
+	                insertion_sort,
+	                selection_sort,
+	                quick_sort,
+	                shell_sort,
+	                merge_sort,
+	                intro_sort,
+	                heap_sort,
+	        };
 
 	auto cmp = Compare {};
 
@@ -91,77 +93,37 @@ void visual()
 	}
 }
 
-template <class Fn_A, class Fn_B>
-void test_fn(Fn_A&& f1, Fn_B&& f2)
+template <class... Fn>
+void time_cmp(Fn&&... fn_list)
 {
-	Timer c1;
-	f1();
-	c1.print();
-
-	Timer c2;
-	f2();
-	c2.print();
-}
-
-template <bool T>
-requires T void deduction_guide_test()
-{
-	array a {1, 2, 3, 4, 5};
-	vector v {1, 2, 3, 4, 5};
-	list l {1, 2, 3, 4, 5};
-	deque d {1, 2, 3, 4, 5};
-	set s {1, 2, 3, 4, 5};
-	unordered_set hs {1, 2, 3, 4, 5};
-
-	static const array
-	        as {"human", "dog", "cat", "cow",
-	            "sheep", "monkey", "turtle", "elephant"};
-
-	map m {
-	        pair {as[0], 0},
-	        {as[1], 1},
-	        {as[2], 2},
-	};
-
-	unordered_map hm {
-	        pair {as[0], 0},
-	        {as[1], 1},
-	        {as[2], 2},
-	};
-
-	println(a, v, l, d, s, hs, m, hm);
+	return (..., [&](auto&& f) {
+		Timer clock;
+		f();
+		clock.print();
+	}(fn_list));
 }
 
 int main()
 {
-	u64 n = pow(2, 16);
+	u64 n = 1e5;
 	std::random_device rd;
 	// vector<i32> v;
-
 	// for (int i = 0; i < n; ++i)
-	// 	v.push_back(rd() % (u64) n);
+	// 	v.emplace_back(rd() % n);
 
 	// xxsort_test(v);
-	// visual<vector<i32>>();
-	// deduction_guide_test<true>();
-
+	
 	std::vector<i32> a;
 	nuts::vector<i32> b;
 
 	for (i32 i = 0; i < n; ++i) {
 		auto tmp = rd() % (i32) n;
-		a.push_back(tmp);
-		b.push_back(tmp);
+		a.emplace_back(tmp);
+		b.emplace_back(tmp);
 	}
 
-	test_fn([&] { std::sort(a.begin(), a.end()); },
-	        [&] { nuts::sort(b.begin(), b.end()); });
-
-	// struct Foo
-	//     : public tuple<string, i32>
-	// {
-	// 	using tuple::tuple;
-	// };
-
+	time_cmp([&] { std::sort(a.begin(), a.end()); },
+	         [&] { nuts::sort(b.begin(), b.end()); });
+	
 	return 0;
 }

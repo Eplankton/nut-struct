@@ -40,19 +40,19 @@ namespace nuts
 				return *this;
 			}
 
-			bool get() const
+			inline bool get() const
 			{
 				u64 i = _p / 8, ofs = _p % 8;
 				return (((*_m)[i] >> (u8) (7 - ofs)) & (u8) 1) == (u8) 1;
 			}
-
-			void print() const { nuts::print(get()); }
 
 			inline bool operator==(bool val) const { return get() == val; }
 			inline bool operator!=(bool val) const { return get() != val; }
 
 			inline bool operator==(const bit_ref& y) const { return get() == y.get(); }
 			inline bool operator!=(const bit_ref& y) const { return get() != y.get(); }
+
+			void print() const { nuts::print(get()); }
 
 		protected:
 			base_type* _m = nullptr;

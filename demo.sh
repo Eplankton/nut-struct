@@ -1,10 +1,10 @@
 echo -e "\n\n\e[36;1m[Demo]\e[0m: Begin..."
 echo -e "\e[36;1m[Demo]\e[0m: Generating binary files..."
 
-time g++-12 \
-    -std=c++23 \
-    include/*.cpp \
-    -O2 \
+time clang++-15 \
+    -std=c++2b \
+    src/*.cpp \
+    -O3 \
     -Wno-psabi \
     -fno-exceptions\
     -o demo
