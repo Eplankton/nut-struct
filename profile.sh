@@ -16,7 +16,7 @@ $1 \
 ./main
 
 gprof --brief main gmon.out > tmp.txt
-gprof2dot -s -n0 -e0 tmp.txt > tmp.dot
+gprof2dot -s tmp.txt > tmp.dot
 
 # -n0 -e0
 # -s

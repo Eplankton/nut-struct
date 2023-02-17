@@ -45,30 +45,33 @@ namespace nuts
 	template <Less T>
 	struct less
 	{
-		inline bool constexpr operator()(const T& a, const T& b)
+		inline bool constexpr
+		operator()(const T& a, const T& b)
 		        const { return a < b; }
 	};
 
 	template <Greater T>
 	struct greater
 	{
-		inline bool constexpr operator()(const T& a, const T& b)
+		inline bool constexpr
+		operator()(const T& a, const T& b)
 		        const { return a > b; }
 	};
 
 	template <Equal T>
 	struct equal
 	{
-		inline bool constexpr operator()(const T& a, const T& b)
+		inline bool constexpr
+		operator()(const T& a, const T& b)
 		        const { return a == b; }
 	};
 
-	template <typename Box, typename R =
-	                                less<typename Box::value_type>>
-	concept Sortable = Iterable<Box> &&
-	        requires(typename Box::value_type x, R cmp)
+	template <typename Box,
+	          typename R = less<typename Box::value_type>>
+	concept Sortable
+	        = Iterable<Box> && requires(typename Box::value_type x, R cmp)
 	{
-		{ cmp(x, x) } -> Same<bool>;
+		{cmp(x, x)} -> Same<bool>;
 	};
 
 	/* Hasher */
@@ -158,10 +161,9 @@ namespace nuts
 	};
 
 	template <typename T>
-	concept Hashable = requires
-	{
-		hash<T>();
-	};
+	concept Hashable = requires {
+		                   hash<T>();
+	                   };
 }
 
 #endif

@@ -28,11 +28,11 @@ namespace nuts
 			}
 		}
 
-		itr_type& begin() { return st; }
-		itr_type& end() { return ed; }
+		inline itr_type& begin() { return st; }
+		inline itr_type& end() { return ed; }
 
-		const itr_type& begin() const { return st; }
-		const itr_type& end() const { return ed; }
+		inline const itr_type& begin() const { return st; }
+		inline const itr_type& end() const { return ed; }
 
 	protected:
 		itr_type st, ed;
@@ -104,8 +104,8 @@ namespace nuts
 		Range(i64 st, i64 ed, i64 step = 1) : lb(st), ub(ed), s(step) {}
 		~Range() = default;
 
-		iterator begin() const { return {lb, s}; }
-		iterator end() const { return {ub, s}; }
+		inline iterator begin() const { return {lb, s}; }
+		inline iterator end() const { return {ub, s}; }
 
 	protected:
 		i64 lb, ub, s;

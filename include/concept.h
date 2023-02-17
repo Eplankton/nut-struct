@@ -133,8 +133,11 @@ namespace nuts
 		static constexpr bool value = true;
 	};
 
+	template <typename T>
+	constexpr bool is_pointer_v = is_pointer<T>::value;
+	
 	template <typename Ptr>
-	concept Pointer = is_pointer<Ptr>::value;
+	concept Pointer = is_pointer_v<Ptr>;
 
 	template <typename Ptr>
 	concept Valid_Pointer = Pointer<Ptr> &&
@@ -151,7 +154,7 @@ namespace nuts
 	};
 
 	template <typename Itr>
-	concept Bidirectional_Itr =
+	concept Bidirect_Itr =
 	        Forward_Itr<Itr> && requires(Itr it)
 	{
 		--it;
@@ -159,7 +162,7 @@ namespace nuts
 
 	template <typename Itr>
 	concept Random_Itr =
-	        Bidirectional_Itr<Itr> && requires(Itr x, u64 n)
+	        Bidirect_Itr<Itr> && requires(Itr x, u64 n)
 	{
 		x + n;
 		x - n;

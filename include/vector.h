@@ -33,7 +33,7 @@ namespace nuts
 		vector(const vector<T>& obj);                              // Copy constructor
 		vector(vector<T>&& src) noexcept { move(src); }            // Move constructor
 		vector(const std::initializer_list<T>& ilist);             // Init by a {ilist}
-		~vector() noexcept { destroy(); }
+		~vector() noexcept { drop(); }
 
 		inline T* data() const noexcept { return const_cast<T*>(data_ptr); }
 		inline u64 size() const noexcept { return v_size; }               // Return the number of elements
@@ -47,7 +47,7 @@ namespace nuts
 		vector<T>& expand();
 
 		inline void clear();// Clear all values, but don't destroy
-		void destroy();     // Clear the contents and release memory, contain exist()
+		void drop();     // Clear the contents and release memory, contain exist()
 		void print() const;
 
 		void push_back(const T& obj);// Add an element to the end
@@ -55,8 +55,8 @@ namespace nuts
 		void emplace_back(const T& val);
 		void emplace_back(T&& val);
 
-		inline void pop_back();                    // Remove the last element
-		vector<T>& move(vector<T>& after) noexcept;// Deprive other's ownership
+		inline void pop_back();                  // Remove the last element
+		vector<T>& move(vector<T>& src) noexcept;// Deprive other's ownership
 
 		inline T& operator[](u64 N) noexcept;// Access specified element
 		inline const T& operator[](u64 N) const noexcept;
@@ -67,7 +67,7 @@ namespace nuts
 		vector<T>& operator=(const vector<T>& obj);// Deep copy operator
 		inline vector<T>& operator=(vector<T>&& src) { return move(src); }
 
-		inline iterator begin() const { return {const_cast<T*>(data())}; }
+		inline iterator begin() const { return data(); }
 		inline iterator end() const
 		{
 			return size() == 0 ? begin()
@@ -145,13 +145,12 @@ namespace nuts
 	}
 
 	template <class T>
-	void vector<T>::destroy()
+	void vector<T>::drop()
 	{
-		if (!empty())
+		if (exist())
 		{
 			delete[] data_ptr;
 			data_ptr = nullptr;
-			v_capacity = v_size = 0;
 		}
 	}
 
@@ -181,13 +180,9 @@ namespace nuts
 			delete[] data_ptr;
 			data_ptr = tmp;
 			v_capacity = N;
-			return *this;
 		}
 		if (N < v_size)
-		{
 			v_size = N;
-			return *this;
-		}
 		return *this;
 	}
 
@@ -206,14 +201,15 @@ namespace nuts
 	{
 		if (v_capacity == v_size)
 			expand();
-		(void) *new (data_ptr + v_size++) T(val);
+		(void) *new (data_ptr + v_size++) T(nuts::move(val));
 	}
 
 	template <class T>
 	void vector<T>::emplace_back(const T& val)
 	{
-		T tmp = val;
-		emplace_back(nuts::move(tmp));
+		if (v_capacity == v_size)
+			expand();
+		(void) *new (data_ptr + v_size++) T(val);
 	}
 
 	template <class T>
@@ -238,7 +234,7 @@ namespace nuts
 	template <class T>
 	vector<T>& vector<T>::move(vector<T>& src) noexcept
 	{
-		destroy();// Self destroy
+		drop();// Self destroy
 
 		data_ptr = src.data_ptr;// Pass ownership
 		v_size = src.v_size;
@@ -281,7 +277,7 @@ namespace nuts
 	template <class T>
 	vector<T>& vector<T>::operator=(const vector<T>& obj)
 	{
-		destroy();
+		drop();
 		assign(obj.begin(), obj.end());
 		return *this;
 	}
@@ -295,8 +291,7 @@ namespace nuts
 		};
 
 		printf("vector @%#llx = [", (u64) data());
-		auto st = begin(), ed = end();
-		for_each(st, ed, print);
+		for_each(*this, print);
 		printf("]\n");
 	}
 

@@ -319,8 +319,18 @@ namespace nuts
 	template <typename T, u64 Buf>
 	void deque<T, Buf>::emplace_back(const T& val)
 	{
-		T tmp = val;
-		emplace_back(nuts::move(tmp));
+		if (empty()) {
+			allocate_back();
+			first = last;
+		}
+		else {
+			if (is_back_full())
+				allocate_back();
+			else
+				++last;
+		}
+		(void) *new (last) T(val);
+		++_size;
 	}
 
 	template <typename T, u64 Buf>
@@ -343,8 +353,18 @@ namespace nuts
 	template <typename T, u64 Buf>
 	void deque<T, Buf>::emplace_front(const T& val)
 	{
-		T tmp = val;
-		emplace_front(nuts::move(tmp));
+		if (empty()) {
+			allocate_front();
+			last = first;
+		}
+		else {
+			if (is_front_full())
+				allocate_front();
+			else
+				--first;
+		}
+		(void) *new (first) T(val);
+		++_size;
 	}
 
 	template <typename T, u64 Buf>

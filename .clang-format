@@ -1,4 +1,5 @@
 # Generated from CLion C/C++ Code Style settings
+
 SortIncludes: Never
 BasedOnStyle: LLVM
 AccessModifierOffset: -4
@@ -69,3 +70,4 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 TabWidth: 4
 UseTab: ForIndentation
+MaxEmptyLinesToKeep: 1

@@ -6,7 +6,7 @@
      *  For exception use
      */
 
-#include "basic_string.h"
+#include "concept.h"
 #include "utility.h"
 
 namespace nuts
@@ -19,73 +19,28 @@ namespace nuts
 	};
 
 	template <typename T>
-	struct Option
+	class Option
 	{
 		T elem;
 		Option_case code;
-		string info;
 
+	public:
 		Option() = default;
 		~Option() = default;
 
-		Option(const T& _x, Option_case _case = Success, const string& _text = "")
-		    : elem(_x), code(_case), info(_text) {}
+		Option(const T& _x, Option_case _case = Success)
+		    : elem(_x), code(_case) {}
 
-		Option<T>& print_info()
-		{
-			switch (code)
-			{
-				case Success:
-					printf("\n[Success]: ");
-					break;
-				case Panic:
-					printf("\n[Panic]: ");
-					break;
-				case Error:
-					printf("\n[Error]: ");
-					break;
-			}
-			std::cout << info << '\n';
-			return *this;
-		}
+		decltype(auto) unwarp() { return elem; }
 
-		string get_info() const
-		{
-			switch (code)
-			{
-				case Success:
-					return "\n[Success]: " + info;
-				case Panic:
-					return "\n[Panic]: " + info;
-				case Error:
-					return "\n[Error]: " + info;
-			}
-		}
-
-		template <class Func>
-		auto handle(Func fn)
+		decltype(auto) handle(nuts::Invocable auto&& fn)
 		{
 			return fn();
 		}
 	};
 
-	template <typename T>
-	struct default_measure
-	{
-		nuts::pair<Option_case, string>
-		operator()(const T& some) { return {Success, ""}; }
-	};
-
-	template <typename T, typename Detect = default_measure<T>>
-	Option<T> make_option(const T& some,
-	                      Detect hr = default_measure<T>())
-	{
-		auto tmp = hr(some);
-		return {some, tmp.first, tmp.second};
-	}
-
 	// ## How-to-use?
-	
+
 	// auto detect_scheme = [&m](const auto& it) {
 	// 				if (it == m.npos)
 	// 	        		return make_pair(Panic, (string)"Get npos iterator!");

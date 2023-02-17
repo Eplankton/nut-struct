@@ -11,8 +11,11 @@ namespace nuts
 	template <class T1, class T2>
 	struct pair
 	{
-		T1 first;
-		T2 second;
+		using first_type = T1;
+		using second_type = T2;
+
+		first_type first;
+		second_type second;
 
 		pair() = default;
 		pair(const pair<T1, T2>& obj)
@@ -91,7 +94,8 @@ namespace nuts
 	pair(T1, T2) -> pair<T1, T2>;
 
 	template <class T1, class T2>
-	inline pair<T1, T2> make_pair(const T1& _first, const T2& _second)
+	inline auto
+	make_pair(const T1& _first, const T2& _second)
 	// Generate a pair<T1, T2>
 	{
 		return pair {_first, _second};
@@ -103,7 +107,8 @@ namespace nuts
 	{
 		Head val;
 		tuple_impl() = default;
-		tuple_impl(const Head& head, const Tail&... tail)
+		tuple_impl(const Head& head,
+		           const Tail&... tail)
 		    : tuple_impl<Idx + 1, Tail...>(tail...), val(head) {}
 	};
 

@@ -31,6 +31,8 @@
 #include "unordered_map.h"
 #include "unordered_set.h"
 
+#include "timer.h"
+
 //	string in = "pi";
 //	// std::cout << "\nPlease enter a name: ";
 //	// std::cin >> in;
@@ -66,7 +68,6 @@
 //	m.insert(1001, 7);
 //	m.insert(make_pair(6, 9));
 //	std::cout << m[3] << m[1001] << m[6] << std::endl;
-
 
 // nuts::stack<int> a;
 // std::stack<int> b;
