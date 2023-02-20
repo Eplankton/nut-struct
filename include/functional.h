@@ -42,34 +42,43 @@ namespace nuts
 		return function<FuncType>(F);
 	}
 
-	template <Less T>
+	template <typename T = void>
 	struct less
 	{
 		inline bool constexpr
-		operator()(const T& a, const T& b)
-		        const { return a < b; }
+		operator()(const auto& x, const auto& y) const
+		    requires Less<decltype(x), decltype(y)>
+		{
+			return x < y;
+		}
 	};
 
-	template <Greater T>
+	template <typename T = void>
 	struct greater
 	{
 		inline bool constexpr
-		operator()(const T& a, const T& b)
-		        const { return a > b; }
+		operator()(const auto& x, const auto& y) const
+		    requires Greater<decltype(x), decltype(y)>
+		{
+			return x > y;
+		}
 	};
 
-	template <Equal T>
+	template <typename T = void>
 	struct equal
 	{
 		inline bool constexpr
-		operator()(const T& a, const T& b)
-		        const { return a == b; }
+		operator()(const auto& x, const auto& y) const
+		    requires Equal<decltype(x), decltype(y)>
+		{
+			return x == y;
+		}
 	};
 
 	template <typename Box,
-	          typename R = less<typename Box::value_type>>
-	concept Sortable
-	        = Iterable<Box> && requires(typename Box::value_type x, R cmp)
+	          typename R = less<>>
+	concept Sortable = Iterable<Box> &&
+	requires(typename Box::value_type x, R cmp)
 	{
 		{cmp(x, x)} -> Same<bool>;
 	};

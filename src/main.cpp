@@ -1,4 +1,5 @@
 // #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
 // #include "../doctest/doctest/doctest.h"
 // #include "../nanobench/src/include/nanobench.h"
 // #include "../include/bits.h"
@@ -9,12 +10,12 @@
 // 	ankerl::nanobench::Rng rng;
 
 // 	for (auto n: {
-// 	             50U,
-// 	             500U,
-// 	             5000U,
-// 	             50000U,
-// 	             500000U,
-// 	             5000000U,
+// 	             10U,
+// 	             100U,
+// 	             1000U,
+// 	             10000U,
+// 	             100000U,
+// 	             1000000U,
 // 	     }) {
 
 // 		nuts::vector<uint64_t> a;
@@ -24,11 +25,10 @@
 // 			a.emplace_back(rng());
 // 		}
 
-// 		bench.minEpochIterations(5)
+// 		bench.minEpochIterations(10)
 // 		        .complexityN(a.size())
 // 		        .run("Complexity", [&] {
 // 			        nuts::sort(a.begin(), a.end());
-// 			        // nuts::find(v, rng());
 // 		        });
 // 	}
 
@@ -47,16 +47,15 @@
 // 	a.reserve(n);
 // 	b.reserve(n);
 
-// 	while (a.size() < n) {
-// 		auto tmp = rng();
-// 		a.emplace_back(tmp);
-// 		b.emplace_back(tmp);
+// 	while (n-- > 0) {
+// 		a.emplace_back(rng());
+// 		b.emplace_back(a.back());
 // 	}
 
 // 	bench.relative(true)
-// 	        .run("a", [&] { nuts::sort(a.begin(), a.end()); })
-// 	        .run("b", [&] { std::sort(b.begin(), b.end()); })
-// 	        .relative(false);
+// 	        .minEpochIterations(5)
+// 	        .run("nuts::sort", [&] { nuts::sort(a.begin(), a.end()); })
+// 	        .run("std::sort", [&] { std::sort(b.begin(), b.end()); });
 // }
 
 #include <bits/stdc++.h>
@@ -65,22 +64,22 @@
 namespace nuts
 {
 	template <nuts::Invocable... Fn>
-	void time_cmp(Fn&&... fn_list) noexcept
+	void time_cmp(Fn&&... fn) noexcept
 	{
-		std::vector<std::future<double>> result;
+		std::vector<std::future<double>> results;
 
 		static const auto wrap_timer =
-		        [&](auto&& fn) {
+		        [&](auto&& f) {
 			        Timer clk;
-			        fn();
+			        f();
 			        return clk.elapsed();
 		        };
 
-		(..., [&](auto&& fn) {
-			result.emplace_back(std::async(wrap_timer, fn));
-		}(fn_list));
+		(..., [&](auto&& f) {
+			results.emplace_back(std::async(wrap_timer, f));
+		}(fn));
 
-		for (auto& x: result) {
+		for (auto&& x: results) {
 			println("Time count: ", x.get() * 1000.0, "(ms)");
 		}
 	}
@@ -88,7 +87,7 @@ namespace nuts
 
 int main()
 {
-	uint64_t n = 5e6;
+	uint64_t n = 1e7;
 	std::random_device rng;
 
 	nuts::vector<uint64_t> a;
@@ -98,9 +97,8 @@ int main()
 	b.reserve(n);
 
 	while (n--) {
-		auto tmp = rng();
-		a.emplace_back(tmp);
-		b.emplace_back(tmp);
+		a.emplace_back(rng());
+		b.emplace_back(a.back());
 	}
 
 	nuts::time_cmp(

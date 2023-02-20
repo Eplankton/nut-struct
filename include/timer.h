@@ -1,4 +1,4 @@
-#include <chrono>// for std::chrono functions
+#include <chrono>
 #include <iostream>
 
 class Timer

@@ -133,8 +133,8 @@ namespace nuts
 				return *this;
 			}
 
-			inline bool operator==(T* obj) const { return _ptr == obj; }
-			inline bool operator!=(T* obj) const { return _ptr != obj; }
+			inline bool operator==(const T* obj) const { return _ptr == obj; }
+			inline bool operator!=(const T* obj) const { return _ptr != obj; }
 
 			inline bool operator==(const iterator& obj) const { return _ptr == obj._ptr; }
 			inline bool operator!=(const iterator& obj) const { return _ptr != obj._ptr; }
