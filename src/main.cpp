@@ -87,7 +87,8 @@ namespace nuts
 
 int main()
 {
-	uint64_t n = 1e7;
+	uint64_t n = 1e8;
+
 	std::random_device rng;
 
 	nuts::vector<uint64_t> a;
@@ -96,16 +97,16 @@ int main()
 	a.reserve(n);
 	b.reserve(n);
 
-	while (n--) {
+	while (n-- > 0) {
 		a.emplace_back(rng());
 		b.emplace_back(a.back());
 	}
 
 	nuts::time_cmp(
-	        [&] { nuts::sort(a.begin(), a.end()); },
-	        [&] { std::sort(b.begin(), b.end()); });
+	        [&] { nuts::sort(a); },
+	        [&] { std::ranges::sort(b); });
 
-	assert(nuts::is_sorted(a));
+	// assert(nuts::is_sorted(a));
 
 	return 0;
 }

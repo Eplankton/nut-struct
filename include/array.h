@@ -24,7 +24,7 @@ namespace nuts
 		array(const std::initializer_list<T>& ilist);
 		~array() = default;
 
-		constexpr pointer data() const noexcept { return const_cast<pointer>(raw); }
+		inline constexpr pointer data() const noexcept { return const_cast<pointer>(raw); }
 		static constexpr u64 size() noexcept { return N; }
 		static constexpr bool empty() noexcept { return size() == 0; }
 
@@ -43,8 +43,8 @@ namespace nuts
 		void print() const;
 		void fill(const T& _val);
 
-		inline constexpr iterator begin() const { return data(); }
-		inline constexpr iterator end() const
+		inline constexpr iterator begin() const noexcept { return data(); }
+		inline constexpr iterator end() const noexcept
 		{
 			return size() == 0 ? begin()
 			                   : begin() + size() - 1;

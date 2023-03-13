@@ -75,12 +75,11 @@ namespace nuts
 		}
 	};
 
-	template <typename Box,
-	          typename R = less<>>
+	template <typename Box, typename Relation = less<>>
 	concept Sortable = Iterable<Box> &&
-	requires(typename Box::value_type x, R cmp)
+	requires(typename Box::value_type x, Relation cmp)
 	{
-		{cmp(x, x)} -> Same<bool>;
+		{ cmp(x, x) } -> Same<bool>;
 	};
 
 	/* Hasher */

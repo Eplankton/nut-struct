@@ -146,18 +146,20 @@ namespace nuts
 
 	template <typename Itr>
 	concept Forward_Itr =
-	        Valid_Pointer<Itr> || requires(Itr it)
+	        Valid_Pointer<Itr> || requires(Itr x)
 	{
 		typename Itr::value_type;
-		*it;
-		++it;
+		*x;
+		++x;
+		x == x;
+		x != x;
 	};
 
 	template <typename Itr>
 	concept Bidirect_Itr =
-	        Forward_Itr<Itr> && requires(Itr it)
+	        Forward_Itr<Itr> && requires(Itr x)
 	{
-		--it;
+		--x;
 	};
 
 	template <typename Itr>

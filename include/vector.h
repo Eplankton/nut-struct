@@ -47,7 +47,7 @@ namespace nuts
 		vector<T>& expand();
 
 		inline void clear();// Clear all values, but don't destroy
-		void drop();     // Clear the contents and release memory, contain exist()
+		void drop();        // Clear the contents and release memory, contain exist()
 		void print() const;
 
 		void push_back(const T& obj);// Add an element to the end
