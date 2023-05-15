@@ -1,7 +1,7 @@
 ## **nut-struct**
 
 ## Introduction
-This project was originally the lab assignment for `Data Structure (2022 Spring)` course at `East China Normal University (ECNU)`, aiming to practice `C++` programming and understand the application or relationships between data structure, algorithm, operating system and computer architecture.  After a long period of commits and additions, this project gradually became a relatively modern and complete library.  Due to busy daily workload, there's no time for me to fix these parts and errors.
+This project was originally the lab assignment for `Data Structure (2022 Spring)` course at `East China Normal University (ECNU)`, aiming to practice `C++` programming and understand the application or relationship between data structure, algorithm, operating system and computer architecture.  After a long period of commits and additions, this project gradually became a relatively modern and complete library.  Due to busy daily workload, there's no time for me to fix these parts and errors.
 
 
 **Waiting list**:
@@ -44,8 +44,8 @@ This project was originally the lab assignment for `Data Structure (2022 Spring)
 [GitHub](https://github.com/Eplankton/nut-struct)
 [Gitee](https://gitee.com/Eplankton/nut-struct)
 
-| Sequence Container |                                                            |
-| :------: | :------------------------------------------------------------------------------------------: |
+| Sequence Container |                                                    
+| :------: | 
 |  [array.h](https://github.com/Eplankton/nut-struct/blob/main/include/array.h)        |
 |  [basic_string.h](https://github.com/Eplankton/nut-struct/blob/main/include/basic_string.h) |
 |  [vector.h](https://github.com/Eplankton/nut-struct/blob/main/include/vector.h)       |
@@ -56,8 +56,8 @@ This project was originally the lab assignment for `Data Structure (2022 Spring)
 
 <br>
 
-| Associative Container |                                                                               |
-| :------: | :--------------------------------------------------------------------------------------------: |
+| Associative Container |                                                                             
+| :------: |
 |  [set.h](https://github.com/Eplankton/nut-struct/blob/main/include/set.h)           |
 |  [map.h](https://github.com/Eplankton/nut-struct/blob/main/include/map.h)           |
 |  [unordered_set.h](https://github.com/Eplankton/nut-struct/blob/main/include/unordered_set.h) |
@@ -65,15 +65,15 @@ This project was originally the lab assignment for `Data Structure (2022 Spring)
 
 <br>
 
-| Iterator && Algorithm |                                                                      |
-| :----------------: | :------------------------------------------------------------------------------------: |
+| Iterator && Algorithm |                                                              
+| :----------------: |
 |  [iterator.h](https://github.com/Eplankton/nut-struct/blob/main/include/iterator.h)  |
 |  [algorithm.h](https://github.com/Eplankton/nut-struct/blob/main/include/algorithm.h) |
 
 <br>
 
-|  Others |                                                                          |
-| :--------: | :--------------------------------------------------------------------------------------: |
+|  Others |                                                                          
+| :--------: | 
 |  [type.h](https://github.com/Eplankton/nut-struct/blob/main/include/type.h)       |
 |  [functional.h](https://github.com/Eplankton/nut-struct/blob/main/include/functional.h) |
 |  [memory.h](https://github.com/Eplankton/nut-struct/blob/main/include/memory.h)     |
@@ -115,5 +115,5 @@ This project was originally the lab assignment for `Data Structure (2022 Spring)
 
 ## **Install**
 
- 1. `git clone https://gitee.com/Eplankton/nut-struct.git ` 
+ 1. `git clone https://github.com/Eplankton/nut-struct.git ` 
     then using by` #include <include/xxx.h>`, all the components are in namespace `nuts`, such as `nuts::vector` and `nuts::sort()`
