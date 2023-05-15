@@ -87,7 +87,7 @@ namespace nuts
 
 int main()
 {
-	uint64_t n = 1e8;
+	uint64_t n = 1e7;
 
 	std::random_device rng;
 

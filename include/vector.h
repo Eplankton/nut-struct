@@ -52,6 +52,7 @@ namespace nuts
 
 		void push_back(const T& obj);// Add an element to the end
 		void push_back(T&& src);
+		void emplace_back();
 		void emplace_back(const T& val);
 		void emplace_back(T&& val);
 
@@ -194,6 +195,14 @@ namespace nuts
 		else
 			reserve(STD_EXPAN);
 		return *this;
+	}
+
+	template <class T>
+	void vector<T>::emplace_back()
+	{
+		if (v_capacity == v_size)
+			expand();
+		(void) *new (data_ptr + v_size++) T();
 	}
 
 	template <class T>

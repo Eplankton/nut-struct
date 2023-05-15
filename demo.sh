@@ -6,7 +6,8 @@ time clang++-15 \
     src/*.cpp \
     -O3 \
     -Wno-psabi \
-    -fno-exceptions\
+    -fno-exceptions \
+    -fno-rtti \
     -o demo
 
 size=$(wc -c <"demo")
