@@ -113,7 +113,7 @@ This project was originally the lab assignment for `Data Structure (2022 Spring)
 
 <br>
 
-## **Install**
+## **Usage**
 
- 1. `git clone https://github.com/Eplankton/nut-struct.git ` 
-    then using by` #include <include/xxx.h>`, all the components are in namespace `nuts`, such as `nuts::vector` and `nuts::sort()`
+ 1. `git clone https://github.com/Eplankton/nut-struct.git` 
+    then using by `#include <include/xxx.h>`, all the components are in namespace `nuts`, such as `nuts::vector` and `nuts::sort()`
